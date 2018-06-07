@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">MakeAReminder</string>
+    <string name="new_reminder">New Reminder</string>
+    <string name="title">Title</string>
+    <string name="time">Time</string>
+    <string name="on_off">Toggle Reminder</string>
+    <string name="name_label">Name</string>
+    <string name="date_picker_title">Date Of Reminder</string>
+    <string name="date">Date</string>
+    <string name="repeat">Repeat</string>
+    <string name="location">Location</string>
+    <string name="new_task">New Task</string>
+    <string name="add_reminder">Add Reminder</string>
+    <string name="when_due">When due.</string>
+    <string name="before_due">%1$d %2$s before due.</string>
+    <string name="reminder_dialog">Add a Reminder</string>
+    <string name="create_reminder">Create Reminder</string>
+    <string name="cancel">Cancel</string>
+    <string-array name="time_type">
+        <item>Minutes</item>
+        <item>Hours</item>
+        <item>Days</item>
+        <item>Weeks</item>
+    </string-array>
+    <plurals name="minute">
+        <item quantity="one">Minute</item>
+        <item quantity="other">Minutes</item>
+    </plurals>
+    <plurals name="hour">
+        <item quantity="one">Hour</item>
+        <item quantity="other">Hours</item>
+    </plurals>
+    <plurals name="day">
+        <item quantity="one">Day</item>
+        <item quantity="other">Days</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">Week</item>
+        <item quantity="other">Weeks</item>
+    </plurals>
+</resources>
