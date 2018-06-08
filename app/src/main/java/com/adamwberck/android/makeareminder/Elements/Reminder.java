@@ -45,7 +45,8 @@ public class Reminder {
         }else {
             SpanOfTime.Type type = mTimeBefore.getTimeType();
             if(type== SpanOfTime.Type.MINUTE){
-                String stringType = mContext.getResources().getQuantityString(R.plurals.minute,(int)(getMinutes()));
+                String stringType = mContext.getResources().getQuantityString(R.plurals.minute,
+                        (int)(getMinutes()));
                 return mContext.getString(R.string.before_due,mTimeBefore.getMinutes()
                         ,stringType);
             }
