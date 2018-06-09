@@ -23,19 +23,19 @@
         <item>Weeks</item>
     </string-array>
     <plurals name="minute">
-        <item quantity="one">Minute</item>
-        <item quantity="other">Minutes</item>
+        <item quantity="one">%d minute before due.</item>
+        <item quantity="other">%d minutes before due.</item>
     </plurals>
     <plurals name="hour">
-        <item quantity="one">Hour</item>
-        <item quantity="other">Hours</item>
+        <item quantity="one">%d hour before due.</item>
+        <item quantity="other">%d hours before due.</item>
     </plurals>
     <plurals name="day">
-        <item quantity="one">Day</item>
-        <item quantity="other">Days</item>
+        <item quantity="one">%d day before due.</item>
+        <item quantity="other">%d days before due.</item>
     </plurals>
     <plurals name="weeks">
-        <item quantity="one">Week</item>
-        <item quantity="other">Weeks</item>
+        <item quantity="one">%d week before due.</item>
+        <item quantity="other">%d weeks before due.</item>
     </plurals>
 </resources>

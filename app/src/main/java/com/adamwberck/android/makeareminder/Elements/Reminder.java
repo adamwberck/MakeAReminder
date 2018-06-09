@@ -13,7 +13,7 @@ public class Reminder {
         @Override
         public int compare(Reminder r1, Reminder r2) {
             if(r1.getTimeBefore()!=r2.getTimeBefore()){
-                return (r1.getMinutes() > r2.getMinutes()) ? 1 : -1;
+                return (r1.getMinutes() < r2.getMinutes()) ? 1 : -1;
             }else{
                 return 0;
             }
@@ -45,22 +45,23 @@ public class Reminder {
         }else {
             SpanOfTime.Type type = mTimeBefore.getTimeType();
             if(type== SpanOfTime.Type.MINUTE){
-                String stringType = mContext.getResources().getQuantityString(R.plurals.minute,
-                        (int)(getMinutes()));
-                return mContext.getString(R.string.before_due,mTimeBefore.getMinutes()
-                        ,stringType);
+                int minutes = (int) getTimeBefore().getMinutes();
+                return mContext.getResources().getQuantityString(R.plurals.minute,minutes,minutes);
             }
             else if(type==SpanOfTime.Type.HOUR){
-
+                int hours = (int) getTimeBefore().getHours();
+                return mContext.getResources().getQuantityString(R.plurals.hour,hours,hours);
             }
             else if(type==SpanOfTime.Type.DAY){
-
+                int days = (int) getTimeBefore().getDays();
+                return mContext.getResources().getQuantityString(R.plurals.day,days,days);
             }
             else if(type==SpanOfTime.Type.WEEK){
-
+                int weeks = (int) getTimeBefore().getWeeks();
+                return mContext.getResources().getQuantityString(R.plurals.weeks,weeks,weeks);
             }
         }
-        return "null";
+        return null;
     }
 
     public SpanOfTime getTimeBefore() {
