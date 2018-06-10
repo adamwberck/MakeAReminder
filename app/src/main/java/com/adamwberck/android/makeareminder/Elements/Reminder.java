@@ -5,10 +5,12 @@ import android.content.Context;
 
 import com.adamwberck.android.makeareminder.R;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 
-public class Reminder {
+
+public class Reminder implements Serializable{
     private static Comparator<Reminder> sComparator = new Comparator<Reminder>() {
         @Override
         public int compare(Reminder r1, Reminder r2) {
@@ -24,7 +26,10 @@ public class Reminder {
     private Task mTask;
     private SpanOfTime mTimeBefore;
 
-
+    @Override
+    public boolean equals(Object o){
+        return getMinutes()==((Reminder)o).getMinutes();
+    }
 
 
     public Reminder(Task task, SpanOfTime duration, Context context) {
@@ -43,26 +48,11 @@ public class Reminder {
         if(mTimeBefore.getMinutes() == 0){
             return mContext.getString(R.string.when_due);
         }else {
-            SpanOfTime.Type type = mTimeBefore.getTimeType();
-            if(type== SpanOfTime.Type.MINUTE){
-                int minutes = (int) getTimeBefore().getMinutes();
-                return mContext.getResources().getQuantityString(R.plurals.minute,minutes,minutes);
-            }
-            else if(type==SpanOfTime.Type.HOUR){
-                int hours = (int) getTimeBefore().getHours();
-                return mContext.getResources().getQuantityString(R.plurals.hour,hours,hours);
-            }
-            else if(type==SpanOfTime.Type.DAY){
-                int days = (int) getTimeBefore().getDays();
-                return mContext.getResources().getQuantityString(R.plurals.day,days,days);
-            }
-            else if(type==SpanOfTime.Type.WEEK){
-                int weeks = (int) getTimeBefore().getWeeks();
-                return mContext.getResources().getQuantityString(R.plurals.weeks,weeks,weeks);
-            }
+            return getTimeBefore().getTimeString(mContext);
         }
-        return null;
+
     }
+
 
     public SpanOfTime getTimeBefore() {
         return mTimeBefore;

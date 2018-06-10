@@ -1,25 +1,23 @@
 package com.adamwberck.android.makeareminder;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -45,6 +43,7 @@ public class TaskFragment extends Fragment{
     private static final int REQUEST_TIME = 1;
     private static final int REQUEST_PHOTO = 2;
     private static final int REQUEST_REMINDER = 3;
+    private static final int REQUEST_EDIT = 4;
 
 
     private static final String ARG_TASK_ID = "task_id";
@@ -234,6 +233,8 @@ public class TaskFragment extends Fragment{
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             // Get view for row item
+            //TODO ViewHolder
+            @SuppressLint("ViewHolder")
             View rowView = mInflater.inflate(R.layout.list_reminder, parent, false);
             TextView infoTextView = rowView.findViewById(R.id.text_reminder_info);
 
@@ -242,9 +243,26 @@ public class TaskFragment extends Fragment{
             holder.text = (TextView) convertView.findViewById(R.id.text_reminder_info);
             holder.button = (ImageButton) convertView.findViewById(R.id.image_button_delete);
             convertView.setTag(holder);*/
-
-            Reminder reminder = (Reminder) getItem(position);
+            final Reminder reminder = (Reminder) getItem(position);
+            //TODO Swipe dismiss reminder
             infoTextView.setText(reminder.getInfo());
+            infoTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FragmentManager manager = getFragmentManager();
+                    CreateReminderFragment dialog = CreateReminderFragment.newInstance(reminder);
+                    dialog.setTargetFragment(TaskFragment.this, REQUEST_EDIT);
+                    dialog.show(manager,DIALOG_REMINDER);
+                }
+            });
+            ImageView image = rowView.findViewById(R.id.image_delete_reminder);
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mTask.removeReminder(reminder);
+                    updateUI();
+                }
+            });
 
             return rowView;
         }
@@ -259,14 +277,19 @@ public class TaskFragment extends Fragment{
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        updateUI();
         if(resultCode != Activity.RESULT_OK){
             return;
         }
-        if(requestCode == REQUEST_REMINDER){
+        if(requestCode == REQUEST_REMINDER || requestCode == REQUEST_EDIT){
             SpanOfTime span = (SpanOfTime) data
                     .getSerializableExtra(CreateReminderFragment.EXTRA_SPAN);
             mTask.addReminder(span);
-            updateUI();
+            if(requestCode==REQUEST_EDIT){
+                Reminder reminder = (Reminder) data
+                        .getSerializableExtra(CreateReminderFragment.EXTRA_REMINDER);
+                mTask.removeReminder(reminder);
+            }
         }
     }
 

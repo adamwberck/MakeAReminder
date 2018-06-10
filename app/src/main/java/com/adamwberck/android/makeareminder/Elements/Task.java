@@ -23,7 +23,7 @@ public class Task {
     }
 
     public void addReminder(SpanOfTime span){
-        mReminders.add(new Reminder(this,span,mContext));
+        addReminder(new Reminder(this,span,mContext));
     }
 
     public void removeReminder(Reminder r){

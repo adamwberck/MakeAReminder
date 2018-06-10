@@ -16,20 +16,27 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 
-import java.time.Period;
-
 public class CreateReminderFragment extends DialogFragment {
-    private static final String ARG_SPAN = "span";
+    private static final String ARG_REMINDER = "reminder";
     public static final String EXTRA_SPAN = "com.adamwberck.android.makeareminder.span";
+    public static final String EXTRA_REMINDER = "com.adamwberck.android.makeareminder.reminder";
     private long mDuration;
     private int mTimeTypeInt;
 
 
     public static CreateReminderFragment newInstance() {
         Bundle args = new Bundle();
-        //args.putSerializable(ARG_SPAN, span);
+        CreateReminderFragment fragment = new CreateReminderFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static CreateReminderFragment newInstance(Reminder reminder) {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_REMINDER, reminder);
 
         CreateReminderFragment fragment = new CreateReminderFragment();
         fragment.setArguments(args);
@@ -79,13 +86,13 @@ public class CreateReminderFragment extends DialogFragment {
 
             }
         });
-
+        final Reminder reminder = (Reminder) getArguments().getSerializable(ARG_REMINDER);
         builder.setTitle(R.string.reminder_dialog)
                 .setView(view)
                 .setPositiveButton(R.string.create_reminder, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        createReminder();
+                        createReminder(reminder);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -95,14 +102,38 @@ public class CreateReminderFragment extends DialogFragment {
                     }
                 });
 
+        if(reminder!=null) {
+            SpanOfTime.Type type = reminder.getTimeBefore().getTimeType();
+            long time = reminder.getTimeBefore().getTime(type);
+            timeText.setText(""+time);
+            int spinnerNumber = setSpinnerNumber(type);
+            spinner.setSelection(spinnerNumber);
+        }
+
         return builder.create();
+    }
+
+    private static int setSpinnerNumber(SpanOfTime.Type type) {
+        if(type==SpanOfTime.Type.MINUTE) {
+            return 0;
+        }
+        else if(type== SpanOfTime.Type.HOUR){
+            return 1;
+        }
+        else if(type==SpanOfTime.Type.DAY){
+            return 2;
+        }
+        else {
+            return 3;
+        }
     }
 
     private void cancel() {
         CreateReminderFragment.this.getDialog().cancel();
+        sendResult(Activity.RESULT_CANCELED,null,null);
     }
 
-    private void createReminder() {
+    private void createReminder(Reminder editReminder) {
         SpanOfTime span;
         if(mTimeTypeInt==0) {
             span = SpanOfTime.ofMinutes(mDuration);
@@ -116,19 +147,22 @@ public class CreateReminderFragment extends DialogFragment {
         else {
             span = SpanOfTime.ofWeeks(mDuration);
         }
-        sendResult(Activity.RESULT_OK,span);
+        sendResult(Activity.RESULT_OK,span,editReminder);
     }
 
-    private void sendResult(int resultCode, SpanOfTime span) {
+    private void sendResult(int resultCode, SpanOfTime span,Reminder editReminder) {
         if (getTargetFragment() == null) {
             return;
         }
-        int d = getTargetRequestCode();
-        int f = resultCode;
 
         Intent intent = new Intent();
         intent.putExtra(EXTRA_SPAN, span);
-        getTargetFragment()
-                .onActivityResult(getTargetRequestCode(), resultCode, intent);
+        if(editReminder==null) {
+            getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
+        }
+        else {
+            intent.putExtra(EXTRA_REMINDER,editReminder);
+            getTargetFragment().onActivityResult(getTargetRequestCode(),resultCode,intent);
+        }
     }
 }

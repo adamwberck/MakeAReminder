@@ -2,17 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="30dp">
+    android:layout_height="50dp">
     <TextView
         android:id="@+id/text_reminder_info"
-        android:textSize="12sp"
+        android:textSize="19sp"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="50dp"
         android:layout_weight="5"/>
     <ImageView
-        android:id="@+id/image_button_delete"
-        android:drawable="@drawable/ic_delete"
+        android:id="@+id/image_delete_reminder"
+        android:src="@drawable/ic_close_black_24dp"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="50dp"
         android:layout_weight="1"/>
 </LinearLayout>
