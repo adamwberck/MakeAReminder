@@ -15,6 +15,8 @@ public class Task {
     private UUID mID;
     private String mName;
     private Date mDate;
+    private SpanOfTime mRepeat;
+    private boolean mHasRepeat = false;
     private List<Reminder> mReminders =
             new SortedReminderList<>(10,Reminder.getComparator());
 
@@ -29,16 +31,6 @@ public class Task {
     public void removeReminder(Reminder r){
         mReminders.remove(r);
     }
-
-    public BigInteger getRepeat() {
-        return mRepeat;
-    }
-
-    public void setRepeat(BigInteger repeat) {
-        mRepeat = repeat;
-    }
-
-    private BigInteger mRepeat;
 
     public String getName() {
         return mName;
@@ -71,8 +63,10 @@ public class Task {
         mDate = new Date();
     }
 
-    public boolean equals(Task r) {
-        return this.mID.equals(r);
+    @Override
+    public boolean equals(Object o) {
+            Task t = (Task) o;
+            return mID.equals(t.getID());
     }
 
     public List<Reminder> getReminders() {

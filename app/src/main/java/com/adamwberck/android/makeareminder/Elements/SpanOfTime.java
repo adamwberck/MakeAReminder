@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 public class SpanOfTime implements Serializable{
     private long mMinutes;
-    private Type mTimeType;
 
     public long getTime(Type type) {
         switch (type) {
@@ -109,10 +108,6 @@ public class SpanOfTime implements Serializable{
         WEEK
     }
 
-    public Type getTimeType() {
-        return mTimeType;
-    }
-
     public Map<Type,Long> getTime(){
 
         Map<Type,Long> timeMap =  new ArrayMap<>();
@@ -125,25 +120,21 @@ public class SpanOfTime implements Serializable{
 
     public static SpanOfTime ofMinutes(long minutes){
         SpanOfTime span = new SpanOfTime(minutes);
-        span.mTimeType=Type.MINUTE;
         return span;
     }
 
     public static SpanOfTime ofHours(long hours){
         SpanOfTime span = new SpanOfTime(TimeUnit.HOURS.toMinutes(hours));
-        span.mTimeType=Type.HOUR;
         return span;
     }
 
     public static SpanOfTime ofDays(long days){
         SpanOfTime span = new SpanOfTime(TimeUnit.DAYS.toMinutes(days));
-        span.mTimeType=Type.DAY;
         return span;
     }
 
     public static SpanOfTime ofWeeks(long weeks){
         SpanOfTime span = new SpanOfTime(TimeUnit.DAYS.toMinutes(weeks*7));
-        span.mTimeType=Type.WEEK;
         return span;
     }
     private SpanOfTime(long minutes){
