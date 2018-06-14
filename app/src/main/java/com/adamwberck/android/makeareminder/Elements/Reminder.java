@@ -21,8 +21,6 @@ public class Reminder implements Serializable{
             }
         }
     };
-
-    private Context mContext;
     private Task mTask;
     private SpanOfTime mTimeBefore;
 
@@ -32,9 +30,8 @@ public class Reminder implements Serializable{
     }
 
 
-    public Reminder(Task task, SpanOfTime duration, Context context) {
+    public Reminder(Task task, SpanOfTime duration) {
         mTask = task;
-        mContext = context;
         mTimeBefore = duration;
     }
 
@@ -44,11 +41,11 @@ public class Reminder implements Serializable{
 
 
     @SuppressLint("NewApi")
-    public String getInfo() {
+    public String getInfo(Context context) {
         if(mTimeBefore.getMinutes() == 0){
-            return mContext.getString(R.string.when_due);
+            return context.getString(R.string.when_due);
         }else {
-            return getTimeBefore().getTimeString(mContext);
+            return getTimeBefore().getTimeString(context);
         }
 
     }

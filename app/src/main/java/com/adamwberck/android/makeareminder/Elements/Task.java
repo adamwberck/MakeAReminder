@@ -2,22 +2,27 @@ package com.adamwberck.android.makeareminder.Elements;
 
 import android.content.Context;
 
+import com.adamwberck.android.makeareminder.ReminderService;
 import com.adamwberck.android.makeareminder.SortedReminderList;
 
-import java.math.BigInteger;
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public class Task {
-    private Context mContext;
+public class Task implements Serializable{
 
     private UUID mID;
     private String mName;
     private Date mDate;
     private SpanOfTime mRepeat;
     private boolean mHasRepeat = false;
-    private List<Reminder> mReminders =
+    private transient List<Reminder> mReminders =
             new SortedReminderList<>(10,Reminder.getComparator());
 
     public void addReminder(Reminder r){
@@ -25,7 +30,7 @@ public class Task {
     }
 
     public void addReminder(SpanOfTime span){
-        addReminder(new Reminder(this,span,mContext));
+        addReminder(new Reminder(this,span));
     }
 
     public void removeReminder(Reminder r){
@@ -44,8 +49,10 @@ public class Task {
         return mDate;
     }
 
-    public void setDate(Date mDate) {
+    public void setDate(Date mDate,Context appContext) {
         this.mDate = mDate;
+        addReminder(new Reminder(this,SpanOfTime.ofMinutes(0)));
+        ReminderService.setServiceAlarm(appContext,false,this);
     }
 
 
@@ -57,10 +64,10 @@ public class Task {
         this(UUID.randomUUID(),context);
     }
 
-    public Task(UUID uuid,Context context) {
-        mContext = context;
+    public Task(UUID uuid,Context appContext) {
         mID = uuid;
-        mDate = new Date();
+        DateTime dtOrg = new DateTime(new Date());
+        setDate(dtOrg.plusMinutes(1).toDate(),appContext);
     }
 
     @Override

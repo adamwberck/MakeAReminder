@@ -27,13 +27,13 @@ import com.adamwberck.android.makeareminder.Elements.Task;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import static android.app.Activity.RESULT_OK;
 
 public class TaskFragment extends Fragment{
-    private static final String DIALOG_REMINDER = "DialogReminder";
     private Task mTask;
     private Callbacks mCallbacks;
     private EditText mTitleField;
@@ -44,12 +44,16 @@ public class TaskFragment extends Fragment{
     private static final int REQUEST_PHOTO = 2;
     private static final int REQUEST_REMINDER = 3;
     private static final int REQUEST_EDIT = 4;
-
+    private static final int REQUEST_SNOOZE = 5;
 
     private static final String ARG_TASK_ID = "task_id";
+    private static final String ARG_ALARM = "alarm";
+
+    private static final String DIALOG_REMINDER = "DialogReminder";
     private static final String DIALOG_DATE  = "DialogDate";
     private static final String DIALOG_PHOTO  = "DialogPhoto";
     private static final String DIALOG_TIME  = "DialogTime";
+    private static final String DIALOG_ALARM = "DialogAlarm";
 
     private static final String EXTRA_TASK_CHANGED =
             "com.adamwberck.android.makeareminder.task_changed";
@@ -60,6 +64,7 @@ public class TaskFragment extends Fragment{
     private Button mReminderButton;
     private ListView mReminderListView;
     private ReminderAdapter mReminderAdapter;
+    private Button mTestButton;
 
 
     @Override
@@ -67,6 +72,13 @@ public class TaskFragment extends Fragment{
         super.onCreate(savedInstanceState);
         UUID taskID = (UUID) getArguments().getSerializable(ARG_TASK_ID);
         mTask = TaskLab.get(getActivity()).getTask(taskID);
+        boolean isAlarmOn = getArguments().getBoolean(ARG_ALARM);
+        if(isAlarmOn){
+            FragmentManager manager = getFragmentManager();
+            AlarmAlertFragment dialog = AlarmAlertFragment.newInstance();
+            dialog.setTargetFragment(TaskFragment.this,REQUEST_SNOOZE);
+            dialog.show(manager,DIALOG_ALARM);
+        }
     }
 
     @Override
@@ -164,7 +176,9 @@ public class TaskFragment extends Fragment{
     @Override
     public void onAttach(Context context){
         super.onAttach(context);
-        mCallbacks = (Callbacks) context;
+        if(context instanceof Callbacks) {
+            mCallbacks = (Callbacks) context;
+        }
         TaskFragment taskFragment = (TaskFragment) getActivity().getSupportFragmentManager()
                 .findFragmentById(R.id.detail_fragment_container);
         if(taskFragment !=null) {
@@ -180,7 +194,9 @@ public class TaskFragment extends Fragment{
 
     private void updateTask() {
         TaskLab.get(getActivity()).updateTask(mTask);
-        mCallbacks.onTaskUpdated(mTask);
+        if(mCallbacks!=null) {
+            mCallbacks.onTaskUpdated(mTask);
+        }
     }
 
     public Task getTask() {
@@ -199,6 +215,17 @@ public class TaskFragment extends Fragment{
     public static TaskFragment newInstance(UUID taskID) {
         Bundle args =  new Bundle();
         args.putSerializable(ARG_TASK_ID, taskID);
+        args.putBoolean(ARG_ALARM,false);
+
+        TaskFragment fragment = new TaskFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static TaskFragment newInstance(UUID taskID,boolean isAlarmOn) {
+        Bundle args =  new Bundle();
+        args.putSerializable(ARG_TASK_ID, taskID);
+        args.putBoolean(ARG_ALARM,isAlarmOn);
 
         TaskFragment fragment = new TaskFragment();
         fragment.setArguments(args);
@@ -245,7 +272,7 @@ public class TaskFragment extends Fragment{
             convertView.setTag(holder);*/
             final Reminder reminder = (Reminder) getItem(position);
             //TODO Swipe dismiss reminder
-            infoTextView.setText(reminder.getInfo());
+            infoTextView.setText(reminder.getInfo(getContext()));
             infoTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -290,12 +317,23 @@ public class TaskFragment extends Fragment{
                         .getSerializableExtra(CreateReminderFragment.EXTRA_REMINDER);
                 mTask.removeReminder(reminder);
             }
+            return;
+        }
+        if(requestCode == REQUEST_DATE || requestCode == REQUEST_TIME){
+            Date date;
+            if(requestCode == REQUEST_TIME) {
+                date = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
+            }
+            else {
+                date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+            }
+            mTask.setDate(date,getActivity().getApplicationContext());
+            updateDate();
         }
     }
 
     private void updateUI() {
         List<Reminder> reminders = mTask.getReminders();
-
 
         if (mReminderAdapter== null) {
             mReminderAdapter = new ReminderAdapter(getContext(),reminders);
@@ -304,5 +342,7 @@ public class TaskFragment extends Fragment{
             mReminderListView.setAdapter(mReminderAdapter);
             mReminderAdapter.notifyDataSetChanged();
         }
+
+
     }
 }

@@ -2,6 +2,7 @@ package com.adamwberck.android.makeareminder;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -70,8 +71,7 @@ public class OverviewFragment extends Fragment{
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState){
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle saInSt){
         View v = inflater.inflate(R.layout.fragment_overview,container,false);
 
         mTaskRecyclerView = v.findViewById(R.id.task_recycler_view);
@@ -189,7 +189,16 @@ public class OverviewFragment extends Fragment{
 
         public void bind(Task task) {
             mTask = task;
-            mTitleTextView.setText(mTask.getName());
+            String name = mTask.getName();
+            if(name!=null) {
+                if(!name.equals("")) {
+                    mTitleTextView.setText(name);
+                    mTitleTextView.setTextColor(getResources().getColor(R.color.black));
+                    return;
+                }
+            }
+            mTitleTextView.setText(R.string.new_task);
+            mTitleTextView.setTextColor(getResources().getColor(R.color.gray));
         }
 
     }

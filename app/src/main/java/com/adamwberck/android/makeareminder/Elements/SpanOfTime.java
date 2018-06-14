@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SpanOfTime implements Serializable{
     private long mMinutes;
+    private Type mTimeType;
 
     public long getTime(Type type) {
         switch (type) {
@@ -77,6 +78,10 @@ public class SpanOfTime implements Serializable{
         return context.getString(R.string.before_due_4,str0,str1,str2,str3);
     }
 
+    public Type getTimeType() {
+        return mTimeType;
+    }
+
     private class TimeResource{
         public TimeResource(String string, int time) {
             mString = string;
@@ -119,25 +124,24 @@ public class SpanOfTime implements Serializable{
     }
 
     public static SpanOfTime ofMinutes(long minutes){
-        SpanOfTime span = new SpanOfTime(minutes);
-        return span;
+        return new SpanOfTime(minutes,Type.MINUTE);
     }
 
     public static SpanOfTime ofHours(long hours){
-        SpanOfTime span = new SpanOfTime(TimeUnit.HOURS.toMinutes(hours));
-        return span;
+        return new SpanOfTime(TimeUnit.HOURS.toMinutes(hours),Type.HOUR);
+
     }
 
     public static SpanOfTime ofDays(long days){
-        SpanOfTime span = new SpanOfTime(TimeUnit.DAYS.toMinutes(days));
-        return span;
+        return new SpanOfTime(TimeUnit.DAYS.toMinutes(days),Type.DAY);
     }
 
     public static SpanOfTime ofWeeks(long weeks){
-        SpanOfTime span = new SpanOfTime(TimeUnit.DAYS.toMinutes(weeks*7));
-        return span;
+        return new SpanOfTime(TimeUnit.DAYS.toMinutes(weeks*7),Type.WEEK);
+
     }
-    private SpanOfTime(long minutes){
+    private SpanOfTime(long minutes,Type type){
+        mTimeType = type;
         mMinutes = minutes;
     }
     public long getMinutes(){

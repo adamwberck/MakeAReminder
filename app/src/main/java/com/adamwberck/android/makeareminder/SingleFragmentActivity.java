@@ -6,7 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
-import com.adamwberck.android.makeareminder.R;
+import net.danlew.android.joda.JodaTimeAndroid;
 
 /* Created by Adam on 8/18/2017.*/
 
@@ -23,6 +23,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        JodaTimeAndroid.init(getApplicationContext());
         setContentView(getLayoutResId());
 
         FragmentManager fm = getSupportFragmentManager();

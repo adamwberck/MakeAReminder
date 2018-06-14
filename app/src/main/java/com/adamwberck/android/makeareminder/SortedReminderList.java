@@ -4,8 +4,6 @@ package com.adamwberck.android.makeareminder;
 
 import android.support.annotation.NonNull;
 
-import com.adamwberck.android.makeareminder.Elements.Reminder;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;

@@ -1,12 +1,10 @@
 package com.adamwberck.android.makeareminder;
 
 import android.content.Context;
-import android.os.Build;
 
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.Elements.Task;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

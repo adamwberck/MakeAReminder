@@ -2,6 +2,7 @@ package com.adamwberck.android.makeareminder;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import java.util.UUID;
@@ -9,19 +10,24 @@ import java.util.UUID;
 public class TaskActivity extends SingleFragmentActivity{
 
 
-    private static final String EXTRA_REMINDER_ID =
-            "com.adamwberck.android.makeareminder.reminder_id";
+    private static final String EXTRA_TASK_ID =
+            "com.adamwberck.android.makeareminder.task_id";
 
-    public static Intent newIntent(Context pakageContext, UUID reminderID) {
-        Intent intent = new Intent(pakageContext,TaskActivity.class);
-        intent.putExtra(EXTRA_REMINDER_ID,reminderID);
+    private static final String EXTRA_ALARM = "com.adamwberck.android.makeareminder.alarm";
+
+    public static Intent newIntent(Context packageContext, UUID reminderID) {
+        Intent intent = new Intent(packageContext,TaskActivity.class);
+        intent.putExtra(EXTRA_TASK_ID,reminderID);
         return intent;
     }
 
     @Override
     protected Fragment createFragment() {
         UUID reminderID = (UUID) getIntent()
-                .getSerializableExtra(EXTRA_REMINDER_ID);
-        return TaskFragment.newInstance(reminderID);
+                .getSerializableExtra(EXTRA_TASK_ID);
+        boolean isAlarmOn = (boolean) getIntent().getSerializableExtra(EXTRA_ALARM);
+        return TaskFragment.newInstance(reminderID,isAlarmOn);
     }
+
+
 }
