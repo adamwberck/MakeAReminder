@@ -50,9 +50,9 @@ public class ReminderService extends IntentService{
     @Override
     public void onHandleIntent(Intent intent){
         Task task = (Task) intent.getExtras().getSerializable(EXTRA_TASK);
-        Intent i = TaskActivity.newIntent(this,task.getID());
+        Intent i = OverviewActivity.newIntent(this,task.getID(),true);
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        i.putExtra(EXTRA_ALARM,true);
+
         startActivity(i);
     }
 }

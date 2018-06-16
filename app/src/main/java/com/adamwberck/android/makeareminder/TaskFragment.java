@@ -64,7 +64,6 @@ public class TaskFragment extends Fragment{
     private Button mReminderButton;
     private ListView mReminderListView;
     private ReminderAdapter mReminderAdapter;
-    private Button mTestButton;
 
 
     @Override
@@ -72,13 +71,6 @@ public class TaskFragment extends Fragment{
         super.onCreate(savedInstanceState);
         UUID taskID = (UUID) getArguments().getSerializable(ARG_TASK_ID);
         mTask = TaskLab.get(getActivity()).getTask(taskID);
-        boolean isAlarmOn = getArguments().getBoolean(ARG_ALARM);
-        if(isAlarmOn){
-            FragmentManager manager = getFragmentManager();
-            AlarmAlertFragment dialog = AlarmAlertFragment.newInstance();
-            dialog.setTargetFragment(TaskFragment.this,REQUEST_SNOOZE);
-            dialog.show(manager,DIALOG_ALARM);
-        }
     }
 
     @Override
@@ -222,16 +214,6 @@ public class TaskFragment extends Fragment{
         return fragment;
     }
 
-    public static TaskFragment newInstance(UUID taskID,boolean isAlarmOn) {
-        Bundle args =  new Bundle();
-        args.putSerializable(ARG_TASK_ID, taskID);
-        args.putBoolean(ARG_ALARM,isAlarmOn);
-
-        TaskFragment fragment = new TaskFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     private class ReminderAdapter extends BaseAdapter{
         private Context mContext;
         private LayoutInflater mInflater;
@@ -282,8 +264,15 @@ public class TaskFragment extends Fragment{
                     dialog.show(manager,DIALOG_REMINDER);
                 }
             });
-            ImageView image = rowView.findViewById(R.id.image_delete_reminder);
-            image.setOnClickListener(new View.OnClickListener() {
+            ImageView isAlarm = rowView.findViewById(R.id.image_is_alarm);
+            if(reminder.isAlarm()) {
+                isAlarm.setImageDrawable(getResources().getDrawable(R.drawable.ic_alarm));
+            }
+            else {
+                isAlarm.setImageDrawable(getResources().getDrawable(R.drawable.ic_notification));
+            }
+            ImageView delete = rowView.findViewById(R.id.image_delete_reminder);
+            delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mTask.removeReminder(reminder);

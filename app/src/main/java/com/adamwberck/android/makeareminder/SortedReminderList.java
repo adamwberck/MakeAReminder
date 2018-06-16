@@ -4,12 +4,15 @@ package com.adamwberck.android.makeareminder;
 
 import android.support.annotation.NonNull;
 
+import com.adamwberck.android.makeareminder.Elements.Reminder;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 
-public class SortedReminderList<T> extends ArrayList<T>{
-    Comparator<T> mComparator;
+public class SortedReminderList<T> extends ArrayList<T> implements Serializable{
+    private transient Comparator<T> mComparator;
     public SortedReminderList(int initialCapacity, Comparator<T> comparator) {
         super(initialCapacity);
         mComparator = comparator;
@@ -29,6 +32,9 @@ public class SortedReminderList<T> extends ArrayList<T>{
         }
         else {
             for(int i=0;i<this.size();i++){
+                if(mComparator==null){
+                    mComparator = (Comparator<T>) Reminder.getComparator();
+                }
                 if(mComparator.compare(get(i),item)<0){
                     super.add(i,item);
                     return true;

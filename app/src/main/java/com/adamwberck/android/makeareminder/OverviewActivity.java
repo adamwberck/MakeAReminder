@@ -1,5 +1,6 @@
 package com.adamwberck.android.makeareminder;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 
@@ -11,15 +12,26 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
         TaskFragment.Callbacks, OverviewFragment.OnDeleteTaskListener,
         TaskFragment.OnDeleteTaskListener{
 
+    private static final String EXTRA_TASK_ID = "com.adamwberck.android.makeareminder.task_id";
+    private static final String EXTRA_ALARM   = "com.adamwberck.android.makeareminder.alarm";
+
     public void onTaskUpdated(Task task){
-        OverviewFragment overviewFragment = (OverviewFragment)
-                getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        OverviewFragment overviewFragment = (OverviewFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         overviewFragment.updateUI();
     }
 
     @Override
     protected Fragment createFragment() {
-        return new OverviewFragment();
+        try {
+            UUID id = (UUID) getIntent().getSerializableExtra(EXTRA_TASK_ID);
+            boolean isAlarmOn = (boolean) getIntent().getSerializableExtra(EXTRA_ALARM);
+            return  OverviewFragment.newInstance(id,isAlarmOn);
+        }
+        catch (NullPointerException e){
+            return  OverviewFragment.newInstance(null,false);
+        }
+
+
     }
 
     @Override
@@ -57,5 +69,12 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
                         .remove(taskFragment).commit();
             }
         }
+    }
+
+    public static Intent newIntent(Context packageContext, UUID id,boolean isAlarmOn) {
+        Intent intent = new Intent(packageContext,OverviewActivity.class);
+        intent.putExtra(EXTRA_TASK_ID,id);
+        intent.putExtra(EXTRA_ALARM,isAlarmOn);
+        return intent;
     }
 }

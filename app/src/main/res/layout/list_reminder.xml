@@ -9,7 +9,13 @@
         android:textSize="17sp"
         android:layout_width="0dp"
         android:layout_height="30dp"
-        android:layout_weight="8"/>
+        android:layout_weight="7"/>
+    <ImageView
+        android:id="@+id/image_is_alarm"
+        android:src="@drawable/ic_alarm"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_weight="1"/>
     <ImageView
         android:id="@+id/image_delete_reminder"
         android:src="@drawable/ic_close_black_24dp"

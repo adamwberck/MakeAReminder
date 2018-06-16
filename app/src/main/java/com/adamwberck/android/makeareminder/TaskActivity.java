@@ -10,10 +10,8 @@ import java.util.UUID;
 public class TaskActivity extends SingleFragmentActivity{
 
 
-    private static final String EXTRA_TASK_ID =
-            "com.adamwberck.android.makeareminder.task_id";
-
-    private static final String EXTRA_ALARM = "com.adamwberck.android.makeareminder.alarm";
+    private static final String EXTRA_TASK_ID = "com.adamwberck.android.makeareminder.task_id";
+    //private static final String EXTRA_ALARM = "com.adamwberck.android.makeareminder.alarm";
 
     public static Intent newIntent(Context packageContext, UUID reminderID) {
         Intent intent = new Intent(packageContext,TaskActivity.class);
@@ -23,10 +21,8 @@ public class TaskActivity extends SingleFragmentActivity{
 
     @Override
     protected Fragment createFragment() {
-        UUID reminderID = (UUID) getIntent()
-                .getSerializableExtra(EXTRA_TASK_ID);
-        boolean isAlarmOn = (boolean) getIntent().getSerializableExtra(EXTRA_ALARM);
-        return TaskFragment.newInstance(reminderID,isAlarmOn);
+        UUID reminderID = (UUID) getIntent().getSerializableExtra(EXTRA_TASK_ID);
+        return TaskFragment.newInstance(reminderID);
     }
 
 

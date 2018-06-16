@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -23,14 +24,29 @@ import java.util.List;
 import java.util.UUID;
 
 public class OverviewFragment extends Fragment{
+    private static final String ARG_TASK_ID = "task_id";
+    private static final String ARG_ALARM = "alarm";
+    private static final int REQUEST_SNOOZE = 0;
+    private static final String DIALOG_ALARM = "Dialog_ALARM";
     private RecyclerView mTaskRecyclerView;
     private TaskAdapter mAdapter;
 
     private Callbacks mCallbacks;
 
+
     public void deleteTask(UUID taskId) {
         Task task = TaskLab.get(getActivity()).getTask(taskId);
         TaskLab.get(getActivity()).removeTask(task);
+    }
+
+    public static Fragment newInstance(UUID id, boolean isAlarmOn) {
+        Bundle args =  new Bundle();
+        args.putSerializable(ARG_TASK_ID, id);
+        args.putBoolean(ARG_ALARM,isAlarmOn);
+
+        OverviewFragment fragment = new OverviewFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
 
     public interface Callbacks {
@@ -116,6 +132,18 @@ public class OverviewFragment extends Fragment{
         super.onAttach(context);
         mCallbacks = (Callbacks) context;
         mDeleteCallBack = (OnDeleteTaskListener) context;
+        UUID taskID = (UUID) getArguments().getSerializable(ARG_TASK_ID);
+        if(taskID!=null) {
+            Task task = TaskLab.get(getActivity()).getTask(taskID);
+            boolean isAlarmOn = getArguments().getBoolean(ARG_ALARM);
+            if (isAlarmOn) {
+                FragmentManager manager = getFragmentManager();
+                AlarmAlertFragment dialog = AlarmAlertFragment.newInstance();
+                dialog.setTargetFragment(OverviewFragment.this, REQUEST_SNOOZE);
+                dialog.show(manager, DIALOG_ALARM);
+            }
+            mCallbacks.onTaskSelected(task);
+        }
     }
 
     @Override

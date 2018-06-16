@@ -23,6 +23,7 @@ public class Reminder implements Serializable{
     };
     private Task mTask;
     private SpanOfTime mTimeBefore;
+    private boolean mIsAlarm = true;
 
     @Override
     public boolean equals(Object o){
@@ -57,5 +58,9 @@ public class Reminder implements Serializable{
 
     public long getMinutes() {
         return getTimeBefore().getMinutes();
+    }
+
+    public boolean isAlarm() {
+        return mIsAlarm;
     }
 }

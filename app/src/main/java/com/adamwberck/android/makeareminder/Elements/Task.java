@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.adamwberck.android.makeareminder.ReminderService;
 import com.adamwberck.android.makeareminder.SortedReminderList;
+import com.adamwberck.android.makeareminder.TaskLab;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -22,11 +23,11 @@ public class Task implements Serializable{
     private Date mDate;
     private SpanOfTime mRepeat;
     private boolean mHasRepeat = false;
-    private transient List<Reminder> mReminders =
-            new SortedReminderList<>(10,Reminder.getComparator());
+    private List<Reminder> mReminders = new SortedReminderList<>(10,Reminder.getComparator());
 
     public void addReminder(Reminder r){
         mReminders.add(r);
+        TaskLab.saveLab();
     }
 
     public void addReminder(SpanOfTime span){
@@ -35,6 +36,7 @@ public class Task implements Serializable{
 
     public void removeReminder(Reminder r){
         mReminders.remove(r);
+        TaskLab.saveLab();
     }
 
     public String getName() {
@@ -43,6 +45,7 @@ public class Task implements Serializable{
 
     public void setName(String mName) {
         this.mName = mName;
+        TaskLab.saveLab();
     }
 
     public Date getDate() {
@@ -53,6 +56,7 @@ public class Task implements Serializable{
         this.mDate = mDate;
         addReminder(new Reminder(this,SpanOfTime.ofMinutes(0)));
         ReminderService.setServiceAlarm(appContext,false,this);
+        TaskLab.saveLab();
     }
 
 
