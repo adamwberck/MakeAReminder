@@ -24,7 +24,8 @@ public class ReminderService extends IntentService{
     public static void setServiceAlarm(Context context, boolean isOn, Task task) {
         Intent i = ReminderService.newIntent(context);
         i.putExtra(EXTRA_TASK,task);
-        PendingIntent pi = PendingIntent.getService(context, 0, i,
+        int requestCode = task.hashCode();
+        PendingIntent pi = PendingIntent.getService(context, requestCode, i,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         DateTime dateTime = new DateTime(task.getDate());
         long millis = dateTime.getMillis();

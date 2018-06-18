@@ -89,7 +89,7 @@ public class TaskFragment extends Fragment{
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mTask.setName(s.toString());
+                mTask.setName(s.toString(),getActivity().getApplicationContext());
                 updateTask();
                 setTaskChanged((TaskLab.get(getActivity()).getTaskIndex(mTask)));
             }
@@ -290,6 +290,7 @@ public class TaskFragment extends Fragment{
         ImageButton button;
         int position;
     }*/
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

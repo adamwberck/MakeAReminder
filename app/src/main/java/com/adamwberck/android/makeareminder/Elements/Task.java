@@ -43,9 +43,10 @@ public class Task implements Serializable{
         return mName;
     }
 
-    public void setName(String mName) {
+    public void setName(String mName,Context appContext) {
         this.mName = mName;
         TaskLab.saveLab();
+        startAlarm(appContext);
     }
 
     public Date getDate() {
@@ -55,8 +56,26 @@ public class Task implements Serializable{
     public void setDate(Date mDate,Context appContext) {
         this.mDate = mDate;
         addReminder(new Reminder(this,SpanOfTime.ofMinutes(0)));
-        ReminderService.setServiceAlarm(appContext,false,this);
         TaskLab.saveLab();
+        startAlarm(appContext);
+    }
+
+    public void startAlarm(Context appContext){
+        if(mName==null){
+            return;
+        }
+        if(mName.equals("")){
+            return;
+        }
+        if(mDate==null){
+            return;
+        }
+        Date now = new Date();
+        if(mDate.before(now)){
+            return;
+        }
+        //TODO Fix this shit
+        ReminderService.setServiceAlarm(appContext,false,this);
     }
 
 

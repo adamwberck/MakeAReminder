@@ -21,6 +21,7 @@
     <string name="before_due_3">%1$s, %2$s &amp; %3$s before due.</string>
     <string name="before_due_4">%1$s, %2$s, %3$s &amp; %4$s before due.</string>
     <string name="reminders">Reminders</string>
+    <string name="name_task_warning">Please Name Task</string>
     <string-array name="time_type">
         <item>Minutes</item>
         <item>Hours</item>

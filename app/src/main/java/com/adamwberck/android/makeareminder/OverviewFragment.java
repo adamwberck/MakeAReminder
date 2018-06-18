@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.adamwberck.android.makeareminder.Elements.Task;
 
@@ -76,10 +77,22 @@ public class OverviewFragment extends Fragment{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.new_task:
-                Task task = new Task(getContext());
-                TaskLab.get(getActivity()).addTask(task);
-                updateUI();
-                mCallbacks.onTaskSelected(task);
+                Task currentTask = ((OverviewActivity)getActivity()).getTask();
+                String name = "null";
+                if(currentTask!=null){
+                    name = currentTask.getName();
+                }
+                if(name==null||name.isEmpty()) {
+                    Toast toast = Toast.makeText(getActivity().getApplicationContext(),
+                            R.string.name_task_warning, Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                else {
+                    Task task = new Task(getContext());
+                    TaskLab.get(getActivity()).addTask(task);
+                    updateUI();
+                    mCallbacks.onTaskSelected(task);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -138,7 +151,7 @@ public class OverviewFragment extends Fragment{
             boolean isAlarmOn = getArguments().getBoolean(ARG_ALARM);
             if (isAlarmOn) {
                 FragmentManager manager = getFragmentManager();
-                AlarmAlertFragment dialog = AlarmAlertFragment.newInstance();
+                AlarmAlertFragment dialog = AlarmAlertFragment.newInstance(task);
                 dialog.setTargetFragment(OverviewFragment.this, REQUEST_SNOOZE);
                 dialog.show(manager, DIALOG_ALARM);
             }
