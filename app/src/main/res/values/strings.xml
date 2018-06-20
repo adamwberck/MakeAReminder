@@ -13,7 +13,9 @@
     <string name="add_reminder">Add Reminder</string>
     <string name="when_due">When due.</string>
 
-    <string name="reminder_dialog">Add a Reminder</string>
+    <string name="reminder_add_dialog">Add a Reminder</string>
+    <string name="reminder_edit_dialog">Edit Reminder</string>
+
     <string name="create_reminder">Create Reminder</string>
     <string name="cancel">Cancel</string>
     <string name="before_due_1">%1$s before due.</string>
@@ -22,6 +24,7 @@
     <string name="before_due_4">%1$s, %2$s, %3$s &amp; %4$s before due.</string>
     <string name="reminders">Reminders</string>
     <string name="name_task_warning">Please Name Task</string>
+    <string name="edit_reminder">Edit Reminder</string>
     <string-array name="time_type">
         <item>Minutes</item>
         <item>Hours</item>

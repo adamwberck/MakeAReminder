@@ -19,7 +19,7 @@ import java.util.UUID;
 public class Task implements Serializable{
 
     private UUID mID;
-    private String mName;
+    private String mName = "";
     private Date mDate;
     private SpanOfTime mRepeat;
     private boolean mHasRepeat = false;
@@ -101,5 +101,10 @@ public class Task implements Serializable{
 
     public List<Reminder> getReminders() {
         return  mReminders;
+    }
+
+    public void addReminder(SpanOfTime span, boolean isAlarm) {
+        Reminder r = new Reminder(this,span,isAlarm);
+        addReminder(r);
     }
 }

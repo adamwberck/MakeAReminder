@@ -5,6 +5,8 @@ import android.content.Context;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.Elements.Task;
 
+import org.joda.time.Interval;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -87,8 +89,8 @@ public class TaskLab implements Serializable{
         mTasks.add(loc,task);*/
     }
 
-    public void removeTask(Task r){
-        mTasks.remove(r);
+    public void removeTask(Task t){
+        mTasks.remove(t);
         saveLab();
     }
 
@@ -98,11 +100,19 @@ public class TaskLab implements Serializable{
     }
 
     public Task getTask(UUID uuid){
-        for(Task r: mTasks){
-            if(r.getID().equals(uuid)){
-                return r;
+        for(Task t: mTasks){
+            if(t.getID().equals(uuid)){
+                return t;
             }
         }
         return null;
+    }
+
+    public void removeUnnamed() {
+        for(Task t: mTasks){
+            if(t.getName().isEmpty()){
+                removeTask(t);
+            }
+        }
     }
 }

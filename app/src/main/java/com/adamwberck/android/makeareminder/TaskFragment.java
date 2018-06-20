@@ -64,6 +64,7 @@ public class TaskFragment extends Fragment{
     private Button mReminderButton;
     private ListView mReminderListView;
     private ReminderAdapter mReminderAdapter;
+    private Button mRepeatButton;
 
 
     @Override
@@ -101,7 +102,7 @@ public class TaskFragment extends Fragment{
         });
 
         mDateButton = v.findViewById(R.id.date_button);
-
+        //TODO fix the button so the time is the time on the button
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -126,6 +127,8 @@ public class TaskFragment extends Fragment{
             }
         });
         updateDate();
+
+        mRepeatButton = v.findViewById(R.id.repeat_button);
 
         mReminderAdapter = new ReminderAdapter(getContext(),mTask.getReminders());
         mReminderListView = v.findViewById(R.id.reminder_list_view);
@@ -293,6 +296,11 @@ public class TaskFragment extends Fragment{
 
 
     @Override
+    public void onDestroy(){
+        TaskLab.get(getContext()).removeUnnamed();
+        super.onDestroy();
+    }
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         updateUI();
         if(resultCode != Activity.RESULT_OK){
@@ -300,13 +308,14 @@ public class TaskFragment extends Fragment{
         }
         if(requestCode == REQUEST_REMINDER || requestCode == REQUEST_EDIT){
             SpanOfTime span = (SpanOfTime) data
-                    .getSerializableExtra(CreateReminderFragment.EXTRA_SPAN);
-            mTask.addReminder(span);
+                    .getSerializableExtra(CreateReminderFragment.EXTRA_NEW_REMINDER);
+            boolean isAlarm = data.getExtras().getBoolean(CreateReminderFragment.EXTRA_IS_ALARM);
             if(requestCode==REQUEST_EDIT){
                 Reminder reminder = (Reminder) data
-                        .getSerializableExtra(CreateReminderFragment.EXTRA_REMINDER);
+                        .getSerializableExtra(CreateReminderFragment.EXTRA_DELETE_REMINDER);
                 mTask.removeReminder(reminder);
             }
+            mTask.addReminder(span,isAlarm);
             return;
         }
         if(requestCode == REQUEST_DATE || requestCode == REQUEST_TIME){

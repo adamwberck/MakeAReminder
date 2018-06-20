@@ -10,21 +10,27 @@ import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Switch;
 
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 
 public class CreateReminderFragment extends DialogFragment {
     private static final String ARG_REMINDER = "reminder";
-    public static final String EXTRA_SPAN = "com.adamwberck.android.makeareminder.span";
-    public static final String EXTRA_REMINDER = "com.adamwberck.android.makeareminder.reminder";
+    public static final String EXTRA_NEW_REMINDER
+            = "com.adamwberck.android.makeareminder.newreminder";
+    public static final String EXTRA_DELETE_REMINDER
+            = "com.adamwberck.android.makeareminder.deletereminder";
+    public static final String EXTRA_IS_ALARM = "com.adamwberck.android.makeareminder.isalarm";
     private long mDuration;
     private int mTimeTypeInt;
+    private boolean mWarningTypeIsAlarm;
 
 
     public static CreateReminderFragment newInstance() {
@@ -86,12 +92,20 @@ public class CreateReminderFragment extends DialogFragment {
 
             }
         });
+
+        final Switch sw = view.findViewById(R.id.reminder_warning_type_switch);
+
         final Reminder reminder = (Reminder) getArguments().getSerializable(ARG_REMINDER);
-        builder.setTitle(R.string.reminder_dialog)
+        String posText = reminder==null ? getString(R.string.create_reminder) :
+                getString(R.string.edit_reminder);
+        String title = reminder==null ? getString(R.string.reminder_add_dialog) :
+                getString(R.string.reminder_edit_dialog);
+        builder.setTitle(title)
                 .setView(view)
-                .setPositiveButton(R.string.create_reminder, new DialogInterface.OnClickListener() {
+                .setPositiveButton(posText, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        mWarningTypeIsAlarm = sw.isChecked();
                         createReminder(reminder);
                     }
                 })
@@ -108,6 +122,8 @@ public class CreateReminderFragment extends DialogFragment {
             timeText.setText(""+time);
             int spinnerNumber = setSpinnerNumber(type);
             spinner.setSelection(spinnerNumber);
+            sw.setChecked(reminder.isAlarm());
+
         }
 
         return builder.create();
@@ -130,7 +146,7 @@ public class CreateReminderFragment extends DialogFragment {
 
     private void cancel() {
         CreateReminderFragment.this.getDialog().cancel();
-        sendResult(Activity.RESULT_CANCELED,null,null);
+        sendResult(Activity.RESULT_CANCELED,null,false,null);
     }
 
     private void createReminder(Reminder editReminder) {
@@ -147,21 +163,23 @@ public class CreateReminderFragment extends DialogFragment {
         else {
             span = SpanOfTime.ofWeeks(mDuration);
         }
-        sendResult(Activity.RESULT_OK,span,editReminder);
+        sendResult(Activity.RESULT_OK,span,mWarningTypeIsAlarm, editReminder);
     }
 
-    private void sendResult(int resultCode, SpanOfTime span,Reminder editReminder) {
+    private void sendResult(int resultCode, SpanOfTime span, boolean isAlarm, Reminder editReminder) {
         if (getTargetFragment() == null) {
             return;
         }
 
         Intent intent = new Intent();
-        intent.putExtra(EXTRA_SPAN, span);
+        intent.putExtra(EXTRA_NEW_REMINDER, span);
+        intent.putExtra(EXTRA_IS_ALARM, isAlarm);
         if(editReminder==null) {
             getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
         }
         else {
-            intent.putExtra(EXTRA_REMINDER,editReminder);
+            editReminder.setWarningType(mWarningTypeIsAlarm);
+            intent.putExtra(EXTRA_DELETE_REMINDER,editReminder);
             getTargetFragment().onActivityResult(getTargetRequestCode(),resultCode,intent);
         }
     }
