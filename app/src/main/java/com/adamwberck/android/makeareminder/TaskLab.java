@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class TaskLab implements Serializable{
@@ -25,6 +26,7 @@ public class TaskLab implements Serializable{
     private static TaskLab sTaskLab;
     private List<Task> mTasks;
     private SpanOfTime mDefaultSnooze;
+    private AtomicInteger mAtomicInteger = new AtomicInteger(Integer.MIN_VALUE);
     private transient Context mContext;
     private static final String FILE_NAME = "tasks.info";
 
@@ -99,9 +101,9 @@ public class TaskLab implements Serializable{
         return mTasks;
     }
 
-    public Task getTask(UUID uuid){
+    public Task getTask(int id){
         for(Task t: mTasks){
-            if(t.getID().equals(uuid)){
+            if(t.getID()==id){
                 return t;
             }
         }
@@ -114,5 +116,9 @@ public class TaskLab implements Serializable{
                 removeTask(t);
             }
         }
+    }
+
+    public  int nextValue() {
+        return mAtomicInteger.incrementAndGet();
     }
 }

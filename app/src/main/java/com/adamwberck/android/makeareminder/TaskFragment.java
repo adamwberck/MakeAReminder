@@ -22,6 +22,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Elements.Reminder;
+import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.Elements.Task;
 
@@ -45,6 +46,7 @@ public class TaskFragment extends Fragment{
     private static final int REQUEST_REMINDER = 3;
     private static final int REQUEST_EDIT = 4;
     private static final int REQUEST_SNOOZE = 5;
+    private static final int REQUEST_REPEAT = 6;
 
     private static final String ARG_TASK_ID = "task_id";
     private static final String ARG_ALARM = "alarm";
@@ -70,7 +72,7 @@ public class TaskFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        UUID taskID = (UUID) getArguments().getSerializable(ARG_TASK_ID);
+        int taskID = getArguments().getInt(ARG_TASK_ID);
         mTask = TaskLab.get(getActivity()).getTask(taskID);
     }
 
@@ -102,7 +104,6 @@ public class TaskFragment extends Fragment{
         });
 
         mDateButton = v.findViewById(R.id.date_button);
-        //TODO fix the button so the time is the time on the button
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,6 +117,7 @@ public class TaskFragment extends Fragment{
 
         mTimeButton = v.findViewById(R.id.time_button);
 
+        //TODO fix the button so the dialog starts with the time that's on the button
         mTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,6 +131,12 @@ public class TaskFragment extends Fragment{
         updateDate();
 
         mRepeatButton = v.findViewById(R.id.repeat_button);
+        mRepeatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         mReminderAdapter = new ReminderAdapter(getContext(),mTask.getReminders());
         mReminderListView = v.findViewById(R.id.reminder_list_view);
@@ -204,10 +212,10 @@ public class TaskFragment extends Fragment{
     }
 
     public interface OnDeleteTaskListener {
-        void onTaskIdSelected(UUID TaskID);
+        void onTaskIdSelected(int TaskID);
     }
 
-    public static TaskFragment newInstance(UUID taskID) {
+    public static TaskFragment newInstance(int taskID) {
         Bundle args =  new Bundle();
         args.putSerializable(ARG_TASK_ID, taskID);
         args.putBoolean(ARG_ALARM,false);
@@ -328,6 +336,11 @@ public class TaskFragment extends Fragment{
             }
             mTask.setDate(date,getActivity().getApplicationContext());
             updateDate();
+            return;
+        }
+        if(requestCode == REQUEST_REPEAT){
+            Repeat repeat = (Repeat) data.getSerializableExtra(SetRepeatFragment.EXTRA_REPEAT);
+            mTask.setRepeat(repeat);
         }
     }
 

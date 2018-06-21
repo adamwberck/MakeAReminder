@@ -28,6 +28,13 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="4"/>
+        <TextView
+            android:textColor="@color/black"
+            android:id="@+id/reminder_warning_text"
+            android:textSize="18sp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="3"/>
         <Switch
             android:id="@+id/reminder_warning_type_switch"

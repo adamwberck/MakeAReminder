@@ -25,11 +25,11 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
     @Override
     protected Fragment createFragment() {
         try {
-            UUID id = (UUID) getIntent().getSerializableExtra(EXTRA_TASK_ID);
+            int id = getIntent().getExtras().getInt(EXTRA_TASK_ID);
             boolean isAlarmOn = (boolean) getIntent().getSerializableExtra(EXTRA_ALARM);
             return OverviewFragment.newInstance(id, isAlarmOn);
         } catch (NullPointerException e) {
-            return OverviewFragment.newInstance(null, false);
+            return OverviewFragment.newInstance( false);
         }
 
 
@@ -67,7 +67,7 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
     }
 
     @Override
-    public void onTaskIdSelected(UUID taskId) {
+    public void onTaskIdSelected(int taskId) {
         TaskFragment taskFragment = (TaskFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.detail_fragment_container);
         OverviewFragment overviewFragment = (OverviewFragment) getSupportFragmentManager()
@@ -78,14 +78,14 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
         }
         if (taskFragment != null) {
             Task viewTask = taskFragment.getTask();
-            if (viewTask.getID().equals(taskId)) {
+            if (viewTask.getID()==taskId) {
                 overviewFragment.getActivity().getSupportFragmentManager().beginTransaction()
                         .remove(taskFragment).commit();
             }
         }
     }
 
-    public static Intent newIntent(Context packageContext, UUID id, boolean isAlarmOn) {
+    public static Intent newIntent(Context packageContext, int id, boolean isAlarmOn) {
         Intent intent = new Intent(packageContext, OverviewActivity.class);
         intent.putExtra(EXTRA_TASK_ID, id);
         intent.putExtra(EXTRA_ALARM, isAlarmOn);

@@ -25,11 +25,21 @@
     <string name="reminders">Reminders</string>
     <string name="name_task_warning">Please Name Task</string>
     <string name="edit_reminder">Edit Reminder</string>
+    <string name="alarm">Alarm</string>
+    <string name="notification">Notification</string>
+    <string name="repeat_title">Set Repeat Duration</string>
+    <string name="repeat_postive">Set Repeat</string>
     <string-array name="time_type">
         <item>Minutes</item>
         <item>Hours</item>
         <item>Days</item>
         <item>Weeks</item>
+    </string-array>
+    <string-array name="time_type_repeat">
+        <item>Days</item>
+        <item>Weeks</item>
+        <item>Months</item>
+        <item>Years</item>
     </string-array>
     <plurals name="minute">
         <item quantity="one">%d minute</item>

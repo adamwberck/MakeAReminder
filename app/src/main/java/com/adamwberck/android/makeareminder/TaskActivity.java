@@ -16,16 +16,16 @@ public class TaskActivity extends SingleFragmentActivity{
     private static final String EXTRA_TASK_ID = "com.adamwberck.android.makeareminder.task_id";
     //private static final String EXTRA_ALARM = "com.adamwberck.android.makeareminder.alarm";
 
-    public static Intent newIntent(Context packageContext, UUID reminderID) {
+    public static Intent newIntent(Context packageContext, int taskID) {
         Intent intent = new Intent(packageContext,TaskActivity.class);
-        intent.putExtra(EXTRA_TASK_ID,reminderID);
+        intent.putExtra(EXTRA_TASK_ID,taskID);
         return intent;
     }
 
     @Override
     protected Fragment createFragment() {
-        UUID reminderID = (UUID) getIntent().getSerializableExtra(EXTRA_TASK_ID);
-        return TaskFragment.newInstance(reminderID);
+        int taskID = getIntent().getExtras().getInt(EXTRA_TASK_ID);
+        return TaskFragment.newInstance(taskID);
     }
 
 

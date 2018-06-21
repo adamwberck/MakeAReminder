@@ -14,26 +14,21 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Elements.Reminder;
+import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 
-public class CreateReminderFragment extends DialogFragment {
-    private static final String ARG_REMINDER = "reminder";
-    public static final String EXTRA_NEW_REMINDER
-            = "com.adamwberck.android.makeareminder.newreminder";
-    public static final String EXTRA_DELETE_REMINDER
-            = "com.adamwberck.android.makeareminder.deletereminder";
-    public static final String EXTRA_IS_ALARM = "com.adamwberck.android.makeareminder.isalarm";
+public class SetRepeatFragment extends DialogFragment {
+    public static final String ARG_REPEAT = "repeat";
+    public static final String EXTRA_REPEAT = "com.adamwberck.android.makeareminder.extrarepeat";
     private long mDuration;
     private int mTimeTypeInt;
-    private boolean mWarningTypeIsAlarm;
 
+    //TODO add exclusion days for hourly repeats
 
     public static CreateReminderFragment newInstance() {
         Bundle args = new Bundle();
@@ -42,9 +37,10 @@ public class CreateReminderFragment extends DialogFragment {
         return fragment;
     }
 
-    public static CreateReminderFragment newInstance(Reminder reminder) {
+    public static CreateReminderFragment newInstance(SpanOfTime currentRepeat) {
+
         Bundle args = new Bundle();
-        args.putSerializable(ARG_REMINDER, reminder);
+        args.putSerializable(ARG_REPEAT, currentRepeat);
 
         CreateReminderFragment fragment = new CreateReminderFragment();
         fragment.setArguments(args);
@@ -55,7 +51,7 @@ public class CreateReminderFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        View view = inflater.inflate(R.layout.dialog_reminder,null);
+        View view = inflater.inflate(R.layout.dialog_repeat,null);
         EditText timeText = view.findViewById(R.id.amount_time_text);
         timeText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -78,9 +74,9 @@ public class CreateReminderFragment extends DialogFragment {
                 }
             }
         });
-        Spinner spinner = view.findViewById(R.id.type_time_spinner);
+        Spinner spinner = view.findViewById(R.id.repeat_time_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.time_type,android.R.layout.simple_spinner_item);
+                R.array.time_type_repeat,android.R.layout.simple_spinner_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -94,29 +90,12 @@ public class CreateReminderFragment extends DialogFragment {
 
             }
         });
-        final Switch sw = view.findViewById(R.id.reminder_warning_type_switch);
-        final TextView warningText = view.findViewById(R.id.reminder_warning_text);
-        sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String strWarningText = sw.isChecked()
-                        ? getString(R.string.alarm) : getString(R.string.notification);
-                warningText.setText(strWarningText);
-            }
-        });
-
-        final Reminder reminder = (Reminder) getArguments().getSerializable(ARG_REMINDER);
-        String posText = reminder==null ? getString(R.string.create_reminder) :
-                getString(R.string.edit_reminder);
-        String title = reminder==null ? getString(R.string.reminder_add_dialog) :
-                getString(R.string.reminder_edit_dialog);
-        builder.setTitle(title)
+        builder.setTitle(R.string.repeat_title)
                 .setView(view)
-                .setPositiveButton(posText, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.repeat_postive, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mWarningTypeIsAlarm = sw.isChecked();
-                        createReminder(reminder);
+                        setRepeat();
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -126,15 +105,6 @@ public class CreateReminderFragment extends DialogFragment {
                     }
                 });
 
-        if(reminder!=null) {
-            SpanOfTime.Type type = reminder.getTimeBefore().getTimeType();
-            long time = reminder.getTimeBefore().getTime(type);
-            timeText.setText(""+time);
-            int spinnerNumber = setSpinnerNumber(type);
-            spinner.setSelection(spinnerNumber);
-            sw.setChecked(reminder.isAlarm());
-
-        }
 
         return builder.create();
     }
@@ -155,42 +125,38 @@ public class CreateReminderFragment extends DialogFragment {
     }
 
     private void cancel() {
-        CreateReminderFragment.this.getDialog().cancel();
-        sendResult(Activity.RESULT_CANCELED,null,false,null);
+        SetRepeatFragment.this.getDialog().cancel();
+        sendResult(Activity.RESULT_CANCELED,null);
     }
 
-    private void createReminder(Reminder editReminder) {
+    private void setRepeat() {
         SpanOfTime span;
-        if(mTimeTypeInt==0) {
-            span = SpanOfTime.ofMinutes(mDuration);
-        }
-        else if(mTimeTypeInt==1){
-            span = SpanOfTime.ofHours(mDuration);
-        }
-        else if(mTimeTypeInt==2){
+        if(mTimeTypeInt==0){
             span = SpanOfTime.ofDays(mDuration);
         }
-        else {
+        else if (mTimeTypeInt==1){
             span = SpanOfTime.ofWeeks(mDuration);
         }
-        sendResult(Activity.RESULT_OK,span,mWarningTypeIsAlarm, editReminder);
+        else if(mTimeTypeInt==2){
+            //TODO add month support
+            span = SpanOfTime.ofWeeks(mDuration);
+        }
+        else {
+            //TODO add year support
+            span = SpanOfTime.ofWeeks(mDuration);
+        }
+        Repeat repeat = new Repeat(mDuration,span);
+        sendResult(Activity.RESULT_OK,repeat);
     }
 
-    private void sendResult(int resultCode, SpanOfTime span, boolean isAlarm, Reminder editReminder) {
+    private void sendResult(int resultCode, Repeat repeat) {
         if (getTargetFragment() == null) {
             return;
         }
 
         Intent intent = new Intent();
-        intent.putExtra(EXTRA_NEW_REMINDER, span);
-        intent.putExtra(EXTRA_IS_ALARM, isAlarm);
-        if(editReminder==null) {
-            getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
-        }
-        else {
-            editReminder.setWarningType(mWarningTypeIsAlarm);
-            intent.putExtra(EXTRA_DELETE_REMINDER,editReminder);
-            getTargetFragment().onActivityResult(getTargetRequestCode(),resultCode,intent);
-        }
+        intent.putExtra(EXTRA_REPEAT, repeat);
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
     }
+
 }

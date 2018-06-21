@@ -35,14 +35,23 @@ public class OverviewFragment extends Fragment{
     private Callbacks mCallbacks;
 
 
-    public void deleteTask(UUID taskId) {
+    public void deleteTask(int taskId) {
         Task task = TaskLab.get(getActivity()).getTask(taskId);
         TaskLab.get(getActivity()).removeTask(task);
     }
 
-    public static Fragment newInstance(UUID id, boolean isAlarmOn) {
+    public static Fragment newInstance(int id, boolean isAlarmOn) {
         Bundle args =  new Bundle();
-        args.putSerializable(ARG_TASK_ID, id);
+        args.putInt(ARG_TASK_ID, id);
+        args.putBoolean(ARG_ALARM,isAlarmOn);
+
+        OverviewFragment fragment = new OverviewFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static Fragment newInstance(boolean isAlarmOn) {
+        Bundle args =  new Bundle();
         args.putBoolean(ARG_ALARM,isAlarmOn);
 
         OverviewFragment fragment = new OverviewFragment();
@@ -57,7 +66,7 @@ public class OverviewFragment extends Fragment{
     private OnDeleteTaskListener mDeleteCallBack;
 
     public interface OnDeleteTaskListener {
-        void onTaskIdSelected(UUID TaskID);
+        void onTaskIdSelected(int TaskID);
     }
 
 
@@ -145,8 +154,8 @@ public class OverviewFragment extends Fragment{
         super.onAttach(context);
         mCallbacks = (Callbacks) context;
         mDeleteCallBack = (OnDeleteTaskListener) context;
-        UUID taskID = (UUID) getArguments().getSerializable(ARG_TASK_ID);
-        if(taskID!=null) {
+        try {
+            int taskID = getArguments().getInt(ARG_TASK_ID);
             Task task = TaskLab.get(getActivity()).getTask(taskID);
             boolean isAlarmOn = getArguments().getBoolean(ARG_ALARM);
             if (isAlarmOn) {
@@ -156,7 +165,7 @@ public class OverviewFragment extends Fragment{
                 dialog.show(manager, DIALOG_ALARM);
             }
             mCallbacks.onTaskSelected(task);
-        }
+        }catch (NullPointerException ignored){}
     }
 
     @Override

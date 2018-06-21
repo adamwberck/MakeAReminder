@@ -18,16 +18,24 @@ import java.util.UUID;
 
 public class Task implements Serializable{
 
-    private UUID mID;
+    private int mID;
     private String mName = "";
     private Date mDate;
-    private SpanOfTime mRepeat;
+    private Repeat mRepeat;
     private boolean mHasRepeat = false;
     private List<Reminder> mReminders = new SortedReminderList<>(10,Reminder.getComparator());
 
     public void addReminder(Reminder r){
         mReminders.add(r);
         TaskLab.saveLab();
+    }
+
+    public Repeat getRepeat() {
+        return mRepeat;
+    }
+
+    public void setRepeat(Repeat repeat) {
+        mRepeat = repeat;
     }
 
     public void addReminder(SpanOfTime span){
@@ -61,9 +69,6 @@ public class Task implements Serializable{
     }
 
     public void startAlarm(Context appContext){
-        if(mName==null){
-            return;
-        }
         if(mName.equals("")){
             return;
         }
@@ -75,28 +80,27 @@ public class Task implements Serializable{
             return;
         }
         //TODO Fix this shit
-        ReminderService.setServiceAlarm(appContext,false,this);
+        ReminderService.setServiceAlarm(appContext,this);
     }
 
 
-    public UUID getID() {
+    public int getID() {
         return mID;
     }
 
-    public Task(Context context) {
-        this(UUID.randomUUID(),context);
-    }
-
-    public Task(UUID uuid,Context appContext) {
-        mID = uuid;
+    public Task(Context appContext) {
+        mID = TaskLab.get(appContext).nextValue();
         DateTime dtOrg = new DateTime(new Date());
         setDate(dtOrg.plusMinutes(1).toDate(),appContext);
     }
 
     @Override
     public boolean equals(Object o) {
-            Task t = (Task) o;
-            return mID.equals(t.getID());
+        if(o.getClass()!=Task.class){
+            return false;
+        }
+        Task t = (Task) o;
+        return mID == t.mID;
     }
 
     public List<Reminder> getReminders() {
@@ -104,7 +108,8 @@ public class Task implements Serializable{
     }
 
     public void addReminder(SpanOfTime span, boolean isAlarm) {
-        Reminder r = new Reminder(this,span,isAlarm);
+        Reminder r = new Reminder(this, span, isAlarm);
         addReminder(r);
     }
+
 }

@@ -5,6 +5,8 @@ import android.util.ArrayMap;
 
 import com.adamwberck.android.makeareminder.R;
 
+import org.joda.time.Period;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,6 +15,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class SpanOfTime implements Serializable{
+    //TODO Change to Interval ?
     private long mMinutes;
     private Type mTimeType;
 
@@ -110,7 +113,9 @@ public class SpanOfTime implements Serializable{
         MINUTE,
         HOUR,
         DAY,
-        WEEK
+        WEEK,
+        MONTH,
+        YEAR
     }
 
     public Map<Type,Long> getTime(){
@@ -138,8 +143,17 @@ public class SpanOfTime implements Serializable{
 
     public static SpanOfTime ofWeeks(long weeks){
         return new SpanOfTime(TimeUnit.DAYS.toMinutes(weeks*7),Type.WEEK);
-
     }
+
+    public static SpanOfTime ofMonths(long months){
+        return new SpanOfTime(TimeUnit.DAYS.toMinutes(months*7*30),Type.MONTH);
+    }
+
+
+    public static SpanOfTime ofYears(long years){
+        return new SpanOfTime(TimeUnit.DAYS.toMinutes(years*365),Type.YEAR);
+    }
+
     private SpanOfTime(long minutes,Type type){
         mTimeType = type;
         mMinutes = minutes;
