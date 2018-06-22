@@ -5,15 +5,22 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.renderscript.ScriptGroup;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.DragEvent;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,11 +40,13 @@ import java.util.List;
 import java.util.UUID;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class TaskFragment extends Fragment{
+    private static final String TAG = "TaskFragment";
     private Task mTask;
     private Callbacks mCallbacks;
-    private EditText mTitleField;
+    private EditText mNameField;
 
 
     private static final int REQUEST_DATE = 0;
@@ -75,16 +84,48 @@ public class TaskFragment extends Fragment{
         int taskID = getArguments().getInt(ARG_TASK_ID);
         mTask = TaskLab.get(getActivity()).getTask(taskID);
     }
+    public void setupUI(View view) {
+
+        // Set up touch listener for non-text box views to hide keyboard.
+        if (!(view instanceof EditText)) {
+            view.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    hideSoftKeyboard(getActivity());
+                    return false;
+                }
+            });
+        }
+
+        //If a layout container, iterate over children and seed recursion.
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                View innerView = ((ViewGroup) view).getChildAt(i);
+                setupUI(innerView);
+            }
+        }
+    }
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_task, container,false);
+        setupUI(v);
+        mNameField = v.findViewById(R.id.task_name);
+        if(mTask.getName()!=null) {
+            mNameField.setText(mTask.getName());
+        }
+        mNameField.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction()==KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                    mNameField.clearFocus();
+                    hideSoftKeyboard(getActivity());
 
-        mTitleField = v.findViewById(R.id.task_title);
-        if(mTask.getName()!=null)
-            mTitleField.setText(mTask.getName());
-
-        mTitleField.addTextChangedListener(new TextWatcher() {
+                    return true;
+                }
+                return false;
+            }
+        });
+        mNameField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 // pass
@@ -174,6 +215,18 @@ public class TaskFragment extends Fragment{
 
         mDateButton.setText(dateMed);
         mTimeButton.setText(h+":"+df.format(m)+" "+AMPM[ampm]);
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        View v = activity.getCurrentFocus();
+        if(v!=null) {
+            v.clearFocus();
+        }
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(
+                activity.getCurrentFocus().getWindowToken(), 0);
     }
 
     @Override

@@ -14,11 +14,9 @@
         android:labelFor="@+id/task_title"
         />
     <EditText
-        android:id="@+id/task_title"
-        android:singleLine="true"
-        android:inputType="textShortMessage"
+        android:id="@+id/task_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"/>
 
     <LinearLayout
         android:layout_width="match_parent"
