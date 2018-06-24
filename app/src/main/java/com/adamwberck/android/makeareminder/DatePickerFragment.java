@@ -20,7 +20,7 @@ import java.util.GregorianCalendar;
  * Created by Adam on 8/21/2017.
  */
 
-public class DatePickerFragment extends DialogFragment {
+public class DatePickerFragment extends DismissDialogFragment {
 
     public static final String EXTRA_DATE =
             "com.bignerdranch.android.criminalintent.date";
@@ -42,15 +42,17 @@ public class DatePickerFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Calendar calendar = getCalendar();
-
+        calendar.setTime((Date)getArguments().getSerializable(ARG_DATE));
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
+        //TODO make it set to current date if button date is in the past
+
 
         View v = LayoutInflater.from(getActivity())
                 .inflate(R.layout.dialog_date,null);
 
-        mDatePicker = (DatePicker) v.findViewById(R.id.dialog_date_picker);
+        mDatePicker = v.findViewById(R.id.dialog_date_picker);
         mDatePicker.init(year, month,day,null);
 
         return new AlertDialog.Builder(getActivity())

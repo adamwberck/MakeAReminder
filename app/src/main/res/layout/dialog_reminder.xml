@@ -8,7 +8,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
     <EditText
-        android:id="@+id/amount_time_text"
+        android:id="@+id/reminder_time_text"
         android:layout_width="0dp"
         android:layout_height="100dp"
         android:layout_weight="1"
@@ -31,7 +31,7 @@
             android:layout_weight="4"/>
         <TextView
             android:textColor="@color/black"
-            android:id="@+id/reminder_warning_text"
+            android:id="@+id/reminder_warning_type_text"
             android:textSize="18sp"
             android:layout_width="0dp"
             android:layout_height="match_parent"

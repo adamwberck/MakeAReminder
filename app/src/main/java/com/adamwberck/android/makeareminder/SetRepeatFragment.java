@@ -22,7 +22,7 @@ import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 
-public class SetRepeatFragment extends DialogFragment {
+public class SetRepeatFragment extends DismissDialogFragment {
     public static final String ARG_REPEAT = "repeat";
     public static final String EXTRA_REPEAT = "com.adamwberck.android.makeareminder.extrarepeat";
     private long mDuration;
@@ -30,19 +30,19 @@ public class SetRepeatFragment extends DialogFragment {
 
     //TODO add exclusion days for hourly repeats
 
-    public static CreateReminderFragment newInstance() {
+    public static SetRepeatFragment newInstance() {
         Bundle args = new Bundle();
-        CreateReminderFragment fragment = new CreateReminderFragment();
+        SetRepeatFragment fragment = new SetRepeatFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
-    public static CreateReminderFragment newInstance(SpanOfTime currentRepeat) {
+    public static SetRepeatFragment newInstance(SpanOfTime currentRepeat) {
 
         Bundle args = new Bundle();
         args.putSerializable(ARG_REPEAT, currentRepeat);
 
-        CreateReminderFragment fragment = new CreateReminderFragment();
+        SetRepeatFragment fragment = new SetRepeatFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,7 +52,7 @@ public class SetRepeatFragment extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View view = inflater.inflate(R.layout.dialog_repeat,null);
-        EditText timeText = view.findViewById(R.id.amount_time_text);
+        EditText timeText = view.findViewById(R.id.repeat_time_text);
         timeText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

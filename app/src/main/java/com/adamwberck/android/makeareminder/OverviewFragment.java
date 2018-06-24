@@ -24,9 +24,11 @@ import com.adamwberck.android.makeareminder.Elements.Task;
 import java.util.List;
 import java.util.UUID;
 
-public class OverviewFragment extends Fragment{
+public class OverviewFragment extends VisibleFragment{
     private static final String ARG_TASK_ID = "task_id";
     private static final String ARG_ALARM = "alarm";
+    private static final String ARG_NAME = "name";
+    
     private static final int REQUEST_SNOOZE = 0;
     private static final String DIALOG_ALARM = "Dialog_ALARM";
     private RecyclerView mTaskRecyclerView;
@@ -40,10 +42,11 @@ public class OverviewFragment extends Fragment{
         TaskLab.get(getActivity()).removeTask(task);
     }
 
-    public static Fragment newInstance(int id, boolean isAlarmOn) {
+    public static Fragment newInstance(int id, boolean isAlarmOn,String name) {
         Bundle args =  new Bundle();
         args.putInt(ARG_TASK_ID, id);
         args.putBoolean(ARG_ALARM,isAlarmOn);
+        args.putString(ARG_NAME,name);
 
         OverviewFragment fragment = new OverviewFragment();
         fragment.setArguments(args);
@@ -74,6 +77,7 @@ public class OverviewFragment extends Fragment{
     public void onCreate(Bundle savedInstanceBundle){
         super.onCreate(savedInstanceBundle);
         setHasOptionsMenu(true);
+
     }
 
     @Override
@@ -87,14 +91,18 @@ public class OverviewFragment extends Fragment{
         switch (item.getItemId()) {
             case R.id.new_task:
                 Task currentTask = ((OverviewActivity)getActivity()).getTask();
-                String name = "null";
-                if(currentTask!=null){
-                    name = currentTask.getName();
-                }
-                if(name==null||name.isEmpty()) {
-                    Toast toast = Toast.makeText(getActivity().getApplicationContext(),
-                            R.string.name_task_warning, Toast.LENGTH_SHORT);
-                    toast.show();
+                if(currentTask!=null) {
+                    String name = currentTask.getName();
+                    if (name.isEmpty()) {
+                        Toast toast = Toast.makeText(getActivity().getApplicationContext(),
+                                R.string.name_task_warning, Toast.LENGTH_SHORT);
+                        toast.show();
+                    } else {
+                        Task task = new Task(getContext());
+                        TaskLab.get(getActivity()).addTask(task);
+                        updateUI();
+                        mCallbacks.onTaskSelected(task);
+                    }
                 }
                 else {
                     Task task = new Task(getContext());
@@ -111,12 +119,12 @@ public class OverviewFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle saInSt){
         View v = inflater.inflate(R.layout.fragment_overview,container,false);
+        super.setupUI(v);
 
         mTaskRecyclerView = v.findViewById(R.id.task_recycler_view);
 
         mTaskRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         setTaskRecyclerViewItemTouchListener();
-
 
         updateUI();
         return v;
@@ -155,12 +163,13 @@ public class OverviewFragment extends Fragment{
         mCallbacks = (Callbacks) context;
         mDeleteCallBack = (OnDeleteTaskListener) context;
         try {
+            boolean isAlarmOn = getArguments().getBoolean(ARG_ALARM);
             int taskID = getArguments().getInt(ARG_TASK_ID);
             Task task = TaskLab.get(getActivity()).getTask(taskID);
-            boolean isAlarmOn = getArguments().getBoolean(ARG_ALARM);
             if (isAlarmOn) {
+                String name = getArguments().getString(ARG_NAME);
                 FragmentManager manager = getFragmentManager();
-                AlarmAlertFragment dialog = AlarmAlertFragment.newInstance(task);
+                AlarmAlertFragment dialog = AlarmAlertFragment.newInstance(task,name);
                 dialog.setTargetFragment(OverviewFragment.this, REQUEST_SNOOZE);
                 dialog.show(manager, DIALOG_ALARM);
             }

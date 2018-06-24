@@ -17,6 +17,7 @@
     <Spinner
         android:id="@+id/repeat_time_spinner"
         android:layout_width="0dp"
+
         android:layout_height="100dp"
         android:layout_weight="1">
     </Spinner>

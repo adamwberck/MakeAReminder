@@ -2,6 +2,7 @@ package com.adamwberck.android.makeareminder;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.support.v4.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -42,7 +43,7 @@ import java.util.UUID;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
-public class TaskFragment extends Fragment{
+public class TaskFragment extends VisibleFragment{
     private static final String TAG = "TaskFragment";
     private Task mTask;
     private Callbacks mCallbacks;
@@ -61,6 +62,7 @@ public class TaskFragment extends Fragment{
     private static final String ARG_ALARM = "alarm";
 
     private static final String DIALOG_REMINDER = "DialogReminder";
+    private static final String DIALOG_REPEAT = "DialogRepeat";
     private static final String DIALOG_DATE  = "DialogDate";
     private static final String DIALOG_PHOTO  = "DialogPhoto";
     private static final String DIALOG_TIME  = "DialogTime";
@@ -84,31 +86,12 @@ public class TaskFragment extends Fragment{
         int taskID = getArguments().getInt(ARG_TASK_ID);
         mTask = TaskLab.get(getActivity()).getTask(taskID);
     }
-    public void setupUI(View view) {
 
-        // Set up touch listener for non-text box views to hide keyboard.
-        if (!(view instanceof EditText)) {
-            view.setOnTouchListener(new View.OnTouchListener() {
-                public boolean onTouch(View v, MotionEvent event) {
-                    hideSoftKeyboard(getActivity());
-                    return false;
-                }
-            });
-        }
-
-        //If a layout container, iterate over children and seed recursion.
-        if (view instanceof ViewGroup) {
-            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
-                View innerView = ((ViewGroup) view).getChildAt(i);
-                setupUI(innerView);
-            }
-        }
-    }
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_task, container,false);
-        setupUI(v);
+        super.setupUI(v);
         mNameField = v.findViewById(R.id.task_name);
         if(mTask.getName()!=null) {
             mNameField.setText(mTask.getName());
@@ -175,7 +158,11 @@ public class TaskFragment extends Fragment{
         mRepeatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                //TODO make generic method to do this
+                FragmentManager manager = getFragmentManager();
+                SetRepeatFragment dialog = SetRepeatFragment.newInstance();
+                dialog.setTargetFragment(TaskFragment.this,REQUEST_REPEAT);
+                dialog.show(manager,DIALOG_REPEAT);
             }
         });
 
@@ -196,6 +183,17 @@ public class TaskFragment extends Fragment{
         });
 
         return v;
+    }
+
+    private void showDialog(Class c,int requestCode,String dialogString) {
+        try {
+            FragmentManager manager = getFragmentManager();
+            DialogFragment dialog = (DialogFragment) c.newInstance();
+            dialog.setTargetFragment(TaskFragment.this,requestCode);
+            dialog.show(manager,dialogString);
+        } catch (java.lang.InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateDate() {

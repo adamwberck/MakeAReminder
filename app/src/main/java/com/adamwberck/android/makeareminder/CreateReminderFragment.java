@@ -6,11 +6,9 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,7 +21,7 @@ import android.widget.TextView;
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 //TODO make dialogs dismiss when clicked off of
-public class CreateReminderFragment extends DialogFragment {
+public class CreateReminderFragment extends DismissDialogFragment {
     private static final String ARG_REMINDER = "reminder";
     public static final String EXTRA_NEW_REMINDER
             = "com.adamwberck.android.makeareminder.newreminder";
@@ -56,7 +54,7 @@ public class CreateReminderFragment extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View view = inflater.inflate(R.layout.dialog_reminder,null);
-        EditText timeText = view.findViewById(R.id.amount_time_text);
+        EditText timeText = view.findViewById(R.id.reminder_time_text);
         timeText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -80,7 +78,7 @@ public class CreateReminderFragment extends DialogFragment {
         });
         Spinner spinner = view.findViewById(R.id.type_time_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.time_type,android.R.layout.simple_spinner_item);
+                R.array.time_type,R.layout.spinner_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -95,13 +93,12 @@ public class CreateReminderFragment extends DialogFragment {
             }
         });
         final Switch sw = view.findViewById(R.id.reminder_warning_type_switch);
-        final TextView warningText = view.findViewById(R.id.reminder_warning_text);
+        final TextView warningText = view.findViewById(R.id.reminder_warning_type_text);
+        updateSwitchLabel(sw, warningText);
         sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String strWarningText = sw.isChecked()
-                        ? getString(R.string.alarm) : getString(R.string.notification);
-                warningText.setText(strWarningText);
+                updateSwitchLabel(sw, warningText);
             }
         });
 
@@ -137,6 +134,12 @@ public class CreateReminderFragment extends DialogFragment {
         }
 
         return builder.create();
+    }
+
+    private void updateSwitchLabel(Switch sw, TextView warningText) {
+        String strWarningText = sw.isChecked()
+                ? getString(R.string.alarm) : getString(R.string.notification);
+        warningText.setText(strWarningText);
     }
 
     private static int setSpinnerNumber(SpanOfTime.Type type) {

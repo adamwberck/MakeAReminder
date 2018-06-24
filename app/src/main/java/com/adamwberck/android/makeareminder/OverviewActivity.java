@@ -2,6 +2,7 @@ package com.adamwberck.android.makeareminder;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.Toast;
@@ -16,6 +17,13 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
 
     private static final String EXTRA_TASK_ID = "com.adamwberck.android.makeareminder.task_id";
     private static final String EXTRA_ALARM = "com.adamwberck.android.makeareminder.alarm";
+    private static final String EXTRA_NAME = "com.adamwberck.android.makeareminder.name";
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        TaskLab.get(this).removeUnnamed();
+    }
 
     public void onTaskUpdated(Task task) {
         OverviewFragment overviewFragment = (OverviewFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
@@ -26,8 +34,9 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
     protected Fragment createFragment() {
         try {
             int id = getIntent().getExtras().getInt(EXTRA_TASK_ID);
-            boolean isAlarmOn = (boolean) getIntent().getSerializableExtra(EXTRA_ALARM);
-            return OverviewFragment.newInstance(id, isAlarmOn);
+            boolean isAlarmOn = getIntent().getExtras().getBoolean(EXTRA_ALARM);
+            String name = getIntent().getExtras().getString(EXTRA_NAME);
+            return OverviewFragment.newInstance(id,isAlarmOn,name);
         } catch (NullPointerException e) {
             return OverviewFragment.newInstance( false);
         }
@@ -43,27 +52,35 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
 
     @Override
     public void onTaskSelected(Task task) {
-        if (findViewById(R.id.detail_fragment_container) == null) {
+        if (isSingleFragment()) {
             Intent intent = TaskActivity.newIntent(this, task.getID());
             startActivity(intent);
         } else {
             TaskFragment tf = (TaskFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.detail_fragment_container);
-            String name = "no fragment";
+
             if (tf != null) {
-                name = tf.getTask().getName();
-            }
-            if (name != null && !name.isEmpty()) {
-                Fragment newDetail = TaskFragment.newInstance(task.getID());
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.detail_fragment_container,newDetail).commit();
+                String name = tf.getTask().getName();
+                if (!name.isEmpty()) {
+                    Fragment newDetail = TaskFragment.newInstance(task.getID());
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.detail_fragment_container, newDetail).commit();
+                } else {
+                    Toast toast = Toast.makeText(getApplicationContext(),
+                            getString(R.string.name_task_warning),Toast.LENGTH_SHORT);
+                    toast.show();
+                }
             }
             else {
-                Toast toast = Toast.makeText(getApplicationContext(), "Please Name Task",
-                        Toast.LENGTH_SHORT);
-                toast.show();
+                Fragment newDetail = TaskFragment.newInstance(task.getID());
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.detail_fragment_container, newDetail).commit();
             }
         }
+    }
+
+    private boolean isSingleFragment() {
+        return findViewById(R.id.detail_fragment_container) == null;
     }
 
     @Override
@@ -85,20 +102,30 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
         }
     }
 
-    public static Intent newIntent(Context packageContext, int id, boolean isAlarmOn) {
+    public static Intent newIntent(Context packageContext, int id, boolean isAlarmOn,
+                                   String name) {
         Intent intent = new Intent(packageContext, OverviewActivity.class);
         intent.putExtra(EXTRA_TASK_ID, id);
         intent.putExtra(EXTRA_ALARM, isAlarmOn);
+        intent.putExtra(EXTRA_NAME, name);
         return intent;
     }
 
     public Task getTask() {
-        if (findViewById(R.id.detail_fragment_container) == null) {
+        if (isSingleFragment()) {
             return null;
         } else {
             TaskFragment tf = (TaskFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.detail_fragment_container);
             return tf==null? null: tf.getTask();
         }
+    }
+
+    @Override
+    public void onBackPressed(){
+        if(!isSingleFragment()){
+
+        }
+        super.onBackPressed();
     }
 }

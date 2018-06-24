@@ -69,7 +69,7 @@ public class Task implements Serializable{
     }
 
     public void startAlarm(Context appContext){
-        if(mName.equals("")){
+        if(mName.isEmpty()){
             return;
         }
         if(mDate==null){
@@ -80,7 +80,7 @@ public class Task implements Serializable{
             return;
         }
         //TODO Fix this shit
-        ReminderService.setServiceAlarm(appContext,this);
+        ReminderService.setServiceAlarm(appContext,mID,mName);
     }
 
 

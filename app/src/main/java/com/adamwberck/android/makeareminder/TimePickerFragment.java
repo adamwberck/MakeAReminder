@@ -13,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TimePicker;
 
+import org.joda.time.DateTime;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -21,7 +23,7 @@ import java.util.GregorianCalendar;
  * Created by Adam on 8/21/2017.
  */
 
-public class TimePickerFragment extends DialogFragment {
+public class TimePickerFragment extends DismissDialogFragment {
 
     public static final String EXTRA_TIME =
             "com.bignerdranch.android.criminalintent.date";
@@ -41,22 +43,23 @@ public class TimePickerFragment extends DialogFragment {
 
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstnaceState) {
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
         Calendar calendar = getCalendar();
-
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
         final int hour = calendar.get(Calendar.HOUR);
         final int minute = calendar.get(Calendar.MINUTE);
+        //TODO make it set to current time if button time is in the past
 
         View v = LayoutInflater.from(getActivity())
                 .inflate(R.layout.dialog_time,null);
 
-        mTimePicker = (TimePicker) v.findViewById(R.id.dialog_time_picker);
+        mTimePicker = v.findViewById(R.id.dialog_time_picker);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             mTimePicker.setHour(hour);
             mTimePicker.setMinute(minute);
+        }
+        else {
+            mTimePicker.setCurrentHour(hour);
+            mTimePicker.setCurrentMinute(minute);
         }
 
         return new AlertDialog.Builder(getActivity())
