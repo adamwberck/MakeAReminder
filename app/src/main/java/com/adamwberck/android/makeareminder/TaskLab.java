@@ -44,7 +44,7 @@ public class TaskLab implements Serializable{
     }
 
 
-    private static TaskLab loadLab(Context context) throws IOException, ClassNotFoundException {
+    private static TaskLab loadLab(Context context) throws IOException,ClassNotFoundException {
         FileInputStream fis = context.openFileInput(FILE_NAME);
         ObjectInputStream ois = new ObjectInputStream(fis);
         TaskLab taskLab = (TaskLab) ois.readObject();
@@ -64,7 +64,7 @@ public class TaskLab implements Serializable{
             }
             catch (ClassNotFoundException c){
                 c.printStackTrace();
-                System.exit(1);
+                sTaskLab = new TaskLab(context);
             }
         }
         return sTaskLab;

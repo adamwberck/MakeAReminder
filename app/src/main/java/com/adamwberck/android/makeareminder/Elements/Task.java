@@ -3,18 +3,14 @@ package com.adamwberck.android.makeareminder.Elements;
 import android.content.Context;
 
 import com.adamwberck.android.makeareminder.ReminderService;
-import com.adamwberck.android.makeareminder.SortedReminderList;
+import com.adamwberck.android.makeareminder.SortedObjectList;
 import com.adamwberck.android.makeareminder.TaskLab;
 
 import org.joda.time.DateTime;
-import org.joda.time.Interval;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 public class Task implements Serializable{
 
@@ -23,7 +19,7 @@ public class Task implements Serializable{
     private Date mDate;
     private Repeat mRepeat;
     private boolean mHasRepeat = false;
-    private List<Reminder> mReminders = new SortedReminderList<>(10,Reminder.getComparator());
+    private List<Reminder> mReminders = new SortedObjectList<>(10,Reminder.getComparator());
 
     public void addReminder(Reminder r){
         mReminders.add(r);
@@ -36,6 +32,7 @@ public class Task implements Serializable{
 
     public void setRepeat(Repeat repeat) {
         mRepeat = repeat;
+        TaskLab.saveLab();
     }
 
     public void addReminder(SpanOfTime span){

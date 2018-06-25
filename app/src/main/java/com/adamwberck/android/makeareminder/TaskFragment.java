@@ -74,7 +74,7 @@ public class TaskFragment extends VisibleFragment{
             "com.adamwberck.android.makeareminder.task_id";
     private Button mDateButton;
     private Button mTimeButton;
-    private Button mReminderButton;
+    private Button mAddReminderButton;
     private ListView mReminderListView;
     private ReminderAdapter mReminderAdapter;
     private Button mRepeatButton;
@@ -160,7 +160,7 @@ public class TaskFragment extends VisibleFragment{
             public void onClick(View v) {
                 //TODO make generic method to do this
                 FragmentManager manager = getFragmentManager();
-                SetRepeatFragment dialog = SetRepeatFragment.newInstance();
+                SetRepeatFragment dialog = SetRepeatFragment.newInstance(mTask.getRepeat());
                 dialog.setTargetFragment(TaskFragment.this,REQUEST_REPEAT);
                 dialog.show(manager,DIALOG_REPEAT);
             }
@@ -171,8 +171,8 @@ public class TaskFragment extends VisibleFragment{
         mReminderListView.setAdapter(mReminderAdapter);
 
 
-        mReminderButton = v.findViewById(R.id.add_reminder_button);
-        mReminderButton.setOnClickListener(new View.OnClickListener() {
+        mAddReminderButton = v.findViewById(R.id.add_reminder_button);
+        mAddReminderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();

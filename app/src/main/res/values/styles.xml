@@ -8,4 +8,15 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="WeekButtonOn"
+        parent="android:style/Widget.Holo.Button">
+        <item name="android:background">@drawable/ic_button_repeat_circle_on</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+    <style name="WeekButtonOff"
+        parent="android:style/Widget.Holo.Button">
+        <item name="android:background">@drawable/ic_button_repeat_circle_off</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
 </resources>

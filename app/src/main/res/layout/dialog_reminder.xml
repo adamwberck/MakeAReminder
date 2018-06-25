@@ -10,14 +10,14 @@
     <EditText
         android:id="@+id/reminder_time_text"
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:inputType="number"
         android:gravity="end"/>
     <Spinner
         android:id="@+id/type_time_spinner"
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1">
     </Spinner>
     </LinearLayout>
