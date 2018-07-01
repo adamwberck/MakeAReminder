@@ -28,13 +28,18 @@ public class TimePickerFragment extends DismissDialogFragment {
     public static final String EXTRA_TIME =
             "com.bignerdranch.android.criminalintent.date";
 
-    private static final String ARG_TIME = "TIME";
+    private static final String ARG_TIME = "time";
 
     private TimePicker mTimePicker;
 
-    public static TimePickerFragment newInstance(Date date) {
+    public static TimePickerFragment newInstance(DateTime date) {
         Bundle args = new Bundle();
-        args.putSerializable(ARG_TIME, date);
+        if(date!=null) {
+            args.putSerializable(ARG_TIME, date);
+        }
+        else {
+            args.putSerializable(ARG_TIME, new DateTime());
+        }
 
         TimePickerFragment fragment = new TimePickerFragment();
         fragment.setArguments(args);
@@ -44,9 +49,9 @@ public class TimePickerFragment extends DismissDialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Calendar calendar = getCalendar();
-        final int hour = calendar.get(Calendar.HOUR);
-        final int minute = calendar.get(Calendar.MINUTE);
+        final DateTime date = (DateTime) getArguments().getSerializable(ARG_TIME);
+        final int hour = date.getHourOfDay();
+        final int minute = date.getMinuteOfHour();
         //TODO make it set to current time if button time is in the past
 
         View v = LayoutInflater.from(getActivity())
@@ -68,11 +73,9 @@ public class TimePickerFragment extends DismissDialogFragment {
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
-                        Calendar calendar = getCalendar();
-                        int year = calendar.get(Calendar.YEAR);
-                        int month = calendar.get(Calendar.MONTH);
-                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+                        int year = date.getYear();
+                        int month = date.getMonthOfYear();
+                        int day = date.getDayOfMonth();
 
                         int hour = 0;
                         int minute = 0;
@@ -84,22 +87,13 @@ public class TimePickerFragment extends DismissDialogFragment {
                             minute = mTimePicker.getCurrentMinute();
                         }
 
-                        Date date = new GregorianCalendar(year, month, day,hour,minute).getTime();
-                        sendResult(Activity.RESULT_OK,date);
+                        sendResult(Activity.RESULT_OK,new DateTime(year,month,day,hour,minute));
                     }
                 })
                 .create();
     }
 
-    @NonNull
-    private Calendar getCalendar() {
-        Date date = (Date) getArguments().getSerializable(ARG_TIME);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        return calendar;
-    }
-
-    private void sendResult(int resultCode, Date date) {
+    private void sendResult(int resultCode, DateTime date) {
         if (getTargetFragment() == null) {
             return;
         }

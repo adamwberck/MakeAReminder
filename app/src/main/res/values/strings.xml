@@ -38,6 +38,9 @@
     <string name="saturday">Saturday</string>
     <string name="more_often">More Often?</string>
     <string name="add_repeat_time">Add Repeat Time</string>
+    <string name="save">Save</string>
+    <string name="set_date">Set Date</string>
+    <string name="set_time">Set Time</string>
     <string-array name="days_of_the_week">
         <item>Sun</item>
         <item>Mon</item>

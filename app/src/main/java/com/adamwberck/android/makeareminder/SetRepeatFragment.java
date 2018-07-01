@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 
+import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
@@ -118,7 +119,7 @@ public class SetRepeatFragment extends DismissDialogFragment {
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
                 TimePickerFragment dialog = TimePickerFragment
-                        .newInstance(new Date());
+                        .newInstance(new DateTime());
                 dialog.setTargetFragment(SetRepeatFragment.this, REQUEST_TIME);
                 dialog.show(manager,DIALOG_TIME);
             }
@@ -384,9 +385,8 @@ public class SetRepeatFragment extends DismissDialogFragment {
                 @Override
                 public void onClick(View v) {
                     FragmentManager manager = getFragmentManager();
-                    Date time = localTime.toDateTimeToday().toDate();
                     TimePickerFragment dialog = TimePickerFragment
-                            .newInstance(time);
+                            .newInstance(new DateTime());
                     dialog.setTargetFragment(SetRepeatFragment.this, REQUEST_TIME);
                     dialog.show(manager,DIALOG_TIME);
                 }

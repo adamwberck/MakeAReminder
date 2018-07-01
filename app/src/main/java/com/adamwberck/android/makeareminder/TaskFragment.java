@@ -17,6 +17,9 @@ import android.util.Log;
 import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +36,8 @@ import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.Elements.Task;
+
+import org.joda.time.DateTime;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -83,8 +88,28 @@ public class TaskFragment extends VisibleFragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         int taskID = getArguments().getInt(ARG_TASK_ID);
         mTask = TaskLab.get(getActivity()).getTask(taskID);
+    }
+
+    @Override
+    public void  onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_task,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.save_task:
+                TaskLab.saveLab();
+                mTask.startAlarm(getActivity().getApplicationContext());
+                getActivity().finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 
@@ -197,22 +222,14 @@ public class TaskFragment extends VisibleFragment{
     }
 
     private void updateDate() {
-        String dateMed = DateFormat.getMediumDateFormat(getContext()).format(mTask.getDate());
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(mTask.getDate());
-
-        int h = calendar.get(Calendar.HOUR);
-        if(h==0) h=12;
-        int m = calendar.get(Calendar.MINUTE);
-
-        int ampm = calendar.get(Calendar.AM_PM);
-        String[] AMPM = {"AM","PM"};
-
-        DecimalFormat df = new DecimalFormat("00");
-
-        mDateButton.setText(dateMed);
-        mTimeButton.setText(h+":"+df.format(m)+" "+AMPM[ampm]);
+        if(mTask.getDate()!=null) {
+            mDateButton.setText(mTask.getDate().toString("mm/dd/yyyy"));
+            mTimeButton.setText(mTask.getDate().toString("hh:mm a"));
+        }
+        else {
+            mDateButton.setText(R.string.set_date);
+            mTimeButton.setText(R.string.set_time);
+        }
     }
 
     public static void hideSoftKeyboard(Activity activity) {
@@ -378,14 +395,14 @@ public class TaskFragment extends VisibleFragment{
             return;
         }
         if(requestCode == REQUEST_DATE || requestCode == REQUEST_TIME){
-            Date date;
+            DateTime date;
             if(requestCode == REQUEST_TIME) {
-                date = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
+                date = (DateTime) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
             }
             else {
-                date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+                date = (DateTime) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             }
-            mTask.setDate(date,getActivity().getApplicationContext());
+            mTask.setDate(date);
             updateDate();
             return;
         }

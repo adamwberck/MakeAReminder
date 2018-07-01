@@ -7,6 +7,7 @@ import com.adamwberck.android.makeareminder.SortedObjectList;
 import com.adamwberck.android.makeareminder.TaskLab;
 
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -16,7 +17,7 @@ public class Task implements Serializable{
 
     private int mID;
     private String mName = "";
-    private Date mDate;
+    private DateTime mDate;
     private Repeat mRepeat;
     private boolean mHasRepeat = false;
     private List<Reminder> mReminders = new SortedObjectList<>(10,Reminder.getComparator());
@@ -54,14 +55,19 @@ public class Task implements Serializable{
         startAlarm(appContext);
     }
 
-    public Date getDate() {
+    public DateTime getDate() {
         return mDate;
     }
 
-    public void setDate(Date mDate,Context appContext) {
-        this.mDate = mDate;
+    public void setDate(DateTime date) {
+        this.mDate = roundDate(date,1);
         addReminder(new Reminder(this,SpanOfTime.ofMinutes(0)));
         TaskLab.saveLab();
+    }
+
+    public void test(Context appContext){
+        setDate(new DateTime().plusMinutes(3));
+        addReminder(new Reminder(this,SpanOfTime.ofMinutes(2),true));
         startAlarm(appContext);
     }
 
@@ -72,8 +78,7 @@ public class Task implements Serializable{
         if(mDate==null){
             return;
         }
-        Date now = new Date();
-        if(mDate.before(now)){
+        if(mDate.isBeforeNow()){
             return;
         }
         //TODO Fix this shit
@@ -87,8 +92,19 @@ public class Task implements Serializable{
 
     public Task(Context appContext) {
         mID = TaskLab.get(appContext).nextValue();
-        DateTime dtOrg = new DateTime(new Date());
-        setDate(dtOrg.plusMinutes(1).toDate(),appContext);
+    }
+
+
+    private DateTime roundDate(final DateTime dateTime, final int minutes) {
+        if (minutes < 1 || 60 % minutes != 0) {
+            throw new IllegalArgumentException("minutes must be a factor of 60");
+        }
+
+        final DateTime hour = dateTime.hourOfDay().roundFloorCopy();
+        final long millisSinceHour = new Duration(hour, dateTime).getMillis();
+        final int roundedMinutes = ((int)Math.round(
+                millisSinceHour / 60000.0 / minutes)) * minutes;
+        return hour.plusMinutes(roundedMinutes);
     }
 
     @Override
@@ -109,4 +125,16 @@ public class Task implements Serializable{
         addReminder(r);
     }
 
+    public DateTime getSoonestTime() {
+        if(mDate.isAfterNow()){
+            for(int i=mReminders.size()-1;i<=0;i--){
+                Reminder r = mReminders.get(i);
+                DateTime time = new DateTime().minusMinutes((int)r.getMinutes());
+                if(time.isAfterNow()){
+                    return time;
+                }
+            }
+        }
+        return null;
+    }
 }

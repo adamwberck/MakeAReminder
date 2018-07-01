@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.DatePicker;
 
+import org.joda.time.DateTime;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -29,9 +31,14 @@ public class DatePickerFragment extends DismissDialogFragment {
 
     private DatePicker mDatePicker;
 
-    public static DatePickerFragment newInstance(Date date) {
+    public static DatePickerFragment newInstance(DateTime date) {
         Bundle args = new Bundle();
-        args.putSerializable(ARG_DATE, date);
+        if(date!=null) {
+            args.putSerializable(ARG_DATE, date);
+        }
+        else {
+            args.putSerializable(ARG_DATE, new DateTime());
+        }
 
         DatePickerFragment fragment = new DatePickerFragment();
         fragment.setArguments(args);
@@ -41,11 +48,10 @@ public class DatePickerFragment extends DismissDialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Calendar calendar = getCalendar();
-        calendar.setTime((Date)getArguments().getSerializable(ARG_DATE));
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        final DateTime dateTime = (DateTime) getArguments().getSerializable(ARG_DATE);
+        int year = dateTime.getYear();
+        int month = dateTime.getMonthOfYear();
+        int day = dateTime.getDayOfMonth();
         //TODO make it set to current date if button date is in the past
 
 
@@ -66,27 +72,18 @@ public class DatePickerFragment extends DismissDialogFragment {
                         int month = mDatePicker.getMonth();
                         int day = mDatePicker.getDayOfMonth();
 
-                        Calendar calendar = getCalendar();
 
-                        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                        int minute = calendar.get(Calendar.MINUTE);
+                        int hour = dateTime.getHourOfDay();
+                        int minute = dateTime.getHourOfDay();
 
-                        Date date = new GregorianCalendar(year, month, day,hour,minute).getTime();
+                        DateTime date = new DateTime(year, month, day,hour,minute);
                         sendResult(Activity.RESULT_OK,date);
                     }
                 })
                 .create();
     }
 
-    @NonNull
-    private Calendar getCalendar() {
-        Date date = (Date) getArguments().getSerializable(ARG_DATE);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        return calendar;
-    }
-
-    private void sendResult(int resultCode, Date date) {
+    private void sendResult(int resultCode, DateTime date) {
         if (getTargetFragment() == null) {
             return;
         }

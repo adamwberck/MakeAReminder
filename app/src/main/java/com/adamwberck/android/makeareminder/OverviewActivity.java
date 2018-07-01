@@ -110,6 +110,10 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
         intent.putExtra(EXTRA_NAME, name);
         return intent;
     }
+    public static Intent newIntent(Context packageContext){
+        Intent intent = new Intent(packageContext, OverviewActivity.class);
+        return intent;
+    }
 
     public Task getTask() {
         if (isSingleFragment()) {

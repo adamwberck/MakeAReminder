@@ -5,6 +5,7 @@ import android.util.ArrayMap;
 
 import com.adamwberck.android.makeareminder.SortedObjectList;
 
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 import org.joda.time.LocalTime;
 
@@ -21,7 +22,7 @@ public class Repeat implements Serializable{
     private Map<DayOfWeek,Boolean> mDaysOfWeek = new ArrayMap<>(7);
     //private Map<Integer,Boolean> mDaysOfMonth = new ArrayMap<>(31);
     private SparseArrayCompat<Boolean> mDaysOfMonth = new SparseArrayCompat<>(31);
-    private List<Date> mDates;
+    private List<DateTime> mDates;
     private List<LocalTime> mTimes = new SortedObjectList<LocalTime>(
             10,new TimeComparator());
 

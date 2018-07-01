@@ -34,9 +34,8 @@ public class ReminderService extends IntentService{
         PendingIntent pi = PendingIntent.getService(context, requestCode, i,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         Task task = TaskLab.get(context).getTask(id);
-        Date date = task.getDate();
-        long millis = new DateTime(date).getMillis();
-        setExact(AlarmManager.RTC_WAKEUP,millis,pi,context);
+        DateTime soon = task.getSoonestTime();
+        setExact(AlarmManager.RTC_WAKEUP,soon.getMillis(),pi,context);
 
     }
 

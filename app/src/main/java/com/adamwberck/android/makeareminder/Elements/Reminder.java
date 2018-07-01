@@ -73,4 +73,8 @@ public class Reminder implements Serializable{
     public void setWarningType(boolean warningType) {
         mIsAlarm = warningType;
     }
+
+    public long getMillis() {
+        return mTimeBefore.getMillis();
+    }
 }
