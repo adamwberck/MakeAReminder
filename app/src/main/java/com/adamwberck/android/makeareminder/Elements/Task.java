@@ -12,6 +12,7 @@ import org.joda.time.Duration;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class Task implements Serializable{
 
@@ -33,7 +34,7 @@ public class Task implements Serializable{
 
     public void setRepeat(Repeat repeat) {
         mRepeat = repeat;
-        TaskLab.saveLab();
+        mHasRepeat=true;
     }
 
     public void addReminder(SpanOfTime span){
@@ -42,17 +43,15 @@ public class Task implements Serializable{
 
     public void removeReminder(Reminder r){
         mReminders.remove(r);
-        TaskLab.saveLab();
     }
 
     public String getName() {
         return mName;
     }
 
-    public void setName(String mName,Context appContext) {
+    public void setName(String mName) {
         this.mName = mName;
         TaskLab.saveLab();
-        startAlarm(appContext);
     }
 
     public DateTime getDate() {
@@ -60,15 +59,18 @@ public class Task implements Serializable{
     }
 
     public void setDate(DateTime date) {
-        this.mDate = roundDate(date,1);
+        this.mDate = floorDate(date,1);
         addReminder(new Reminder(this,SpanOfTime.ofMinutes(0)));
+        String s = mDate.toString("hh:mm a", Locale.getDefault());
         TaskLab.saveLab();
     }
 
-    public void test(Context appContext){
+    public void test(){
         setDate(new DateTime().plusMinutes(3));
         addReminder(new Reminder(this,SpanOfTime.ofMinutes(2),true));
-        startAlarm(appContext);
+        String id = Math.abs(mID)+"";
+        id = id.substring(Math.min(0,id.length()-7));
+        setName(id);
     }
 
     public void startAlarm(Context appContext){
@@ -82,7 +84,8 @@ public class Task implements Serializable{
             return;
         }
         //TODO Fix this shit
-        ReminderService.setServiceAlarm(appContext,mID,mName);
+        ReminderService.setServiceAlarm(appContext,mID,mName,false);
+        ReminderService.setServiceAlarm(appContext,mID,mName,true);
     }
 
 
@@ -95,14 +98,14 @@ public class Task implements Serializable{
     }
 
 
-    private DateTime roundDate(final DateTime dateTime, final int minutes) {
+    private DateTime floorDate(final DateTime dateTime, final int minutes) {
         if (minutes < 1 || 60 % minutes != 0) {
             throw new IllegalArgumentException("minutes must be a factor of 60");
         }
 
         final DateTime hour = dateTime.hourOfDay().roundFloorCopy();
         final long millisSinceHour = new Duration(hour, dateTime).getMillis();
-        final int roundedMinutes = ((int)Math.round(
+        final int roundedMinutes = ((int)Math.floor(
                 millisSinceHour / 60000.0 / minutes)) * minutes;
         return hour.plusMinutes(roundedMinutes);
     }
@@ -127,9 +130,9 @@ public class Task implements Serializable{
 
     public DateTime getSoonestTime() {
         if(mDate.isAfterNow()){
-            for(int i=mReminders.size()-1;i<=0;i--){
+            for(int i=mReminders.size()-1;i>=0;i--){
                 Reminder r = mReminders.get(i);
-                DateTime time = new DateTime().minusMinutes((int)r.getMinutes());
+                DateTime time = mDate.minusMinutes((int)r.getMinutes());
                 if(time.isAfterNow()){
                     return time;
                 }

@@ -77,11 +77,10 @@ public class OverviewFragment extends VisibleFragment{
     public void onCreate(Bundle savedInstanceBundle){
         super.onCreate(savedInstanceBundle);
         setHasOptionsMenu(true);
-
     }
 
     @Override
-    public void  onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_overview,menu);
     }
@@ -98,22 +97,24 @@ public class OverviewFragment extends VisibleFragment{
                                 R.string.name_task_warning, Toast.LENGTH_SHORT);
                         toast.show();
                     } else {
-                        Task task = new Task(getContext());
-                        TaskLab.get(getActivity()).addTask(task);
-                        updateUI();
-                        mCallbacks.onTaskSelected(task);
+                        newTask();
                     }
                 }
                 else {
-                    Task task = new Task(getContext());
-                    TaskLab.get(getActivity()).addTask(task);
-                    updateUI();
-                    mCallbacks.onTaskSelected(task);
+                    newTask();
                 }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void newTask() {
+        Task task = new Task(getContext());
+        TaskLab.get(getActivity()).addTask(task);
+        task.test();
+        mCallbacks.onTaskSelected(task);
+        updateUI();
     }
 
     @Override
@@ -166,15 +167,25 @@ public class OverviewFragment extends VisibleFragment{
             boolean isAlarmOn = getArguments().getBoolean(ARG_ALARM);
             int taskID = getArguments().getInt(ARG_TASK_ID);
             Task task = TaskLab.get(getActivity()).getTask(taskID);
-            if (isAlarmOn) {
-                String name = getArguments().getString(ARG_NAME);
-                FragmentManager manager = getFragmentManager();
-                AlarmAlertFragment dialog = AlarmAlertFragment.newInstance(task,name);
-                dialog.setTargetFragment(OverviewFragment.this, REQUEST_SNOOZE);
-                dialog.show(manager, DIALOG_ALARM);
-            }
+            //TODO make dialog activity
             mCallbacks.onTaskSelected(task);
+            if (isAlarmOn) {
+                startAlarmDialog(task);
+            }
         }catch (NullPointerException ignored){}
+    }
+
+    private void startAlarmDialog(Task task) {
+        //TODO fix dialog so it shows
+        //TODO probably make new activity for Dialog
+        String name = getArguments().getString(ARG_NAME);
+        FragmentManager manager = getFragmentManager();
+        AlarmAlertFragment dialog = AlarmAlertFragment.newInstance(task,name);
+        dialog.setTargetFragment(OverviewFragment.this, REQUEST_SNOOZE);
+        dialog.show(manager, DIALOG_ALARM);
+
+        ReminderService.setServiceAlarm(getActivity().getApplicationContext(),task.getID(),name,
+                true);
     }
 
     @Override

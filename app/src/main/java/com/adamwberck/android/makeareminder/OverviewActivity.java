@@ -127,8 +127,8 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
 
     @Override
     public void onBackPressed(){
+        //TODO handle back pressing with dual view
         if(!isSingleFragment()){
-
         }
         super.onBackPressed();
     }

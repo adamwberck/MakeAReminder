@@ -141,7 +141,7 @@ public class TaskFragment extends VisibleFragment{
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mTask.setName(s.toString(),getActivity().getApplicationContext());
+                mTask.setName(s.toString());
                 updateTask();
                 setTaskChanged((TaskLab.get(getActivity()).getTaskIndex(mTask)));
             }
