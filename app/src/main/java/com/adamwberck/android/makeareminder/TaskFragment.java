@@ -91,6 +91,8 @@ public class TaskFragment extends VisibleFragment{
         setHasOptionsMenu(true);
         int taskID = getArguments().getInt(ARG_TASK_ID);
         mTask = TaskLab.get(getActivity()).getTask(taskID);
+        //stop alarms while editing
+        ReminderService.cancelServiceAlarm(getContext(),mTask.getID());
     }
 
     @Override
@@ -103,15 +105,12 @@ public class TaskFragment extends VisibleFragment{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.save_task:
-                TaskLab.saveLab();
-                mTask.startAlarm(getActivity().getApplicationContext());
                 getActivity().finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -374,6 +373,9 @@ public class TaskFragment extends VisibleFragment{
     @Override
     public void onDestroy(){
         TaskLab.get(getContext()).removeUnnamed();
+        TaskLab.saveLab();
+        mTask.startAlarm(getActivity().getApplicationContext());
+        Log.i(TAG,this.toString()+" destroyed.");
         super.onDestroy();
     }
     @Override

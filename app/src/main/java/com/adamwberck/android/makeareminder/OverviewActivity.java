@@ -32,16 +32,7 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
 
     @Override
     protected Fragment createFragment() {
-        try {
-            int id = getIntent().getExtras().getInt(EXTRA_TASK_ID);
-            boolean isAlarmOn = getIntent().getExtras().getBoolean(EXTRA_ALARM);
-            String name = getIntent().getExtras().getString(EXTRA_NAME);
-            return OverviewFragment.newInstance(id,isAlarmOn,name);
-        } catch (NullPointerException e) {
-            return OverviewFragment.newInstance( false);
-        }
-
-
+        return OverviewFragment.newInstance();
     }
 
     @Override
@@ -102,12 +93,9 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
         }
     }
 
-    public static Intent newIntent(Context packageContext, int id, boolean isAlarmOn,
-                                   String name) {
+    public static Intent newIntent(Context packageContext, int id) {
         Intent intent = new Intent(packageContext, OverviewActivity.class);
         intent.putExtra(EXTRA_TASK_ID, id);
-        intent.putExtra(EXTRA_ALARM, isAlarmOn);
-        intent.putExtra(EXTRA_NAME, name);
         return intent;
     }
     public static Intent newIntent(Context packageContext){

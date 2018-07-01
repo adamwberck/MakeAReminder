@@ -33,7 +33,7 @@ public class TaskActivity extends SingleFragmentActivity{
     public void onBackPressed(){
         String name = ((TaskFragment)getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_container)).getTask().getName();
-        if(name==null||name.isEmpty()){
+        if(name.isEmpty()){
             Toast toast = Toast.makeText(getApplicationContext(), R.string.name_task_warning,
                     Toast.LENGTH_SHORT);
             toast.show();

@@ -42,25 +42,23 @@ public class OverviewFragment extends VisibleFragment{
         TaskLab.get(getActivity()).removeTask(task);
     }
 
-    public static Fragment newInstance(int id, boolean isAlarmOn,String name) {
+    public static Fragment newInstance(int id) {
         Bundle args =  new Bundle();
         args.putInt(ARG_TASK_ID, id);
-        args.putBoolean(ARG_ALARM,isAlarmOn);
-        args.putString(ARG_NAME,name);
 
         OverviewFragment fragment = new OverviewFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
-    public static Fragment newInstance(boolean isAlarmOn) {
+    public static Fragment newInstance() {
         Bundle args =  new Bundle();
-        args.putBoolean(ARG_ALARM,isAlarmOn);
 
         OverviewFragment fragment = new OverviewFragment();
         fragment.setArguments(args);
         return fragment;
     }
+
 
     public interface Callbacks {
         void onTaskSelected(Task task);
@@ -164,29 +162,14 @@ public class OverviewFragment extends VisibleFragment{
         mCallbacks = (Callbacks) context;
         mDeleteCallBack = (OnDeleteTaskListener) context;
         try {
-            boolean isAlarmOn = getArguments().getBoolean(ARG_ALARM);
             int taskID = getArguments().getInt(ARG_TASK_ID);
             Task task = TaskLab.get(getActivity()).getTask(taskID);
-            //TODO make dialog activity
             mCallbacks.onTaskSelected(task);
-            if (isAlarmOn) {
-                startAlarmDialog(task);
-            }
-        }catch (NullPointerException ignored){}
+        }
+        catch (NullPointerException ignored){}
     }
 
-    private void startAlarmDialog(Task task) {
-        //TODO fix dialog so it shows
-        //TODO probably make new activity for Dialog
-        String name = getArguments().getString(ARG_NAME);
-        FragmentManager manager = getFragmentManager();
-        AlarmAlertFragment dialog = AlarmAlertFragment.newInstance(task,name);
-        dialog.setTargetFragment(OverviewFragment.this, REQUEST_SNOOZE);
-        dialog.show(manager, DIALOG_ALARM);
 
-        ReminderService.setServiceAlarm(getActivity().getApplicationContext(),task.getID(),name,
-                true);
-    }
 
     @Override
     public void onDetach() {
@@ -260,12 +243,10 @@ public class OverviewFragment extends VisibleFragment{
         public void bind(Task task) {
             mTask = task;
             String name = mTask.getName();
-            if(name!=null) {
-                if(!name.equals("")) {
-                    mTitleTextView.setText(name);
-                    mTitleTextView.setTextColor(getResources().getColor(R.color.black));
-                    return;
-                }
+            if(!name.isEmpty()) {
+                mTitleTextView.setText(name);
+                mTitleTextView.setTextColor(getResources().getColor(R.color.black));
+                return;
             }
             mTitleTextView.setText(R.string.new_task);
             mTitleTextView.setTextColor(getResources().getColor(R.color.gray));

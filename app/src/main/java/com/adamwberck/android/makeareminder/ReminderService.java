@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
+import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.Task;
 
 import org.joda.time.DateTime;
@@ -22,36 +23,51 @@ public class ReminderService extends IntentService{
     private static final String EXTRA_TASK_ID =  "com.adamwberck.android.makeareminder.taskid";
     private static final String EXTRA_ALARM = "com.adamwberck.android.makeareminder.alarm";
     private static final String EXTRA_NAME = "com.adamwberck.android.makeareminder.name";
+    private static final String EXTRA_TITLE = "com.adamwberck.android.makeareminder.title";
 
     public ReminderService() {
         super(TAG);
     }
-
+    public static void cancelServiceAlarm(Context context,int id){
+        Intent i = ReminderService.newIntent(context);
+        i.putExtra(EXTRA_TASK_ID,id);
+        int requestCode = id;
+        cancel(context, i,requestCode);
+    }
     public static void setServiceAlarm(Context context, int id, String name,boolean turnAlarmOn) {
         Intent i = ReminderService.newIntent(context);
         i.putExtra(EXTRA_TASK_ID,id);
-        i.putExtra(EXTRA_NAME,name);
         int requestCode = id;
-        PendingIntent pi = PendingIntent.getService(context, requestCode, i,
-                PendingIntent.FLAG_UPDATE_CURRENT);
         if(!turnAlarmOn){
-            cancel(context, pi);
+            cancel(context, i,requestCode);
         }
         else {
             Task task = TaskLab.get(context).getTask(id);
-            DateTime soon = task.getSoonestTime();
-            if(soon!=null) {
+            Object[] os = task.getSoonestTime();
+            if(os!=null) {
+                DateTime soon = (DateTime) os[0];
+                Reminder r = (Reminder) os[1];
+                i.putExtra(EXTRA_NAME,name);
+                if(r.getMinutes()!=0) {
+                    String s = r.getTimeBefore().getTimeString(context);
+                    name = context.getString(R.string.alarm_reminder, name, s);
+                }
+                i.putExtra(EXTRA_TITLE,name);
+                PendingIntent pi = PendingIntent.getService(context, requestCode, i,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
                 String s = soon.toString("hh:mm a", Locale.getDefault());
                 setExact(AlarmManager.RTC_WAKEUP, soon.getMillis(), pi, context, turnAlarmOn);
             }
             else {
-                cancel(context, pi);
+                cancel(context, i,requestCode);
             }
         }
 
     }
 
-    private static void cancel(Context context, PendingIntent pi) {
+    private static void cancel(Context context, Intent i,int requestCode) {
+        PendingIntent pi = PendingIntent.getService(context, requestCode, i,
+                PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
         pi.cancel();
@@ -76,9 +92,10 @@ public class ReminderService extends IntentService{
     public void onHandleIntent(Intent intent){
         int id = intent.getExtras().getInt(EXTRA_TASK_ID);
         String name = intent.getExtras().getString(EXTRA_NAME);
-        Intent i = OverviewActivity.newIntent(this,id,true,name);
+        String title = intent.getExtras().getString(EXTRA_TITLE);
+        Intent i = AlarmActivity.newIntent(this,id,true,name,title);
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(i);
     }
 }

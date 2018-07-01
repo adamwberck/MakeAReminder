@@ -5,12 +5,15 @@ import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
 /* Created by Adam on 8/18/2017.*/
 
 public abstract class SingleFragmentActivity extends AppCompatActivity {
+
+    private static final String TAG = "Fragment";
 
     protected abstract Fragment createFragment();
 
@@ -35,5 +38,11 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
                     .add(R.id.fragment_container, fragment)
                     .commit();
         }
+    }
+
+    @Override
+    public void onDestroy(){
+        Log.i(TAG,this.toString() + " destroyed");
+        super.onDestroy();
     }
 }

@@ -128,13 +128,16 @@ public class Task implements Serializable{
         addReminder(r);
     }
 
-    public DateTime getSoonestTime() {
+    public Object[] getSoonestTime() {
         if(mDate.isAfterNow()){
             for(int i=mReminders.size()-1;i>=0;i--){
                 Reminder r = mReminders.get(i);
                 DateTime time = mDate.minusMinutes((int)r.getMinutes());
                 if(time.isAfterNow()){
-                    return time;
+                    Object[] objects = new Object[2];
+                    objects[0] = time;
+                    objects[1] = r;
+                    return objects;
                 }
             }
         }

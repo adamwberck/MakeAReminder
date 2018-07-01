@@ -92,8 +92,10 @@ public class TaskLab implements Serializable{
     }
 
     public void removeTask(Task t){
-        mTasks.remove(t);
-        saveLab();
+        if(mTasks.remove(t)){
+            ReminderService.cancelServiceAlarm(mContext,t.getID());
+            saveLab();
+        }
     }
 
 

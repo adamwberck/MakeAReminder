@@ -18,6 +18,7 @@
 
     <string name="create_reminder">Create Reminder</string>
     <string name="cancel">Cancel</string>
+    <string name="alarm_reminder">%1$s : %2$s</string>
     <string name="before_due_1">%1$s before due.</string>
     <string name="before_due_2">%1$s &amp; %2$s before due.</string>
     <string name="before_due_3">%1$s, %2$s &amp; %3$s before due.</string>
@@ -26,6 +27,7 @@
     <string name="name_task_warning">Please Name Task</string>
     <string name="edit_reminder">Edit Reminder</string>
     <string name="alarm">Alarm</string>
+
     <string name="notification">Notification</string>
     <string name="repeat_title">Set Repeat Duration</string>
     <string name="repeat_positive">Set Repeat</string>
