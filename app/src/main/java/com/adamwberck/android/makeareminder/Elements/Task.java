@@ -18,6 +18,7 @@ public class Task implements Serializable{
 
     private int mID;
     private String mName = "";
+    //TODO split into LocalTime and LocalDate
     private DateTime mDate;
     private Repeat mRepeat;
     private boolean mHasRepeat = false;

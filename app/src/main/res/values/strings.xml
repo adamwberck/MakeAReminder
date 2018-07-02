@@ -18,6 +18,11 @@
 
     <string name="create_reminder">Create Reminder</string>
     <string name="cancel">Cancel</string>
+    <string name="snooze_text">%1$s%2$s</string>
+    <string name="minute_letter">m</string>
+    <string name="hour_letter">h</string>
+    <string name="day_letter">d</string>
+    <string name="week_letter">w</string>
     <string name="alarm_reminder">%1$s : %2$s</string>
     <string name="before_due_1">%1$s before due.</string>
     <string name="before_due_2">%1$s &amp; %2$s before due.</string>
@@ -43,6 +48,16 @@
     <string name="save">Save</string>
     <string name="set_date">Set Date</string>
     <string name="set_time">Set Time</string>
+    <string name="set_snooze">Set Snooze</string>
+    <string name="reset">Reset</string>
+    <string-array name="snooze_array">
+        <item>15 Mins</item>
+        <item>30 Mins</item>
+        <item>1 Hour</item>
+        <item>2 Hours</item>
+        <item>4 Hours</item>
+        <item>Custom</item>
+    </string-array>
     <string-array name="days_of_the_week">
         <item>Sun</item>
         <item>Mon</item>

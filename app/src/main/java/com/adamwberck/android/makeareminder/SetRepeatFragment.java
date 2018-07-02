@@ -29,18 +29,10 @@ import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 
 import org.joda.time.DateTime;
-import org.joda.time.Instant;
 import org.joda.time.LocalTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -309,8 +301,8 @@ public class SetRepeatFragment extends DismissDialogFragment {
         public View getView(final int position, View convertView, ViewGroup parent) {
             //TODO replace with ViewHolder
             @SuppressLint("ViewHolder")
-            View v = mInflater.inflate(R.layout.button_day, parent, false);
-            final Button button = v.findViewById(R.id.week_toggle_button);
+            View v = mInflater.inflate(R.layout.button_circle, parent, false);
+            final Button button = v.findViewById(R.id.toggle_button);
             String name = (String) getItem(position);
             button.setText(name);
             updateDayButton(position, button);
@@ -331,13 +323,13 @@ public class SetRepeatFragment extends DismissDialogFragment {
 
         private void updateDayButton(int position, Button button) {
             if(mIsWeek) {
-                int background = mRepeat.isWeek(position) ? R.drawable.ic_button_repeat_circle_on :
-                        R.drawable.ic_button_repeat_circle_off;
+                int background = mRepeat.isWeek(position) ? R.drawable.ic_button_circle_on :
+                        R.drawable.ic_button_circle_off;
                 button.setBackgroundResource(background);
             }
             else {
-                int background = mRepeat.isMonth(position+1) ? R.drawable.ic_button_repeat_circle_on :
-                        R.drawable.ic_button_repeat_circle_off;
+                int background = mRepeat.isMonth(position+1) ? R.drawable.ic_button_circle_on :
+                        R.drawable.ic_button_circle_off;
                 button.setBackgroundResource(background);
             }
         }

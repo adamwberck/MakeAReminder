@@ -5,8 +5,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <Button
         android:layout_gravity="center"
-        android:id="@+id/week_toggle_button"
-        style="@style/WeekButtonOff"
-        android:layout_width="60dp"
-        android:layout_height="60dp"/>
+        android:id="@+id/toggle_button"
+        style="@style/SquareButton"
+        android:layout_width="80dp"
+        android:layout_height="80dp"/>
 </FrameLayout>
