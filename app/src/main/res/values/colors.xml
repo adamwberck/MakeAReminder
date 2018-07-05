@@ -7,6 +7,8 @@
     <color name="gray">#777777</color>
     <color name="lightGray">#AAAAAA</color>
     <color name="red">#FF0000</color>
-    <color name="lightBlue">#3BB9FF</color>
     <color name="white">#FFFFFF</color>
+    <color name="lightBlue">#3BB9FF</color>
+    <color name="mixedBlue">#1E83BF</color>
+    <color name="blue">#004d80</color>
 </resources>

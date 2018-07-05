@@ -63,4 +63,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/add_reminder"/>
+    <Button
+        android:id="@+id/alarm_test_button"
+        android:text="@string/test_alarm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

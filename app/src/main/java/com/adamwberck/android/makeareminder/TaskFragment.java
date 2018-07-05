@@ -83,6 +83,7 @@ public class TaskFragment extends VisibleFragment{
     private ListView mReminderListView;
     private ReminderAdapter mReminderAdapter;
     private Button mRepeatButton;
+    private Button mTestAlarmButton;
 
 
     @Override
@@ -120,6 +121,20 @@ public class TaskFragment extends VisibleFragment{
         if(mTask.getName()!=null) {
             mNameField.setText(mTask.getName());
         }
+
+        mTestAlarmButton = v.findViewById(R.id.alarm_test_button);
+        mTestAlarmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int id = mTask.getID();
+                String name = mTask.getName();
+                String title = mTask.getName()+" Test";
+                Intent i = AlarmActivity.newIntent(getActivity(),id,true,name,title);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivity(i);
+            }
+        });
         mNameField.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
