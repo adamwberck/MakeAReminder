@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 
 import com.adamwberck.android.makeareminder.Elements.Task;
 
+import org.joda.time.DateTime;
+
 public class AlarmFullFragment extends VisibleFragment {
     private static final String ARG_TASK_ID = "task_id";
     private static final String ARG_ALARM = "alarm";
@@ -57,7 +59,7 @@ public class AlarmFullFragment extends VisibleFragment {
         String name = getArguments().getString(ARG_NAME);
         String title = getArguments().getString(ARG_TITLE);
         FragmentManager manager = getFragmentManager();
-        AlarmAlertFragment dialog = AlarmAlertFragment.newInstance(task,title);
+        AlarmAlertDialog dialog = AlarmAlertDialog.newInstance(task,title);
         dialog.setTargetFragment(AlarmFullFragment.this, REQUEST_SNOOZE);
         dialog.show(manager, DIALOG_ALARM);
         ReminderService.setServiceAlarm(getActivity(),task.getID(),name,
@@ -66,10 +68,22 @@ public class AlarmFullFragment extends VisibleFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode!= Activity.RESULT_OK){
+        if(resultCode!= Activity.RESULT_OK) {
+            getActivity().finish();
             return;
         }
+
         if(requestCode==REQUEST_SNOOZE){
+            DateTime snoozeTime = (DateTime) data.getExtras().getSerializable(AlarmAlertDialog.EXTRA_INTERVAL);
+            Task task = TaskLab.get(getContext()).getTask(mTaskID);
+            if(snoozeTime.isAfterNow()) {
+                task.setSnoozeTime(snoozeTime);
+                ReminderService.setServiceAlarm(getActivity().getApplicationContext(),mTaskID
+                        ,task.getName(),true);
+            }
+            else{
+                task.setSnoozeTime(null);
+            }
             getActivity().finish();
         }
     }

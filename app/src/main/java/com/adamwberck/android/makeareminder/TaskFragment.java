@@ -6,24 +6,17 @@ import android.support.v4.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.format.DateFormat;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -39,14 +32,10 @@ import com.adamwberck.android.makeareminder.Elements.Task;
 
 import org.joda.time.DateTime;
 
-import java.text.DecimalFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
+import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
-import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class TaskFragment extends VisibleFragment{
     private static final String TAG = "TaskFragment";
@@ -84,6 +73,7 @@ public class TaskFragment extends VisibleFragment{
     private ReminderAdapter mReminderAdapter;
     private Button mRepeatButton;
     private Button mTestAlarmButton;
+    private Button mSnoozeButton;
 
 
     @Override
@@ -122,6 +112,23 @@ public class TaskFragment extends VisibleFragment{
             mNameField.setText(mTask.getName());
         }
 
+        mSnoozeButton = v.findViewById(R.id.snooze_button);
+
+        mSnoozeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int id = mTask.getID();
+                String name = mTask.getName();
+                String title = mTask.getName();
+                Intent i = AlarmActivity.newIntent(getActivity(),id,true,name,title);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivity(i);
+                updateUI();
+            }
+        });
+
+
         mTestAlarmButton = v.findViewById(R.id.alarm_test_button);
         mTestAlarmButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,6 +140,7 @@ public class TaskFragment extends VisibleFragment{
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(i);
+                updateUI();
             }
         });
         mNameField.setOnKeyListener(new View.OnKeyListener() {
@@ -171,7 +179,7 @@ public class TaskFragment extends VisibleFragment{
             @Override
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
-                DatePickerFragment dialog = DatePickerFragment
+                DatePickerDialog dialog = DatePickerDialog
                         .newInstance(mTask.getDate());
                 dialog.setTargetFragment(TaskFragment.this, REQUEST_DATE);
                 dialog.show(manager,DIALOG_DATE);
@@ -185,7 +193,7 @@ public class TaskFragment extends VisibleFragment{
             @Override
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
-                TimePickerFragment dialog = TimePickerFragment
+                TimePickerDialog dialog = TimePickerDialog
                         .newInstance(mTask.getDate());
                 dialog.setTargetFragment(TaskFragment.this, REQUEST_TIME);
                 dialog.show(manager,DIALOG_TIME);
@@ -199,7 +207,7 @@ public class TaskFragment extends VisibleFragment{
             public void onClick(View v) {
                 //TODO make generic method to do this
                 FragmentManager manager = getFragmentManager();
-                SetRepeatFragment dialog = SetRepeatFragment.newInstance(mTask.getRepeat());
+                SetRepeatDialog dialog = SetRepeatDialog.newInstance(mTask.getRepeat());
                 dialog.setTargetFragment(TaskFragment.this,REQUEST_REPEAT);
                 dialog.show(manager,DIALOG_REPEAT);
             }
@@ -215,7 +223,7 @@ public class TaskFragment extends VisibleFragment{
             @Override
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
-                CreateReminderFragment dialog = CreateReminderFragment.newInstance();
+                CreateReminderDialog dialog = CreateReminderDialog.newInstance();
                 dialog.setTargetFragment(TaskFragment.this, REQUEST_REMINDER);
                 dialog.show(manager,DIALOG_REMINDER);
             }
@@ -307,6 +315,8 @@ public class TaskFragment extends VisibleFragment{
         return fragment;
     }
 
+
+
     private class ReminderAdapter extends BaseAdapter{
         private Context mContext;
         private LayoutInflater mInflater;
@@ -352,7 +362,7 @@ public class TaskFragment extends VisibleFragment{
                 @Override
                 public void onClick(View v) {
                     FragmentManager manager = getFragmentManager();
-                    CreateReminderFragment dialog = CreateReminderFragment.newInstance(reminder);
+                    CreateReminderDialog dialog = CreateReminderDialog.newInstance(reminder);
                     dialog.setTargetFragment(TaskFragment.this, REQUEST_EDIT);
                     dialog.show(manager,DIALOG_REMINDER);
                 }
@@ -372,7 +382,7 @@ public class TaskFragment extends VisibleFragment{
                     updateUI();
                 }
             });
-
+            updateUI();
             return rowView;
         }
 
@@ -384,6 +394,12 @@ public class TaskFragment extends VisibleFragment{
         int position;
     }*/
 
+    @Override
+    public void onResume(){
+        Log.i(TAG,"Resume");
+        updateUI();
+        super.onResume();
+    }
 
     @Override
     public void onDestroy(){
@@ -395,38 +411,36 @@ public class TaskFragment extends VisibleFragment{
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        updateUI();
         if(resultCode != Activity.RESULT_OK){
             return;
         }
         if(requestCode == REQUEST_REMINDER || requestCode == REQUEST_EDIT){
             SpanOfTime span = (SpanOfTime) data
-                    .getSerializableExtra(CreateReminderFragment.EXTRA_NEW_REMINDER);
-            boolean isAlarm = data.getExtras().getBoolean(CreateReminderFragment.EXTRA_IS_ALARM);
+                    .getSerializableExtra(CreateReminderDialog.EXTRA_NEW_REMINDER);
+            boolean isAlarm = data.getExtras().getBoolean(CreateReminderDialog.EXTRA_IS_ALARM);
             if(requestCode==REQUEST_EDIT){
                 Reminder reminder = (Reminder) data
-                        .getSerializableExtra(CreateReminderFragment.EXTRA_DELETE_REMINDER);
+                        .getSerializableExtra(CreateReminderDialog.EXTRA_DELETE_REMINDER);
                 mTask.removeReminder(reminder);
             }
             mTask.addReminder(span,isAlarm);
-            return;
         }
         if(requestCode == REQUEST_DATE || requestCode == REQUEST_TIME){
             DateTime date;
             if(requestCode == REQUEST_TIME) {
-                date = (DateTime) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
+                date = (DateTime) data.getSerializableExtra(TimePickerDialog.EXTRA_TIME);
             }
             else {
-                date = (DateTime) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+                date = (DateTime) data.getSerializableExtra(DatePickerDialog.EXTRA_DATE);
             }
             mTask.setDate(date);
             updateDate();
-            return;
         }
         if(requestCode == REQUEST_REPEAT){
-            Repeat repeat = (Repeat) data.getSerializableExtra(SetRepeatFragment.EXTRA_REPEAT);
+            Repeat repeat = (Repeat) data.getSerializableExtra(SetRepeatDialog.EXTRA_REPEAT);
             mTask.setRepeat(repeat);
         }
+        updateUI();
     }
 
     private void updateUI() {
@@ -440,6 +454,36 @@ public class TaskFragment extends VisibleFragment{
             mReminderAdapter.notifyDataSetChanged();
         }
 
+        if(mTask.isOverdue()){
+            mSnoozeButton.setVisibility(View.VISIBLE);
+            DateTime snoozeTime = mTask.getSnoozeTime();
+            mSnoozeButton.setText(R.string.set_snooze);
+            if(snoozeTime!=null){
+                String time;
+                if(isSameDay(snoozeTime)) {
+                    time = snoozeTime.toString("hh:mm a", Locale.getDefault());
+                }
+                else {
+                    time = snoozeTime.toString("MMM, dd hh:,mm a",Locale.getDefault());
+                }
+                String dateText = getResources().getString(R.string.snoozed_till, time);
+                mSnoozeButton.setText(dateText);
+            }
+        }
+        else {
+            mSnoozeButton.setVisibility(View.GONE);
+        }
 
+    }
+
+    private boolean isSameDay(DateTime snoozeTime) {
+        DateTime today = new DateTime();
+        if(snoozeTime.getDayOfYear()!=today.getDayOfYear()){
+            return false;
+        }
+        if(snoozeTime.getYear()!=today.getYear()){
+            return false;
+        }
+        return true;
     }
 }

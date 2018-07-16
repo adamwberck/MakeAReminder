@@ -21,7 +21,7 @@ import android.widget.TextView;
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 //TODO make dialogs dismiss when clicked off of
-public class CreateReminderFragment extends DismissDialogFragment {
+public class CreateReminderDialog extends DismissDialogFragment {
     private static final String ARG_REMINDER = "reminder";
     public static final String EXTRA_NEW_REMINDER
             = "com.adamwberck.android.makeareminder.newreminder";
@@ -33,18 +33,18 @@ public class CreateReminderFragment extends DismissDialogFragment {
     private boolean mWarningTypeIsAlarm;
 
 
-    public static CreateReminderFragment newInstance() {
+    public static CreateReminderDialog newInstance() {
         Bundle args = new Bundle();
-        CreateReminderFragment fragment = new CreateReminderFragment();
+        CreateReminderDialog fragment = new CreateReminderDialog();
         fragment.setArguments(args);
         return fragment;
     }
 
-    public static CreateReminderFragment newInstance(Reminder reminder) {
+    public static CreateReminderDialog newInstance(Reminder reminder) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_REMINDER, reminder);
 
-        CreateReminderFragment fragment = new CreateReminderFragment();
+        CreateReminderDialog fragment = new CreateReminderDialog();
         fragment.setArguments(args);
         return fragment;
     }
@@ -158,7 +158,7 @@ public class CreateReminderFragment extends DismissDialogFragment {
     }
 
     private void cancel() {
-        CreateReminderFragment.this.getDialog().cancel();
+        CreateReminderDialog.this.getDialog().cancel();
         sendResult(Activity.RESULT_CANCELED,null,false,null);
     }
 

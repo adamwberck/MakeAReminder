@@ -55,8 +55,19 @@ public class ReminderService extends IntentService{
                 i.putExtra(EXTRA_TITLE,name);
                 PendingIntent pi = PendingIntent.getService(context, requestCode, i,
                         PendingIntent.FLAG_UPDATE_CURRENT);
-                String s = soon.toString("hh:mm a", Locale.getDefault());
                 setExact(AlarmManager.RTC_WAKEUP, soon.getMillis(), pi, context, turnAlarmOn);
+            }
+            else if(task.getSnoozeTime()!=null){
+                if(task.getSnoozeTime().isAfterNow()) {
+
+                    i.putExtra(EXTRA_NAME, name);
+                    i.putExtra(EXTRA_TITLE, name + " Originally due " + task.getDate()
+                            .toString("hh:mm a"));
+                    PendingIntent pi = PendingIntent.getService(context, requestCode, i,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+                    setExact(AlarmManager.RTC_WAKEUP, task.getSnoozeTime().getMillis(), pi, context,
+                            turnAlarmOn);
+                }
             }
             else {
                 cancel(context, i,requestCode);

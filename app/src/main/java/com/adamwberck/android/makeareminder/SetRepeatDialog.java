@@ -36,7 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-public class SetRepeatFragment extends DismissDialogFragment {
+public class SetRepeatDialog extends DismissDialogFragment {
     public static final String ARG_REPEAT = "repeat";
     public static final String EXTRA_REPEAT = "com.adamwberck.android.makeareminder.extrarepeat";
     private static final int REQUEST_TIME = 0;
@@ -50,12 +50,12 @@ public class SetRepeatFragment extends DismissDialogFragment {
 
     //TODO add exclusion days for hourly repeats
 
-    public static SetRepeatFragment newInstance(Repeat currentRepeat) {
+    public static SetRepeatDialog newInstance(Repeat currentRepeat) {
 
         Bundle args = new Bundle();
         args.putSerializable(ARG_REPEAT, currentRepeat);
 
-        SetRepeatFragment fragment = new SetRepeatFragment();
+        SetRepeatDialog fragment = new SetRepeatDialog();
         fragment.setArguments(args);
         return fragment;
     }
@@ -110,9 +110,9 @@ public class SetRepeatFragment extends DismissDialogFragment {
             @Override
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
-                TimePickerFragment dialog = TimePickerFragment
+                TimePickerDialog dialog = TimePickerDialog
                         .newInstance(new DateTime());
-                dialog.setTargetFragment(SetRepeatFragment.this, REQUEST_TIME);
+                dialog.setTargetFragment(SetRepeatDialog.this, REQUEST_TIME);
                 dialog.show(manager,DIALOG_TIME);
             }
         });
@@ -195,7 +195,7 @@ public class SetRepeatFragment extends DismissDialogFragment {
         }
         if(requestCode==REQUEST_TIME){
             LocalTime localTime =
-                    new LocalTime(data.getSerializableExtra(TimePickerFragment.EXTRA_TIME));
+                    new LocalTime(data.getSerializableExtra(TimePickerDialog.EXTRA_TIME));
             mRepeat.addTime(localTime);
         }
         updateUI();
@@ -248,7 +248,7 @@ public class SetRepeatFragment extends DismissDialogFragment {
     }
 
     private void cancel() {
-        SetRepeatFragment.this.getDialog().cancel();
+        SetRepeatDialog.this.getDialog().cancel();
         sendResult(Activity.RESULT_CANCELED);
     }
 
@@ -377,9 +377,9 @@ public class SetRepeatFragment extends DismissDialogFragment {
                 @Override
                 public void onClick(View v) {
                     FragmentManager manager = getFragmentManager();
-                    TimePickerFragment dialog = TimePickerFragment
+                    TimePickerDialog dialog = TimePickerDialog
                             .newInstance(new DateTime());
-                    dialog.setTargetFragment(SetRepeatFragment.this, REQUEST_TIME);
+                    dialog.setTargetFragment(SetRepeatDialog.this, REQUEST_TIME);
                     dialog.show(manager,DIALOG_TIME);
                 }
             });

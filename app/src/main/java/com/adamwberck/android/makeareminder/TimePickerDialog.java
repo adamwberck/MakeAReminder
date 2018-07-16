@@ -6,8 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,15 +13,11 @@ import android.widget.TimePicker;
 
 import org.joda.time.DateTime;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
 /**
  * Created by Adam on 8/21/2017.
  */
 
-public class TimePickerFragment extends DismissDialogFragment {
+public class TimePickerDialog extends DismissDialogFragment {
 
     public static final String EXTRA_TIME =
             "com.bignerdranch.android.criminalintent.date";
@@ -32,7 +26,7 @@ public class TimePickerFragment extends DismissDialogFragment {
 
     private TimePicker mTimePicker;
 
-    public static TimePickerFragment newInstance(DateTime date) {
+    public static TimePickerDialog newInstance(DateTime date) {
         Bundle args = new Bundle();
         if(date!=null) {
             args.putSerializable(ARG_TIME, date);
@@ -41,7 +35,7 @@ public class TimePickerFragment extends DismissDialogFragment {
             args.putSerializable(ARG_TIME, new DateTime());
         }
 
-        TimePickerFragment fragment = new TimePickerFragment();
+        TimePickerDialog fragment = new TimePickerDialog();
         fragment.setArguments(args);
         return fragment;
     }

@@ -8,6 +8,7 @@ import com.adamwberck.android.makeareminder.TaskLab;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.joda.time.Interval;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -21,6 +22,7 @@ public class Task implements Serializable{
     //TODO split into LocalTime and LocalDate
     private DateTime mDate;
     private Repeat mRepeat;
+    private DateTime mSnoozeTime;
     private boolean mHasRepeat = false;
     private List<Reminder> mReminders = new SortedObjectList<>(10,Reminder.getComparator());
 
@@ -143,5 +145,17 @@ public class Task implements Serializable{
             }
         }
         return null;
+    }
+
+    public boolean isOverdue() {
+        return mDate.isBeforeNow();
+    }
+
+    public void setSnoozeTime(DateTime date) {
+        mSnoozeTime = date;
+    }
+
+    public DateTime getSnoozeTime() {
+        return mSnoozeTime;
     }
 }

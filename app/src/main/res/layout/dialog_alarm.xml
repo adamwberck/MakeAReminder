@@ -135,5 +135,23 @@ android:layout_height="wrap_content">
                 android:layout_gravity="center_horizontal"
                 style="@style/SquareButton3"/>
         </LinearLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/alarm_snooze_button"
+            android:text="@string/snooze"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/alarm_dismiss_button"
+            android:text="@string/dismiss"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </LinearLayout>

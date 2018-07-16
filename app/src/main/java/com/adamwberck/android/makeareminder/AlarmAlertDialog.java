@@ -4,26 +4,20 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.Elements.Task;
 
 import org.joda.time.DateTime;
@@ -32,21 +26,20 @@ import org.joda.time.Interval;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
-import static com.adamwberck.android.makeareminder.TaskFragment.hideSoftKeyboard;
-
-public class AlarmAlertFragment extends DialogFragment {
+public class AlarmAlertDialog extends DialogFragment {
     private static final DateTime START_TIME = new DateTime();
     private static final String ARG_TASK = "task";
     private static final String ARG_NAME = "name";
     private static final String TAG = "AlarmAlert";
+    public static final String EXTRA_INTERVAL =
+            "com.adamwberck.android.makeareminder.extrainterval";
+    private boolean mNewAlarm = true;
     private Stack<DateTime> mUndoStack = new Stack<>();
     private TextView mSnoozeText;
     private DateTime mSnoozeTime = new DateTime(START_TIME);
@@ -55,9 +48,9 @@ public class AlarmAlertFragment extends DialogFragment {
     private int mButtonNumber = 0;
     private TextView mSnoozeText2;
 
-    public static AlarmAlertFragment newInstance(Task task,String name){
+    public static AlarmAlertDialog newInstance(Task task, String name){
         Bundle args = new Bundle();
-        AlarmAlertFragment fragment = new AlarmAlertFragment();
+        AlarmAlertDialog fragment = new AlarmAlertDialog();
         args.putSerializable(ARG_TASK,task);
         args.putString(ARG_NAME,name);
         fragment.setArguments(args);
@@ -105,6 +98,10 @@ public class AlarmAlertFragment extends DialogFragment {
     }
 
     private void updateSnoozeText() {
+        Resources r = getResources();
+        int color = mNewAlarm ? r.getColor(R.color.blue):r.getColor(R.color.black);
+        mSnoozeText.setTextColor(color);
+        mSnoozeText2.setTextColor(color);
         Interval interval = new Interval(START_TIME,mSnoozeTime);
         PeriodFormatter pfb  = new PeriodFormatterBuilder()
                 .printZeroAlways()
@@ -123,10 +120,12 @@ public class AlarmAlertFragment extends DialogFragment {
                     (int) day,(int)day);
             String snoozeWeek = getResources().getQuantityString(R.plurals.weeks,
                     (int) weeks,(int)weeks);
+            mSnoozeText2.setVisibility(View.VISIBLE);
             if(day!=0&&weeks!=0){
-            mSnoozeText2.setText(getString(R.string.snooze_text_2,snoozeWeek,
+                mSnoozeText2.setText(getString(R.string.snooze_text_2,snoozeWeek,
                     snoozeDay));
-            }else {
+            }
+            else {
                 String text = weeks==0?snoozeDay:snoozeWeek;
                 mSnoozeText2.setText(text);
             }
@@ -134,6 +133,7 @@ public class AlarmAlertFragment extends DialogFragment {
         }
         else {
             mSnoozeText2.setText("");
+            mSnoozeText2.setVisibility(View.GONE);
         }
     }
 
@@ -144,6 +144,10 @@ public class AlarmAlertFragment extends DialogFragment {
         char c =  s.charAt(s.length()-1);
         int time = Integer.parseInt(s.substring(0,s.length()-1));
         mUndoStack.push(mSnoozeTime);
+        if(mNewAlarm){
+            mSnoozeTime = START_TIME;
+            mNewAlarm = false;
+        }
         switch (c){
             case 'm':
                 mSnoozeTime = mSnoozeTime.plusMinutes(time);
@@ -166,10 +170,17 @@ public class AlarmAlertFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View v = LayoutInflater.from(getContext()).inflate(R.layout.dialog_alarm,null);
 
+        Task task = (Task) getArguments().getSerializable(ARG_TASK);
+        DateTime snoozeTime = task.getSnoozeTime();
+        if(snoozeTime!=null && snoozeTime.isAfterNow()) {
+            Interval interval = new Interval(DateTime.now(), snoozeTime);
+            mSnoozeTime = START_TIME.plus(interval.toDurationMillis());
+        }
         ImageButton resetButton = v.findViewById(R.id.reset_button);
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mUndoStack.push(mSnoozeTime);
                 mSnoozeTime = new DateTime(START_TIME);
                 updateSnoozeText();
             }
@@ -183,15 +194,15 @@ public class AlarmAlertFragment extends DialogFragment {
                     mSnoozeTime = mUndoStack.pop();
                 }
                 if(mUndoStack.size()==0){
-                    mSnoozeTime = new DateTime(START_TIME);
+                    mNewAlarm = true;
                 }
                 updateSnoozeText();
             }
         });
 
-
         mSnoozeText = v.findViewById(R.id.snooze_time_text);
         mSnoozeText2 = v.findViewById(R.id.snooze_time_text_2);
+        updateSnoozeText();
         mSnoozeList = Arrays.asList(getResources().getStringArray(R.array.snooze_labels));
         final HorizontalScrollView horizontalScrollView =  v.findViewById(R.id.snooze_scrollview);
         horizontalScrollView.setOnTouchListener(new View.OnTouchListener(){
@@ -219,30 +230,37 @@ public class AlarmAlertFragment extends DialogFragment {
         setupButtons(v.findViewById(R.id.snooze_buttons));
         String name = getArguments().getString(ARG_NAME);
 
+        //End Buttons
+        Button snoozeButton = v.findViewById(R.id.alarm_snooze_button);
+        snoozeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendResult(Activity.RESULT_OK,new Interval(START_TIME,mSnoozeTime));
+            }
+        });
+        Button dismissButton = v.findViewById(R.id.alarm_dismiss_button);
+        dismissButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendResult(Activity.RESULT_CANCELED,null);
+            }
+        });
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setView(v)
-                .setTitle(name)
-                .setPositiveButton("Snooze", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        cancel();
-                    }
-                })
-                .setNegativeButton("Complete", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        cancel();
-                    }
-                })
-                .setNeutralButton("Skip",new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        cancel();
-                    }
-                });
+                .setTitle(name);
         return builder.create();
     }
 
+    private void sendResult(int resultCode, Interval interval){
+        Intent intent = new Intent();
+        DateTime endTime = null;
+        if(interval!=null) {
+            endTime = new DateTime().plus(interval.toDurationMillis());
+        }
+        intent.putExtra(EXTRA_INTERVAL,endTime);
+        getTargetFragment().onActivityResult(getTargetRequestCode(),resultCode,intent);
+    }
     private void cancel() {
         this.getDialog().cancel();
         getTargetFragment()
