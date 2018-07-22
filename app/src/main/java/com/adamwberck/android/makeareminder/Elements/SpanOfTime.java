@@ -5,8 +5,6 @@ import android.util.ArrayMap;
 
 import com.adamwberck.android.makeareminder.R;
 
-import org.joda.time.Period;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,7 +28,7 @@ public class SpanOfTime implements Serializable{
         }
     }
 
-    public String getTimeString(Context context) {
+    public String getTimeString(Context context,String startText, String endText) {
         Map<Type,Long> map = getTime();
         List<TimeResource> timeResources = new ArrayList<>(4);
 
@@ -71,15 +69,15 @@ public class SpanOfTime implements Serializable{
         }
         catch (IndexOutOfBoundsException ignored){}
         if(zeros==3){
-            return context.getString(R.string.before_due_1,str0);
+            return context.getString(R.string.time_text_1,startText,str0,endText);
         }
         if(zeros==2){
-            return context.getString(R.string.before_due_2,str0,str1);
+            return context.getString(R.string.time_text_2,startText,str0,str1,endText);
         }
         if(zeros==1) {
-            return context.getString(R.string.before_due_3,str0,str1,str2);
+            return context.getString(R.string.time_text_3,startText,str0,str1,str2,endText);
         }
-        return context.getString(R.string.before_due_4,str0,str1,str2,str3);
+        return context.getString(R.string.time_text_4,startText,str0,str1,str2,str3,endText);
     }
 
     public Type getTimeType() {
@@ -89,6 +87,7 @@ public class SpanOfTime implements Serializable{
     public long getMillis() {
         return TimeUnit.MINUTES.toMillis(mMinutes);
     }
+
 
     private class TimeResource{
         public TimeResource(String string, int time) {

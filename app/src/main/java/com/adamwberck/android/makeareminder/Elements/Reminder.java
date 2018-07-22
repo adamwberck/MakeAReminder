@@ -52,7 +52,7 @@ public class Reminder implements Serializable{
         if(mTimeBefore.getMinutes() == 0){
             return context.getString(R.string.when_due);
         }else {
-            return getTimeBefore().getTimeString(context);
+            return getTimeBefore().getTimeString(context,"","before due.");
         }
 
     }

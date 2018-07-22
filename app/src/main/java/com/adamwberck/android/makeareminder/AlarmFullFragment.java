@@ -55,7 +55,6 @@ public class AlarmFullFragment extends VisibleFragment {
     }
 
     private void startAlarmDialog(Task task) {
-        //TODO fix dialog so it shows reminder
         String name = getArguments().getString(ARG_NAME);
         String title = getArguments().getString(ARG_TITLE);
         FragmentManager manager = getFragmentManager();
@@ -74,17 +73,24 @@ public class AlarmFullFragment extends VisibleFragment {
         }
 
         if(requestCode==REQUEST_SNOOZE){
-            DateTime snoozeTime = (DateTime) data.getExtras().getSerializable(AlarmAlertDialog.EXTRA_INTERVAL);
+            DateTime snoozeTime = (DateTime) data.getExtras()
+                    .getSerializable(AlarmAlertDialog.EXTRA_INTERVAL);
             Task task = TaskLab.get(getContext()).getTask(mTaskID);
-            if(snoozeTime.isAfterNow()) {
+
+            if (snoozeTime!=null && snoozeTime.isAfterNow()) {
                 task.setSnoozeTime(snoozeTime);
-                ReminderService.setServiceAlarm(getActivity().getApplicationContext(),mTaskID
-                        ,task.getName(),true);
             }
-            else{
+            else {
                 task.setSnoozeTime(null);
+                if(snoozeTime==null){
+                    task.setComplete(true);
+                }
             }
+            ReminderService.setServiceAlarm(getActivity().getApplicationContext(), mTaskID
+                            , task.getName(), true);
+
             getActivity().finish();
         }
+
     }
 }

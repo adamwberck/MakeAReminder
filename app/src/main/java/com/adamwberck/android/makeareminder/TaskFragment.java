@@ -453,6 +453,12 @@ public class TaskFragment extends VisibleFragment{
             mReminderListView.setAdapter(mReminderAdapter);
             mReminderAdapter.notifyDataSetChanged();
         }
+        Repeat repeat = mTask.getRepeat();
+        if(repeat!=null){
+            String s = repeat.getRepeatTime().getTimeString(getContext(),"Every ",
+                    "");
+            mRepeatButton.setText(s);
+        }
 
         if(mTask.isOverdue()){
             mSnoozeButton.setVisibility(View.VISIBLE);

@@ -43,13 +43,17 @@ public class ReminderService extends IntentService{
         }
         else {
             Task task = TaskLab.get(context).getTask(id);
+            if(task.isComplete()&&task.hasRepeat()){
+                task.applyRepeat();
+            }
             Object[] os = task.getSoonestTime();
             if(os!=null) {
                 DateTime soon = (DateTime) os[0];
                 Reminder r = (Reminder) os[1];
                 i.putExtra(EXTRA_NAME,name);
                 if(r.getMinutes()!=0) {
-                    String s = r.getTimeBefore().getTimeString(context);
+                    String s = r.getTimeBefore().getTimeString(context,"",
+                            " before due");
                     name = context.getString(R.string.alarm_reminder, name, s);
                 }
                 i.putExtra(EXTRA_TITLE,name);

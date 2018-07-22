@@ -170,7 +170,7 @@ public class AlarmAlertDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View v = LayoutInflater.from(getContext()).inflate(R.layout.dialog_alarm,null);
 
-        Task task = (Task) getArguments().getSerializable(ARG_TASK);
+        final Task task = (Task) getArguments().getSerializable(ARG_TASK);
         DateTime snoozeTime = task.getSnoozeTime();
         if(snoozeTime!=null && snoozeTime.isAfterNow()) {
             Interval interval = new Interval(DateTime.now(), snoozeTime);
@@ -208,7 +208,6 @@ public class AlarmAlertDialog extends DialogFragment {
         horizontalScrollView.setOnTouchListener(new View.OnTouchListener(){
             @Override
             public boolean onTouch(View view, MotionEvent event) {
-                // TODO Auto-generated method stub
 
                 int scrollX = view.getScrollX();
                 int scrollY = view.getScrollY();
@@ -225,8 +224,6 @@ public class AlarmAlertDialog extends DialogFragment {
             }
 
         });
-
-        //TODO switch to page viewer
         setupButtons(v.findViewById(R.id.snooze_buttons));
         String name = getArguments().getString(ARG_NAME);
 
@@ -242,7 +239,7 @@ public class AlarmAlertDialog extends DialogFragment {
         dismissButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendResult(Activity.RESULT_CANCELED,null);
+                sendResult(Activity.RESULT_OK,null);
             }
         });
 
@@ -252,7 +249,7 @@ public class AlarmAlertDialog extends DialogFragment {
         return builder.create();
     }
 
-    private void sendResult(int resultCode, Interval interval){
+    private void sendResult(int resultCode, Interval interval ){
         Intent intent = new Intent();
         DateTime endTime = null;
         if(interval!=null) {

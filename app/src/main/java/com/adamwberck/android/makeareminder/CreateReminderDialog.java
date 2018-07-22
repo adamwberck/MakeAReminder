@@ -20,7 +20,6 @@ import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
-//TODO make dialogs dismiss when clicked off of
 public class CreateReminderDialog extends DismissDialogFragment {
     private static final String ARG_REMINDER = "reminder";
     public static final String EXTRA_NEW_REMINDER

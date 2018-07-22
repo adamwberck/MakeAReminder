@@ -1,8 +1,10 @@
 package com.adamwberck.android.makeareminder.Elements;
 
+import android.content.Context;
 import android.support.v4.util.SparseArrayCompat;
 import android.util.ArrayMap;
 
+import com.adamwberck.android.makeareminder.R;
 import com.adamwberck.android.makeareminder.SortedObjectList;
 
 import org.joda.time.DateTime;
@@ -10,6 +12,7 @@ import org.joda.time.DateTimeComparator;
 import org.joda.time.LocalTime;
 
 import java.io.Serializable;
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -58,6 +61,55 @@ public class Repeat implements Serializable{
 
     public void setRepeatTime(SpanOfTime timeType) {
         mRepeatTime = timeType;
+    }
+
+    public SpanOfTime getRepeatTime() {
+        return mRepeatTime;
+    }
+
+    public LocalTime getSoonestTime() {
+        try {
+            for (LocalTime time : mTimes) {
+                DateTime date = time.toDateTimeToday();
+                if(date.isAfterNow()){
+                    return time;
+                }
+            }
+        }
+        catch (NullPointerException e){
+            return null;
+        }
+        return null;
+    }
+
+    public List<Integer> getDayOfWeekNumbers() {
+        List<Integer> ints = new ArrayList<>(7);
+        if(mDaysOfWeek.get(DayOfWeek.SUNDAY)){
+            ints.add(0);
+        }
+        if(mDaysOfWeek.get(DayOfWeek.MONDAY)){
+            ints.add(1);
+        }
+        if(mDaysOfWeek.get(DayOfWeek.TUESDAY)){
+            ints.add(2);
+        }
+        if(mDaysOfWeek.get(DayOfWeek.WEDNESDAY)){
+            ints.add(3);
+        }
+        if(mDaysOfWeek.get(DayOfWeek.THURSDAY)){
+            ints.add(4);
+        }
+        if(mDaysOfWeek.get(DayOfWeek.FRIDAY)) {
+            ints.add(5);
+        }
+        if(mDaysOfWeek.get(DayOfWeek.SATURDAY)) {
+            ints.add(6);
+        }
+        return ints;
+    }
+
+    public SparseArrayCompat<Boolean> getMonthDays() {
+        return mDaysOfMonth;
     }
 
 
@@ -119,7 +171,7 @@ public class Repeat implements Serializable{
             if(o1.isEqual(o2)){
                 return 0;
             }
-            return o1.isBefore(o2)?-1:1;
+            return o1.isBefore(o2)?1:-1;
         }
     }
 }

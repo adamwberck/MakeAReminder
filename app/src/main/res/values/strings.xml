@@ -24,10 +24,14 @@
     <string name="day_letter">d</string>
     <string name="week_letter">w</string>
     <string name="alarm_reminder">%1$s : %2$s</string>
-    <string name="before_due_1">%1$s before due.</string>
-    <string name="before_due_2">%1$s &amp; %2$s before due.</string>
-    <string name="before_due_3">%1$s, %2$s &amp; %3$s before due.</string>
-    <string name="before_due_4">%1$s, %2$s, %3$s &amp; %4$s before due.</string>
+
+
+    <string name="time_text_1">%1$s %2$s %3$s.</string>
+    <string name="time_text_2">%1$s %2$s &amp; %3$s %4$s.</string>
+    <string name="time_text_3">%1$s %2$s, %3$s &amp; %4$s %5$s.</string>
+    <string name="time_text_4">%1$s %2$s, %3$s, %4$s &amp; %5$s %6$s.</string>
+
+
     <string name="reminders">Reminders</string>
     <string name="name_task_warning">Please Name Task</string>
     <string name="edit_reminder">Edit Reminder</string>
@@ -56,6 +60,7 @@
     <string name="snooze">Snooze</string>
     <string name="dismiss">Dismiss</string>
     <string name="snoozed_till">Snoozed until %1$s</string>
+    <string name="every_day">Every Day</string>
     <string-array name="snooze_array">
         <item>15 Mins</item>
         <item>30 Mins</item>
@@ -94,6 +99,15 @@
         <item>Weeks</item>
     </string-array>
     <string-array name="time_type_repeat">
+        <item>Days</item>
+        <item>Weeks</item>
+        <item>Months</item>
+        <item>Years</item>
+    </string-array>
+
+    <string-array name="time_type_span">
+        <item>Minutes</item>
+        <item>Hours</item>
         <item>Days</item>
         <item>Weeks</item>
         <item>Months</item>

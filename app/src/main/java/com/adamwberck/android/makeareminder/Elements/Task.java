@@ -1,6 +1,8 @@
 package com.adamwberck.android.makeareminder.Elements;
 
 import android.content.Context;
+import android.support.v4.util.SparseArrayCompat;
+import android.util.SparseArray;
 
 import com.adamwberck.android.makeareminder.ReminderService;
 import com.adamwberck.android.makeareminder.SortedObjectList;
@@ -9,6 +11,7 @@ import com.adamwberck.android.makeareminder.TaskLab;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
+import org.joda.time.LocalTime;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -24,6 +27,7 @@ public class Task implements Serializable{
     private Repeat mRepeat;
     private DateTime mSnoozeTime;
     private boolean mHasRepeat = false;
+    private boolean mComplete = false;
     private List<Reminder> mReminders = new SortedObjectList<>(10,Reminder.getComparator());
 
     public void addReminder(Reminder r){
@@ -157,5 +161,52 @@ public class Task implements Serializable{
 
     public DateTime getSnoozeTime() {
         return mSnoozeTime;
+    }
+
+    public boolean hasRepeat() {
+        return mHasRepeat;
+    }
+
+    public void setComplete(boolean complete) {
+        mComplete = complete;
+    }
+
+    public boolean isComplete() {
+        return mComplete;
+    }
+
+    public void applyRepeat() {
+        Repeat r = mRepeat;
+        SpanOfTime.Type type = r.getTimeType();
+        int rawPeriod = (int) r.getRawPeriod();
+        switch (type) {
+            case DAY:
+                if (r.getTimes().size() > 0) {
+                    mDate = r.getSoonestTime().toDateTimeToday();
+                }
+                mDate.plusDays(rawPeriod);
+                return;
+            case WEEK:
+                mDate.plusWeeks(rawPeriod);
+                List<Integer> weeks = r.getDayOfWeekNumbers();
+                for(int w : weeks) {
+                    if (mDate.getDayOfWeek() == w) {
+                        return;
+                    }
+                    else {
+                        mDate.plusDays(1);
+                    }
+                }
+                return;
+            case MONTH:
+                mDate.plusMonths(rawPeriod);
+                SparseArrayCompat<Boolean> days = r.getMonthDays();
+                int monthDay = mDate.getDayOfMonth();
+                while(!days.get(monthDay)){
+                    mDate.plusDays(1);
+                    monthDay = mDate.getDayOfMonth();
+                }
+                return;
+        }
     }
 }
