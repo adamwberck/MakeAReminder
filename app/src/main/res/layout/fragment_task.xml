@@ -73,4 +73,10 @@
         android:text="@string/snooze"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <Button
+        android:text="@string/complete"
+        android:id="@+id/complete_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
 </LinearLayout>

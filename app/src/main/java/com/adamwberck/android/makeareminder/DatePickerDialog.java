@@ -53,7 +53,7 @@ public class DatePickerDialog extends DismissDialogFragment {
                 .inflate(R.layout.dialog_date,null);
 
         mDatePicker = v.findViewById(R.id.dialog_date_picker);
-        mDatePicker.init(year, month,day,null);
+        mDatePicker.init(year, month-1,day,null);
 
         return new AlertDialog.Builder(getActivity())
                 .setView(v)
@@ -70,7 +70,7 @@ public class DatePickerDialog extends DismissDialogFragment {
                         int hour = dateTime.getHourOfDay();
                         int minute = dateTime.getHourOfDay();
 
-                        DateTime date = new DateTime(year, month, day,hour,minute);
+                        DateTime date = new DateTime(year, month+1, day,hour,minute);
                         sendResult(Activity.RESULT_OK,date);
                     }
                 })

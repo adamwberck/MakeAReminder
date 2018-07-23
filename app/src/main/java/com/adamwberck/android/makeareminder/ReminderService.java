@@ -43,9 +43,6 @@ public class ReminderService extends IntentService{
         }
         else {
             Task task = TaskLab.get(context).getTask(id);
-            if(task.isComplete()&&task.hasRepeat()){
-                task.applyRepeat();
-            }
             Object[] os = task.getSoonestTime();
             if(os!=null) {
                 DateTime soon = (DateTime) os[0];

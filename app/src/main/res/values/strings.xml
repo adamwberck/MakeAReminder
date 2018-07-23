@@ -61,6 +61,8 @@
     <string name="dismiss">Dismiss</string>
     <string name="snoozed_till">Snoozed until %1$s</string>
     <string name="every_day">Every Day</string>
+    <string name="complete">Complete</string>
+    <string name="uncomplete">Uncomplete</string>
     <string-array name="snooze_array">
         <item>15 Mins</item>
         <item>30 Mins</item>

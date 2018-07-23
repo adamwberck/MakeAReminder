@@ -74,6 +74,7 @@ public class TaskFragment extends VisibleFragment{
     private Button mRepeatButton;
     private Button mTestAlarmButton;
     private Button mSnoozeButton;
+    private Button mCompleteButton;
 
 
     @Override
@@ -111,6 +112,15 @@ public class TaskFragment extends VisibleFragment{
         if(mTask.getName()!=null) {
             mNameField.setText(mTask.getName());
         }
+
+        mCompleteButton = v.findViewById(R.id.complete_button);
+        mCompleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTask.setComplete(!mTask.isComplete());
+                updateUI();
+            }
+        });
 
         mSnoozeButton = v.findViewById(R.id.snooze_button);
 
@@ -245,7 +255,7 @@ public class TaskFragment extends VisibleFragment{
 
     private void updateDate() {
         if(mTask.getDate()!=null) {
-            mDateButton.setText(mTask.getDate().toString("mm/dd/yyyy"));
+            mDateButton.setText(mTask.getDate().toString("MM/dd/yyyy"));
             mTimeButton.setText(mTask.getDate().toString("hh:mm a"));
         }
         else {
@@ -444,6 +454,13 @@ public class TaskFragment extends VisibleFragment{
     }
 
     private void updateUI() {
+        if(!mTask.isComplete()) {
+            mCompleteButton.setText(R.string.complete);
+        }
+        else{
+            mCompleteButton.setText(R.string.uncomplete);
+        }
+
         List<Reminder> reminders = mTask.getReminders();
 
         if (mReminderAdapter== null) {

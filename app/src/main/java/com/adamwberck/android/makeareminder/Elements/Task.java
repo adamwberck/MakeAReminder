@@ -41,7 +41,12 @@ public class Task implements Serializable{
 
     public void setRepeat(Repeat repeat) {
         mRepeat = repeat;
-        mHasRepeat=true;
+        if(repeat!=null) {
+            mHasRepeat = true;
+        }
+        else {
+            mHasRepeat = false;
+        }
     }
 
     public void addReminder(SpanOfTime span){
@@ -169,6 +174,9 @@ public class Task implements Serializable{
 
     public void setComplete(boolean complete) {
         mComplete = complete;
+        if(mComplete){
+            mSnoozeTime = null;
+        }
     }
 
     public boolean isComplete() {
@@ -181,32 +189,31 @@ public class Task implements Serializable{
         int rawPeriod = (int) r.getRawPeriod();
         switch (type) {
             case DAY:
-                if (r.getTimes().size() > 0) {
+                if (r.getTimes()!=null && r.getTimes().size() > 0) {
                     mDate = r.getSoonestTime().toDateTimeToday();
                 }
-                mDate.plusDays(rawPeriod);
+                mDate = mDate.plusDays(rawPeriod);
                 return;
             case WEEK:
-                mDate.plusWeeks(rawPeriod);
+                mDate.plusWeeks(rawPeriod-1);
                 List<Integer> weeks = r.getDayOfWeekNumbers();
                 for(int w : weeks) {
                     if (mDate.getDayOfWeek() == w) {
                         return;
                     }
                     else {
-                        mDate.plusDays(1);
+                        mDate = mDate.plusDays(1);
                     }
                 }
                 return;
             case MONTH:
-                mDate.plusMonths(rawPeriod);
+                mDate = mDate.plusMonths(rawPeriod-1);
                 SparseArrayCompat<Boolean> days = r.getMonthDays();
                 int monthDay = mDate.getDayOfMonth();
                 while(!days.get(monthDay)){
-                    mDate.plusDays(1);
+                    mDate = mDate.plusDays(1);
                     monthDay = mDate.getDayOfMonth();
                 }
-                return;
         }
     }
 }
