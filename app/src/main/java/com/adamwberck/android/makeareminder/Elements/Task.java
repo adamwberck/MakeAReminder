@@ -20,6 +20,9 @@ import java.util.Locale;
 
 public class Task implements Serializable{
 
+    //TODO add exceptions (meaning on tuesday go off at a different time
+
+
     private int mID;
     private String mName = "";
     //TODO split into LocalTime and LocalDate
@@ -78,9 +81,10 @@ public class Task implements Serializable{
     }
 
     public void test(){
-        setDate(new DateTime().plusMinutes(60));
+        setDate(new DateTime().plusMinutes(1));
         //addReminder(new Reminder(this,SpanOfTime.ofMinutes(2),true));
         String id = Math.abs(mID)+"";
+        setRepeat(new Repeat(1,SpanOfTime.ofDays(1)));
         id = id.substring(Math.min(0,id.length()-7));
         setName(id);
     }
@@ -184,35 +188,63 @@ public class Task implements Serializable{
     }
 
     public void applyRepeat() {
+        if(!isOverdue()||!hasRepeat()){
+            return;
+        }
         Repeat r = mRepeat;
+        setComplete(false);
         SpanOfTime.Type type = r.getTimeType();
         int rawPeriod = (int) r.getRawPeriod();
         switch (type) {
             case DAY:
-                if (r.getTimes()!=null && r.getTimes().size() > 0) {
-                    mDate = r.getSoonestTime().toDateTimeToday();
+                while(isOverdue()) {
+                    mDate = mDate.plusDays(rawPeriod);
                 }
-                mDate = mDate.plusDays(rawPeriod);
+                if(r.isMoreOften()){
+                    LocalTime lt = r.getTimes().get(0);
+                    int hour = lt.getHourOfDay();
+                    int min = lt.getMinuteOfHour();
+                    mDate = new DateTime(mDate.getYear(),mDate.getMonthOfYear(),
+                            mDate.getDayOfMonth(),hour,min);
+                }
                 return;
             case WEEK:
-                mDate.plusWeeks(rawPeriod-1);
+                mDate = mDate.plusWeeks(rawPeriod-1);
                 List<Integer> weeks = r.getDayOfWeekNumbers();
-                for(int w : weeks) {
-                    if (mDate.getDayOfWeek() == w) {
-                        return;
-                    }
-                    else {
-                        mDate = mDate.plusDays(1);
-                    }
+                int dayOWeek = mDate.getDayOfWeek();
+                while(!weeks.contains(dayOWeek)){
+                    mDate = mDate.plusDays(1);
+                    dayOWeek = mDate.getDayOfWeek();
+                }
+                while (isOverdue()){
+                    mDate = mDate.plusWeeks(rawPeriod);
                 }
                 return;
             case MONTH:
-                mDate = mDate.plusMonths(rawPeriod-1);
-                SparseArrayCompat<Boolean> days = r.getMonthDays();
-                int monthDay = mDate.getDayOfMonth();
-                while(!days.get(monthDay)){
-                    mDate = mDate.plusDays(1);
-                    monthDay = mDate.getDayOfMonth();
+                int month = mDate.getMonthOfYear();
+                int year = mDate.getYear();
+                int day = mDate.getDayOfMonth();
+                int hour = mDate.getHourOfDay();
+                int minute = mDate.getMinuteOfHour();
+
+                for(int dayM : r.getMonthDays()){
+                    if(day<dayM){
+                        mDate = new DateTime(year,month,dayM,hour,minute);
+                        while (isOverdue()){
+                            mDate = mDate.plusMonths(rawPeriod);
+                        }
+                        return;
+                    }
+                }
+                mDate = mDate.plusMonths(rawPeriod);
+
+                month = mDate.getMonthOfYear();
+                year = mDate.getYear();
+                hour = mDate.getHourOfDay();
+                minute = mDate.getMinuteOfHour();
+                mDate = new DateTime(year,month,r.getMonthDays().get(0),hour,minute);
+                while (isOverdue()){
+                    mDate = mDate.plusMonths(rawPeriod);
                 }
         }
     }

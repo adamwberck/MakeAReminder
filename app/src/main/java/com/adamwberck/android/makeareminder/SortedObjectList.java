@@ -14,18 +14,17 @@ import java.util.Collection;
 import java.util.Comparator;
 
 public class SortedObjectList<T> extends ArrayList<T> implements Serializable{
-    private transient Comparator<T> mComparator;
+    private Comparator<T> mComparator;
     public SortedObjectList(int initialCapacity, Comparator<T> comparator) {
         super(initialCapacity);
         mComparator = comparator;
     }
 
-    public SortedObjectList() {
+    public boolean hasComparator(){
+        return mComparator!=null;
     }
 
-    public SortedObjectList(@NonNull Collection<? extends T> c) {
-        super(c);
-    }
+
 
     @Override
     public boolean add(T item){
@@ -34,9 +33,6 @@ public class SortedObjectList<T> extends ArrayList<T> implements Serializable{
         }
         else {
             for(int i=0;i<this.size();i++){
-                if(mComparator==null){
-                    mComparator = (Comparator<T>) Reminder.getComparator();
-                }
                 if(mComparator.compare(get(i),item)<0){
                     super.add(i,item);
                     return true;

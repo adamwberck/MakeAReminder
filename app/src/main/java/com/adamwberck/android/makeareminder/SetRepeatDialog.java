@@ -323,12 +323,12 @@ public class SetRepeatDialog extends DismissDialogFragment {
 
         private void updateDayButton(int position, Button button) {
             if(mIsWeek) {
-                int background = mRepeat.isWeek(position) ? R.drawable.ic_button_circle_on :
+                int background = mRepeat.isRepeatOnWeekDay(position) ? R.drawable.ic_button_circle_on :
                         R.drawable.ic_button_circle_off;
                 button.setBackgroundResource(background);
             }
             else {
-                int background = mRepeat.isMonth(position+1) ? R.drawable.ic_button_circle_on :
+                int background = mRepeat.isRepeatOnMonthDay(position+1) ? R.drawable.ic_button_circle_on :
                         R.drawable.ic_button_circle_off;
                 button.setBackgroundResource(background);
             }

@@ -63,6 +63,7 @@
     <string name="every_day">Every Day</string>
     <string name="complete">Complete</string>
     <string name="uncomplete">Uncomplete</string>
+    <string name="start_day">Start Day</string>
     <string-array name="snooze_array">
         <item>15 Mins</item>
         <item>30 Mins</item>

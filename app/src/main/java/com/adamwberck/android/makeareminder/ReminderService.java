@@ -11,6 +11,7 @@ import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.Task;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalTime;
 
 import java.util.Date;
 import java.util.Locale;
@@ -59,6 +60,7 @@ public class ReminderService extends IntentService{
                 setExact(AlarmManager.RTC_WAKEUP, soon.getMillis(), pi, context, turnAlarmOn);
             }
             else if(task.getSnoozeTime()!=null){
+                //TODO check if snooze is after repeat
                 if(task.getSnoozeTime().isAfterNow()) {
 
                     i.putExtra(EXTRA_NAME, name);
@@ -68,6 +70,13 @@ public class ReminderService extends IntentService{
                             PendingIntent.FLAG_UPDATE_CURRENT);
                     setExact(AlarmManager.RTC_WAKEUP, task.getSnoozeTime().getMillis(), pi, context,
                             turnAlarmOn);
+                }
+            }
+            else if(task.getRepeat().isMoreOften()) {
+                LocalTime lt = task.getRepeat().getSoonestTime();
+                if(lt!=null){
+                    DateTime dt = lt.toDateTimeToday();
+                    task.setDate(dt);
                 }
             }
             else {

@@ -5,5 +5,9 @@
         android:icon="@drawable/ic_menu_add"
         android:title="@string/new_task"
         app:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/start_day"
+        android:title="@string/start_day"
+        app:showAsAction="ifRoom"/>
 
 </menu>

@@ -7,18 +7,25 @@ import android.util.Log;
 
 import com.adamwberck.android.makeareminder.Elements.Task;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 import java.util.List;
 
 public class StartupReceiver extends BroadcastReceiver {
     private static final String TAG =
             "StartupReceiver";
     @Override
-    public void onReceive(Context context, Intent
-            intent) {
-            List<Task> tasks = TaskLab.get(context).getTasks();
-            for(Task task:tasks) {
-                ReminderService.setServiceAlarm(context,task.getID(),task.getName(),
-                        true);
+    public void onReceive(Context context, Intent intent) {
+        Log.i(TAG,"Startup Receiver");
+        List<Task> tasks = TaskLab.get(context).getTasks();
+        //TODO Startup not showing in log
+        for(Task task:tasks) {
+            if(task.isComplete()&&task.hasRepeat()){
+                task.applyRepeat();
             }
+            ReminderService.setServiceAlarm(context,task.getID(),task.getName(),
+                    true);
+        }
+        StartDayService.setServiceAlarm(context,true);
     }
 }

@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SpanOfTime implements Serializable{
     //TODO Change to Interval
-    //TODO Change Everything to Joda Time
+    //TODO Change Everything to JodaTime
     private long mMinutes;
     private Type mTimeType;
 

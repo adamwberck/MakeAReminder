@@ -102,6 +102,9 @@ public class OverviewFragment extends VisibleFragment{
                     newTask();
                 }
                 return true;
+            case R.id.start_day:
+                StartDayService.testServiceAlarm(getContext());
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

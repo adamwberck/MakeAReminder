@@ -5,7 +5,9 @@ import android.content.Context;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.Elements.Task;
 
+import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.joda.time.LocalTime;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,10 +24,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TaskLab implements Serializable{
     //public static final long MINUTE = 60000;
+    //TODO add settings page
+    private LocalTime mStartOfDay = new LocalTime(3,0);
     //TODO Change to SQL Lite
     private static TaskLab sTaskLab;
     private List<Task> mTasks;
-    private SpanOfTime mDefaultSnooze;
     private AtomicInteger mAtomicInteger = new AtomicInteger(Integer.MIN_VALUE);
     private transient Context mContext;
     private static final String FILE_NAME = "tasks.info";
@@ -122,5 +125,10 @@ public class TaskLab implements Serializable{
 
     public  int nextValue() {
         return mAtomicInteger.incrementAndGet();
+    }
+
+    public long getStartDay() {
+        return mStartOfDay.toDateTimeToday().getMillis();
+        //return new DateTime().plusMinutes(1).getMillis();
     }
 }

@@ -242,17 +242,6 @@ public class TaskFragment extends VisibleFragment{
         return v;
     }
 
-    private void showDialog(Class c,int requestCode,String dialogString) {
-        try {
-            FragmentManager manager = getFragmentManager();
-            DialogFragment dialog = (DialogFragment) c.newInstance();
-            dialog.setTargetFragment(TaskFragment.this,requestCode);
-            dialog.show(manager,dialogString);
-        } catch (java.lang.InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void updateDate() {
         if(mTask.getDate()!=null) {
             mDateButton.setText(mTask.getDate().toString("MM/dd/yyyy"));
@@ -272,8 +261,10 @@ public class TaskFragment extends VisibleFragment{
         InputMethodManager inputMethodManager =
                 (InputMethodManager) activity.getSystemService(
                         Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(
-                activity.getCurrentFocus().getWindowToken(), 0);
+        if(inputMethodManager!=null) {
+            inputMethodManager.hideSoftInputFromWindow(
+                    activity.getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
     @Override

@@ -26,7 +26,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        JodaTimeAndroid.init(getApplicationContext());
         setContentView(getLayoutResId());
 
         FragmentManager fm = getSupportFragmentManager();

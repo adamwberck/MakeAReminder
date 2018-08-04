@@ -1,33 +1,37 @@
 package com.adamwberck.android.makeareminder.Elements;
 
-import android.content.Context;
-import android.support.v4.util.SparseArrayCompat;
-import android.util.ArrayMap;
-
-import com.adamwberck.android.makeareminder.R;
 import com.adamwberck.android.makeareminder.SortedObjectList;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeComparator;
 import org.joda.time.LocalTime;
 
 import java.io.Serializable;
-import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class Repeat implements Serializable{
     private long mRawPeriod;
     private SpanOfTime mRepeatTime;
-    private Map<DayOfWeek,Boolean> mDaysOfWeek = new ArrayMap<>(7);
-    //private Map<Integer,Boolean> mDaysOfMonth = new ArrayMap<>(31);
-    private SparseArrayCompat<Boolean> mDaysOfMonth = new SparseArrayCompat<>(31);
+    private List<Integer> mDaysOfTheWeek = new SortedObjectList<>(7,
+            new IntComparator());
+    private List<Integer> mDaysOfMonth = new SortedObjectList<>(31,
+            new IntComparator());
     private List<DateTime> mDates;
     private List<LocalTime> mTimes = new SortedObjectList<LocalTime>(
             10,new TimeComparator());
+
+
+    private class IntComparator implements Comparator<Integer>, Serializable{
+        @Override
+        public int compare(Integer o1, Integer o2) {
+            return Integer.compare(o1,o2);
+        }
+    }
+
+    public boolean isMoreOften(){
+        return mTimes.size()!=0&&getTimeType()== SpanOfTime.Type.DAY;
+    }
 
     public void addTime(LocalTime localTime){
         mTimes.add(localTime);
@@ -35,16 +39,13 @@ public class Repeat implements Serializable{
     public void removeTime(LocalTime localTime){
         mTimes.remove(localTime);
     }
-    public boolean isWeek(int position) {
-        return isWeek(getDayOfWeek(position));
+
+    public boolean isRepeatOnWeekDay(int position) {
+        return mDaysOfTheWeek.contains(position);
     }
 
-    public boolean isWeek(DayOfWeek dayOfWeek) {
-        return mDaysOfWeek.get(dayOfWeek);
-    }
-
-    public boolean isMonth(int i) {
-        return mDaysOfMonth.get(i);
+    public boolean isRepeatOnMonthDay(int i) {
+        return mDaysOfMonth.contains(i);
     }
 
     public List<LocalTime> getTimes() {
@@ -83,88 +84,47 @@ public class Repeat implements Serializable{
     }
 
     public List<Integer> getDayOfWeekNumbers() {
-        List<Integer> ints = new ArrayList<>(7);
-        if(mDaysOfWeek.get(DayOfWeek.SUNDAY)){
-            ints.add(0);
-        }
-        if(mDaysOfWeek.get(DayOfWeek.MONDAY)){
-            ints.add(1);
-        }
-        if(mDaysOfWeek.get(DayOfWeek.TUESDAY)){
-            ints.add(2);
-        }
-        if(mDaysOfWeek.get(DayOfWeek.WEDNESDAY)){
-            ints.add(3);
-        }
-        if(mDaysOfWeek.get(DayOfWeek.THURSDAY)){
-            ints.add(4);
-        }
-        if(mDaysOfWeek.get(DayOfWeek.FRIDAY)) {
-            ints.add(5);
-        }
-        if(mDaysOfWeek.get(DayOfWeek.SATURDAY)) {
-            ints.add(6);
-        }
-        return ints;
+        return mDaysOfTheWeek;
     }
 
-    public SparseArrayCompat<Boolean> getMonthDays() {
+    public List<Integer> getMonthDays() {
         return mDaysOfMonth;
     }
 
 
-    public enum DayOfWeek{
-        SUNDAY,
-        MONDAY,
-        TUESDAY,
-        WEDNESDAY,
-        THURSDAY,
-        FRIDAY,
-        SATURDAY
-    }
-
     public Repeat(long everyPeriod, SpanOfTime repeatTime) {
         mRawPeriod = everyPeriod;
         mRepeatTime = repeatTime;
-
-        for(DayOfWeek day: DayOfWeek.values()){
-            mDaysOfWeek.put(day,false);
-        }
-        for(int i=1;i<=31;i++){
-            mDaysOfMonth.put(i,false);
-        }
         mDates = new ArrayList<>(366);
     }
 
 
-    public void toggleWeek(DayOfWeek dayOfWeek){
-        boolean onOrOff = mDaysOfWeek.get(dayOfWeek);
-        mDaysOfWeek.put(dayOfWeek,!onOrOff);
-    }
-
-    public void toggleWeek(int num){
-        toggleWeek(getDayOfWeek(num));
-    }
-
-    private static DayOfWeek getDayOfWeek(int num) {
-        switch (num){
-            case 0: return DayOfWeek.SUNDAY;
-            case 1: return DayOfWeek.MONDAY;
-            case 2: return DayOfWeek.TUESDAY;
-            case 3: return DayOfWeek.WEDNESDAY;
-            case 4: return DayOfWeek.THURSDAY;
-            case 5: return DayOfWeek.FRIDAY;
-            case 6: return DayOfWeek.SUNDAY;
+    public void toggleWeek(int dayOfWeek){
+        boolean onOrOff = mDaysOfTheWeek.contains(dayOfWeek);
+        if(onOrOff){
+            for(int i=0;i<mDaysOfTheWeek.size();i++){
+                int day = mDaysOfTheWeek.get(i);
+                if(day==dayOfWeek){
+                    mDaysOfTheWeek.remove(i);
+                }
+            }
         }
-        return null;
+        else {
+            mDaysOfTheWeek.add(dayOfWeek);
+        }
     }
 
     public void toggleDayOfMonth(int dayOfMonth){
-        boolean onOrOff = mDaysOfMonth.get(dayOfMonth);
-        mDaysOfMonth.put(dayOfMonth,!onOrOff);
+        boolean onOrOff = mDaysOfTheWeek.contains(dayOfMonth);
+        if(onOrOff){
+            mDaysOfTheWeek.remove(dayOfMonth);
+        }
+        else {
+            mDaysOfTheWeek.add(dayOfMonth);
+        }
     }
 
-    private class TimeComparator implements Comparator<LocalTime> {
+    private class TimeComparator implements Comparator<LocalTime>, Serializable {
 
         @Override
         public int compare(LocalTime o1, LocalTime o2) {
