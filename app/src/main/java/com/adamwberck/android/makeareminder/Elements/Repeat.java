@@ -115,12 +115,17 @@ public class Repeat implements Serializable{
     }
 
     public void toggleDayOfMonth(int dayOfMonth){
-        boolean onOrOff = mDaysOfTheWeek.contains(dayOfMonth);
+        boolean onOrOff = mDaysOfMonth.contains(dayOfMonth);
         if(onOrOff){
-            mDaysOfTheWeek.remove(dayOfMonth);
+            for(int i=0;i<mDaysOfMonth.size();i++){
+                int day = mDaysOfMonth.get(i);
+                if(day==dayOfMonth){
+                    mDaysOfTheWeek.remove(i);
+                }
+            }
         }
         else {
-            mDaysOfTheWeek.add(dayOfMonth);
+            mDaysOfMonth.add(dayOfMonth);
         }
     }
 

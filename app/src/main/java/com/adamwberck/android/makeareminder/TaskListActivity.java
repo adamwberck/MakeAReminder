@@ -4,15 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.View;
 import android.widget.Toast;
 
 import com.adamwberck.android.makeareminder.Elements.Task;
 
-import java.util.UUID;
-
-public class OverviewActivity extends SingleFragmentActivity implements OverviewFragment.Callbacks,
-        TaskFragment.Callbacks, OverviewFragment.OnDeleteTaskListener,
+public class TaskListActivity extends SingleFragmentActivity implements TaskListFragment.Callbacks,
+        TaskFragment.Callbacks, TaskListFragment.OnDeleteTaskListener,
         TaskFragment.OnDeleteTaskListener {
 
     private static final String EXTRA_TASK_ID = "com.adamwberck.android.makeareminder.task_id";
@@ -26,13 +23,13 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
     }
 
     public void onTaskUpdated(Task task) {
-        OverviewFragment overviewFragment = (OverviewFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        overviewFragment.updateUI();
+        TaskListFragment taskListFragment = (TaskListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        taskListFragment.updateUI();
     }
 
     @Override
     protected Fragment createFragment() {
-        return OverviewFragment.newInstance();
+        return TaskListFragment.newInstance();
     }
 
     @Override
@@ -78,28 +75,28 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
     public void onTaskIdSelected(int taskId) {
         TaskFragment taskFragment = (TaskFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.detail_fragment_container);
-        OverviewFragment overviewFragment = (OverviewFragment) getSupportFragmentManager()
+        TaskListFragment taskListFragment = (TaskListFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_container);
-        if (overviewFragment != null) {
-            overviewFragment.deleteTask(taskId);
-            overviewFragment.updateUI();
+        if (taskListFragment != null) {
+            taskListFragment.deleteTask(taskId);
+            taskListFragment.updateUI();
         }
         if (taskFragment != null) {
             Task viewTask = taskFragment.getTask();
             if (viewTask.getID()==taskId) {
-                overviewFragment.getActivity().getSupportFragmentManager().beginTransaction()
+                taskListFragment.getActivity().getSupportFragmentManager().beginTransaction()
                         .remove(taskFragment).commit();
             }
         }
     }
 
     public static Intent newIntent(Context packageContext, int id) {
-        Intent intent = new Intent(packageContext, OverviewActivity.class);
+        Intent intent = new Intent(packageContext, TaskListActivity.class);
         intent.putExtra(EXTRA_TASK_ID, id);
         return intent;
     }
     public static Intent newIntent(Context packageContext){
-        Intent intent = new Intent(packageContext, OverviewActivity.class);
+        Intent intent = new Intent(packageContext, TaskListActivity.class);
         return intent;
     }
 

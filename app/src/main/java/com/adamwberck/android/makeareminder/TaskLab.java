@@ -1,6 +1,7 @@
 package com.adamwberck.android.makeareminder;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.Elements.Task;
@@ -23,6 +24,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class TaskLab implements Serializable{
+    private final static String TAG = "TaskLab";
+
+
     //public static final long MINUTE = 60000;
     //TODO add settings page
     private LocalTime mStartOfDay = new LocalTime(3,0);
@@ -63,10 +67,12 @@ public class TaskLab implements Serializable{
                 sTaskLab = loadLab(context);
                 sTaskLab.mContext = context;
             } catch (IOException e) {
+                Log.i(TAG,"IOException");
                 sTaskLab = new TaskLab(context);
             }
             catch (ClassNotFoundException c){
                 c.printStackTrace();
+                Log.i(TAG,"Class not found exception");
                 sTaskLab = new TaskLab(context);
             }
         }

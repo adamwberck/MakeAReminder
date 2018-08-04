@@ -64,6 +64,8 @@
     <string name="complete">Complete</string>
     <string name="uncomplete">Uncomplete</string>
     <string name="start_day">Start Day</string>
+    <string name="task_time">1 Jan 1990</string>
+    <string name="remove_repeat">Remove Repeat</string>
     <string-array name="snooze_array">
         <item>15 Mins</item>
         <item>30 Mins</item>

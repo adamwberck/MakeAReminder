@@ -99,7 +99,6 @@ public class Task implements Serializable{
         if(mDate.isBeforeNow()){
             return;
         }
-        //TODO Fix this shit
         ReminderService.setServiceAlarm(appContext,mID,mName,false);
         ReminderService.setServiceAlarm(appContext,mID,mName,true);
     }

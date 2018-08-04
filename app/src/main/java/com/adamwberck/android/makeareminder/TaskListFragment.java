@@ -2,10 +2,8 @@ package com.adamwberck.android.makeareminder;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -21,10 +19,13 @@ import android.widget.Toast;
 
 import com.adamwberck.android.makeareminder.Elements.Task;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Locale;
 
-public class OverviewFragment extends VisibleFragment{
+public class TaskListFragment extends VisibleFragment{
+
+    //TODO sort tasks based on due date and completeness
     private static final String ARG_TASK_ID = "task_id";
     private static final String ARG_ALARM = "alarm";
     private static final String ARG_NAME = "name";
@@ -46,15 +47,14 @@ public class OverviewFragment extends VisibleFragment{
         Bundle args =  new Bundle();
         args.putInt(ARG_TASK_ID, id);
 
-        OverviewFragment fragment = new OverviewFragment();
+        TaskListFragment fragment = new TaskListFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
     public static Fragment newInstance() {
         Bundle args =  new Bundle();
-
-        OverviewFragment fragment = new OverviewFragment();
+        TaskListFragment fragment = new TaskListFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -87,7 +87,7 @@ public class OverviewFragment extends VisibleFragment{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.new_task:
-                Task currentTask = ((OverviewActivity)getActivity()).getTask();
+                Task currentTask = ((TaskListActivity)getActivity()).getTask();
                 if(currentTask!=null) {
                     String name = currentTask.getName();
                     if (name.isEmpty()) {
@@ -104,6 +104,7 @@ public class OverviewFragment extends VisibleFragment{
                 return true;
             case R.id.start_day:
                 StartDayService.testServiceAlarm(getContext());
+                updateUI();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -120,7 +121,7 @@ public class OverviewFragment extends VisibleFragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle saInSt){
-        View v = inflater.inflate(R.layout.fragment_overview,container,false);
+        View v = inflater.inflate(R.layout.fragment_tasklist,container,false);
         super.setupUI(v);
 
         mTaskRecyclerView = v.findViewById(R.id.task_recycler_view);
@@ -235,6 +236,7 @@ public class OverviewFragment extends VisibleFragment{
             });
 
             mTitleTextView = itemView.findViewById(R.id.task_title);
+            mDateTextView = itemView.findViewById(R.id.task_due_date);
         }
 
         @Override
@@ -244,15 +246,36 @@ public class OverviewFragment extends VisibleFragment{
 
 
         public void bind(Task task) {
+            List<TextView> taskText = new ArrayList<>();
+            taskText.add(mTitleTextView);
+            taskText.add(mDateTextView);
+
             mTask = task;
             String name = mTask.getName();
             if(!name.isEmpty()) {
                 mTitleTextView.setText(name);
-                mTitleTextView.setTextColor(getResources().getColor(R.color.black));
+                for(TextView t: taskText){
+                    t.setTextColor(getResources().getColor(R.color.black));
+                }
+                mDateTextView.setText(mTask.getDate().toString("dd MMM YYYY hh:mm a",
+                        Locale.getDefault()));
+                if(task.isComplete()){
+                    for(TextView t: taskText){
+                        t.setTextColor(getResources().getColor(R.color.green));
+                    }
+                }
+                else if(task.isOverdue()){
+                    for(TextView t: taskText){
+                        t.setTextColor(getResources().getColor(R.color.red));
+                    }
+                }
                 return;
             }
             mTitleTextView.setText(R.string.new_task);
-            mTitleTextView.setTextColor(getResources().getColor(R.color.gray));
+            mDateTextView.setText("");
+            for(TextView t: taskText){
+                t.setTextColor(getResources().getColor(R.color.gray));
+            }
         }
 
     }

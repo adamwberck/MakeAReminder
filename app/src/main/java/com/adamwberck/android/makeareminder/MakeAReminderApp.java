@@ -4,7 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import net.danlew.android.joda.JodaTimeAndroid;
-
+//TODO handle dual view
 public class MakeAReminderApp extends Application {
     private static final String TAG = "MakeAReminderApp";
         public void onCreate() {

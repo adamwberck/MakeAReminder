@@ -180,9 +180,11 @@ public class AlarmAlertDialog extends DialogFragment {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mUndoStack.push(mSnoozeTime);
-                mSnoozeTime = new DateTime(START_TIME);
-                updateSnoozeText();
+                if(!mSnoozeTime.equals(START_TIME)) {
+                    mUndoStack.push(mSnoozeTime);
+                    mSnoozeTime = START_TIME;
+                    updateSnoozeText();
+                }
             }
         });
 

@@ -467,6 +467,9 @@ public class TaskFragment extends VisibleFragment{
                     "");
             mRepeatButton.setText(s);
         }
+        else {
+            mRepeatButton.setText(R.string.repeat);
+        }
 
         if(mTask.isOverdue()){
             mSnoozeButton.setVisibility(View.VISIBLE);

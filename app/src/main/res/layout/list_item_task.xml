@@ -1,26 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:layout_editor_absoluteY="81dp"
-    tools:layout_editor_absoluteX="0dp">
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/task_title"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="30dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:text="Reminder Title"
+        android:text="Take out the Trash"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-</android.support.constraint.ConstraintLayout>
+        tools:ignore="HardcodedText" />
+    <TextView
+        android:id="@+id/task_due_date"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="0dp"
+        android:text="Due on: 1 Jan 1970"
+        android:textColor="@android:color/black"
+        android:textSize="13sp"
+        tools:ignore="HardcodedText" />
+</LinearLayout>

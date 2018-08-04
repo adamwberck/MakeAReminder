@@ -11,16 +11,7 @@ import java.util.Comparator;
 
 
 public class Reminder implements Serializable{
-    private static Comparator<Reminder> sComparator = new Comparator<Reminder>() {
-        @Override
-        public int compare(Reminder r1, Reminder r2) {
-            if(r1.getTimeBefore()!=r2.getTimeBefore()){
-                return (r1.getMinutes() < r2.getMinutes()) ? 1 : -1;
-            }else{
-                return 0;
-            }
-        }
-    };
+    private static Comparator<Reminder> sComparator = new ReminderComparator();
     private Task mTask;
     private SpanOfTime mTimeBefore;
     private boolean mIsAlarm = true;
@@ -76,5 +67,16 @@ public class Reminder implements Serializable{
 
     public long getMillis() {
         return mTimeBefore.getMillis();
+    }
+
+    private static class ReminderComparator implements Comparator<Reminder>,Serializable {
+        @Override
+        public int compare(Reminder r1, Reminder r2) {
+            if(r1.getTimeBefore()!=r2.getTimeBefore()){
+                return (r1.getMinutes() < r2.getMinutes()) ? 1 : -1;
+            }else{
+                return 0;
+            }
+        }
     }
 }

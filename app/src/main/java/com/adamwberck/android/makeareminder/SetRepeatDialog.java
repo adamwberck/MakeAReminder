@@ -41,6 +41,8 @@ public class SetRepeatDialog extends DismissDialogFragment {
     public static final String EXTRA_REPEAT = "com.adamwberck.android.makeareminder.extrarepeat";
     private static final int REQUEST_TIME = 0;
     private static final String DIALOG_TIME = "DialogTime";
+    private static final String EXTRA_REMOVE = "com.adamwberck.android.makeareminder.removerepeat";
+
     private long mDuration;
     private int mTimeTypeInt;
     private int mWeekInt;
@@ -48,6 +50,9 @@ public class SetRepeatDialog extends DismissDialogFragment {
     private ListView mListView;
     private TimeListAdapter mTimeListAdapter;
 
+    //TODO more often should be open
+
+    //TODO add hourly repeats
     //TODO add exclusion days for hourly repeats
 
     public static SetRepeatDialog newInstance(Repeat currentRepeat) {
@@ -96,7 +101,10 @@ public class SetRepeatDialog extends DismissDialogFragment {
         mListView.setAdapter(mTimeListAdapter);
         final TextView moreOften = view.findViewById(R.id.more_often_option);
         final View moreOftenGroup = view.findViewById(R.id.more_often_group) ;
-        moreOftenGroup.setVisibility(View.GONE);
+
+        int vis = mRepeat.isMoreOften()? View.VISIBLE:View.GONE;
+        moreOftenGroup.setVisibility(vis);
+
         moreOftenVisibility(moreOften);
         moreOften.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,7 +145,7 @@ public class SetRepeatDialog extends DismissDialogFragment {
                 if(!parent.getItemAtPosition(position).toString().equals("")) {
                     moreOftenGroup.setVisibility(View.GONE);
                     mTimeTypeInt = position;
-                    mRepeat.setRepeatTime(getTimeType(position));
+                    mRepeat.setRepeatTime(getTimeType());
                     moreOftenVisibility(moreOften);
                     updateGridView(gridView, weekAdapter, monthAdapter);
                 }
@@ -145,6 +153,16 @@ public class SetRepeatDialog extends DismissDialogFragment {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
+            }
+        });
+
+        Button removeButton = view.findViewById(R.id.remove_repeat_button);
+        removeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mRepeat = null;
+                setRepeat();
+                getDialog().cancel();
             }
         });
 
@@ -169,7 +187,7 @@ public class SetRepeatDialog extends DismissDialogFragment {
         return builder.create();
     }
 
-    private SpanOfTime getTimeType(int timeTypeInt) {
+    private SpanOfTime getTimeType() {
         SpanOfTime span;
         if(mTimeTypeInt==0){
             span = SpanOfTime.ofDays(mDuration);
@@ -248,7 +266,7 @@ public class SetRepeatDialog extends DismissDialogFragment {
     }
 
     private void cancel() {
-        SetRepeatDialog.this.getDialog().cancel();
+        getDialog().cancel();
         sendResult(Activity.RESULT_CANCELED);
     }
 
