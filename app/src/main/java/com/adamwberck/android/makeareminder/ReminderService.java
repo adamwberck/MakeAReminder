@@ -43,7 +43,7 @@ public class ReminderService extends IntentService{
             cancel(context, i,requestCode);
         }
         else {
-            Task task = TaskLab.get(context).getTask(id);
+            Task task = GroupLab.get(context).getTask(id);
             Object[] os = task.getSoonestTime();
             if(os!=null) {
                 DateTime soon = (DateTime) os[0];

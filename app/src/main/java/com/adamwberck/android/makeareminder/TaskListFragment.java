@@ -17,6 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.adamwberck.android.makeareminder.Elements.Group;
 import com.adamwberck.android.makeareminder.Elements.Task;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class TaskListFragment extends VisibleFragment{
     
     private static final int REQUEST_SNOOZE = 0;
     private static final String DIALOG_ALARM = "Dialog_ALARM";
+    private Group mGroup;
     private RecyclerView mTaskRecyclerView;
     private TaskAdapter mAdapter;
 
@@ -39,8 +41,9 @@ public class TaskListFragment extends VisibleFragment{
 
 
     public void deleteTask(int taskId) {
-        Task task = TaskLab.get(getActivity()).getTask(taskId);
-        TaskLab.get(getActivity()).removeTask(task);
+        //Task task = TaskLab.get(getActivity()).getTask(taskId);
+        //TaskLab.get(getActivity()).removeTask(task);
+        mGroup.removeTask(taskId);
     }
 
     public static Fragment newInstance(int id) {
@@ -113,7 +116,7 @@ public class TaskListFragment extends VisibleFragment{
 
     private void newTask() {
         Task task = new Task(getContext());
-        TaskLab.get(getActivity()).addTask(task);
+        mGroup.addTask(task);
         task.test();
         mCallbacks.onTaskSelected(task);
         updateUI();
@@ -147,7 +150,7 @@ public class TaskListFragment extends VisibleFragment{
                         int position = viewHolder.getAdapterPosition();
                         Task task = mAdapter.mTasks.get(position);
                         mDeleteCallBack.onTaskIdSelected(task.getID());
-                        TaskLab.get(getActivity()).removeTask(task);
+                        mGroup.removeTask(task);
                     }
                 };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
@@ -167,7 +170,7 @@ public class TaskListFragment extends VisibleFragment{
         mDeleteCallBack = (OnDeleteTaskListener) context;
         try {
             int taskID = getArguments().getInt(ARG_TASK_ID);
-            Task task = TaskLab.get(getActivity()).getTask(taskID);
+            Task task = mGroup.getTask(taskID);
             mCallbacks.onTaskSelected(task);
         }
         catch (NullPointerException ignored){}
@@ -183,8 +186,7 @@ public class TaskListFragment extends VisibleFragment{
     }
 
     public void updateUI() {
-        TaskLab taskLab = TaskLab.get(getActivity());
-        List<Task> tasks = taskLab.getTasks();
+        List<Task> tasks = mGroup.getTasks();
 
 
         if (mAdapter == null) {
@@ -224,7 +226,7 @@ public class TaskListFragment extends VisibleFragment{
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    TaskLab.get(getActivity()).removeTask(mTask);
+                                    mGroup.removeTask(mTask);
                                     dialog.dismiss();
                                     updateUI();
                                 }

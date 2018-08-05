@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.adamwberck.android.makeareminder.Elements.Group;
 import com.adamwberck.android.makeareminder.Elements.Task;
 
 import org.joda.time.DateTime;
@@ -48,7 +49,7 @@ public class AlarmFullFragment extends VisibleFragment {
         super.onAttach(context);
         boolean isAlarmOn = getArguments().getBoolean(ARG_ALARM);
         mTaskID = getArguments().getInt(ARG_TASK_ID);
-        Task task = TaskLab.get(getActivity()).getTask(mTaskID);
+        Task task = GroupLab.get(getActivity()).getTask(mTaskID);
         if (isAlarmOn) {
             startAlarmDialog(task);
         }
@@ -75,7 +76,7 @@ public class AlarmFullFragment extends VisibleFragment {
         if(requestCode==REQUEST_SNOOZE){
             DateTime snoozeTime = (DateTime) data.getExtras()
                     .getSerializable(AlarmAlertDialog.EXTRA_INTERVAL);
-            Task task = TaskLab.get(getContext()).getTask(mTaskID);
+            Task task = GroupLab.get(getContext()).getTask(mTaskID);
 
             if (snoozeTime!=null && snoozeTime.isAfterNow()) {
                 task.setSnoozeTime(snoozeTime);

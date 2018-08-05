@@ -1,20 +1,16 @@
 package com.adamwberck.android.makeareminder.Elements;
 
 import android.content.Context;
-import android.support.v4.util.SparseArrayCompat;
-import android.util.SparseArray;
 
+import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.ReminderService;
 import com.adamwberck.android.makeareminder.SortedObjectList;
-import com.adamwberck.android.makeareminder.TaskLab;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
-import org.joda.time.Interval;
 import org.joda.time.LocalTime;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,7 +33,7 @@ public class Task implements Serializable{
 
     public void addReminder(Reminder r){
         mReminders.add(r);
-        TaskLab.saveLab();
+        GroupLab.saveLab();
     }
 
     public Repeat getRepeat() {
@@ -68,7 +64,7 @@ public class Task implements Serializable{
 
     public void setName(String mName) {
         this.mName = mName;
-        TaskLab.saveLab();
+        GroupLab.saveLab();
     }
 
     public DateTime getDate() {
@@ -79,7 +75,7 @@ public class Task implements Serializable{
         this.mDate = floorDate(date,1);
         addReminder(new Reminder(this,SpanOfTime.ofMinutes(0)));
         String s = mDate.toString("hh:mm a", Locale.getDefault());
-        TaskLab.saveLab();
+        GroupLab.saveLab();
     }
 
     public void test(){
@@ -111,7 +107,7 @@ public class Task implements Serializable{
     }
 
     public Task(Context appContext) {
-        mID = TaskLab.get(appContext).nextValue();
+        mID = GroupLab.get(appContext).nextValue();
     }
 
 

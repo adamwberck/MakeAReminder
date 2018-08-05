@@ -50,7 +50,7 @@ public class StartDayService extends IntentService {
                 AlarmManager alarmManager = (AlarmManager)
                         context.getSystemService(Context.ALARM_SERVICE);
 
-                long startTime = TaskLab.get(context).getStartDay();
+                long startTime = GroupLab.get(context).getStartDay();
                 long cTime = startTime - new DateTime().getMillis();
                 Log.i(TAG,"Seconds left: " + TimeUnit.MILLISECONDS.toSeconds(cTime));
                 PendingIntent pi = PendingIntent.getService(context, REQUEST_CODE, i,
@@ -79,7 +79,7 @@ public class StartDayService extends IntentService {
     public void onHandleIntent(Intent intent){
         Log.i(TAG,"Start Intent Handled");
         Context context = getApplicationContext();
-        List<Task> tasks = TaskLab.get(context).getTasks();
+        List<Task> tasks = GroupLab.get(context).getTasks();
         for(Task task:tasks) {
             if(task.hasRepeat()){
                 task.applyRepeat();
