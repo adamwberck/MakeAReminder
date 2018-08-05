@@ -1,7 +1,5 @@
 package com.adamwberck.android.makeareminder.Elements;
 
-import com.adamwberck.android.makeareminder.SortedObjectList;
-
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 

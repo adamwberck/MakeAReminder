@@ -1,4 +1,4 @@
-package com.adamwberck.android.makeareminder;
+package com.adamwberck.android.makeareminder.Activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +7,9 @@ import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
 import com.adamwberck.android.makeareminder.Elements.Task;
+import com.adamwberck.android.makeareminder.Fragment.TaskFragment;
+import com.adamwberck.android.makeareminder.Fragment.TaskListFragment;
+import com.adamwberck.android.makeareminder.R;
 
 public class TaskListActivity extends SingleFragmentActivity implements TaskListFragment.Callbacks,
         TaskFragment.Callbacks, TaskListFragment.OnDeleteTaskListener,
@@ -19,7 +22,7 @@ public class TaskListActivity extends SingleFragmentActivity implements TaskList
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        TaskLab.get(this).removeUnnamed();
+        //TaskLab.get(this).removeUnnamed();
     }
 
     public void onTaskUpdated(Task task) {
@@ -41,7 +44,7 @@ public class TaskListActivity extends SingleFragmentActivity implements TaskList
     @Override
     public void onTaskSelected(Task task) {
         if (isSingleFragment()) {
-            Intent intent = TaskActivity.newIntent(this, task.getID());
+            Intent intent = TaskActivity.newIntent(this, task);
             startActivity(intent);
         } else {
             TaskFragment tf = (TaskFragment) getSupportFragmentManager()
@@ -50,7 +53,7 @@ public class TaskListActivity extends SingleFragmentActivity implements TaskList
             if (tf != null) {
                 String name = tf.getTask().getName();
                 if (!name.isEmpty()) {
-                    Fragment newDetail = TaskFragment.newInstance(task.getID());
+                    Fragment newDetail = TaskFragment.newInstance(task);
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.detail_fragment_container, newDetail).commit();
                 } else {
@@ -60,7 +63,7 @@ public class TaskListActivity extends SingleFragmentActivity implements TaskList
                 }
             }
             else {
-                Fragment newDetail = TaskFragment.newInstance(task.getID());
+                Fragment newDetail = TaskFragment.newInstance(task);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.detail_fragment_container, newDetail).commit();
             }

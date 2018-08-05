@@ -1,4 +1,4 @@
-package com.adamwberck.android.makeareminder;
+package com.adamwberck.android.makeareminder.Dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -8,7 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class DismissDialogFragment extends DialogFragment {
+public class DismissDialog extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){

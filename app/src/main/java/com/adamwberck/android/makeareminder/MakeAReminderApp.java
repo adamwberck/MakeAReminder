@@ -3,6 +3,8 @@ package com.adamwberck.android.makeareminder;
 import android.app.Application;
 import android.util.Log;
 
+import com.adamwberck.android.makeareminder.Service.StartDayService;
+
 import net.danlew.android.joda.JodaTimeAndroid;
 //TODO handle dual view
 public class MakeAReminderApp extends Application {

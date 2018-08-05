@@ -1,4 +1,4 @@
-package com.adamwberck.android.makeareminder;
+package com.adamwberck.android.makeareminder.Activity;
 
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
+import com.adamwberck.android.makeareminder.R;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 

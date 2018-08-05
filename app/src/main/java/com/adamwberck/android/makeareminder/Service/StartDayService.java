@@ -1,17 +1,16 @@
-package com.adamwberck.android.makeareminder;
+package com.adamwberck.android.makeareminder.Service;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.util.Log;
 
 import com.adamwberck.android.makeareminder.Elements.Task;
+import com.adamwberck.android.makeareminder.GroupLab;
 
 import org.joda.time.DateTime;
-import org.joda.time.Interval;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

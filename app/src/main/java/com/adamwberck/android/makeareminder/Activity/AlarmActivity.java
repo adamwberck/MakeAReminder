@@ -1,8 +1,10 @@
-package com.adamwberck.android.makeareminder;
+package com.adamwberck.android.makeareminder.Activity;
 
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
+
+import com.adamwberck.android.makeareminder.Fragment.AlarmFullFragment;
 
 public class AlarmActivity extends SingleFragmentActivity {
     private static final String EXTRA_TASK_ID = "com.adamwberck.android.makeareminder.task_id";

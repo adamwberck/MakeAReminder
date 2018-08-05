@@ -1,4 +1,4 @@
-package com.adamwberck.android.makeareminder;
+package com.adamwberck.android.makeareminder.Dialog;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
+import com.adamwberck.android.makeareminder.R;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
@@ -36,7 +37,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-public class SetRepeatDialog extends DismissDialogFragment {
+public class SetRepeatDialog extends DismissDialog {
     public static final String ARG_REPEAT = "repeat";
     public static final String EXTRA_REPEAT = "com.adamwberck.android.makeareminder.extrarepeat";
     private static final int REQUEST_TIME = 0;

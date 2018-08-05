@@ -1,7 +1,5 @@
 package com.adamwberck.android.makeareminder.Elements;
 
-import com.adamwberck.android.makeareminder.ReminderService;
-
 import org.joda.time.DateTime;
 
 import java.io.Serializable;

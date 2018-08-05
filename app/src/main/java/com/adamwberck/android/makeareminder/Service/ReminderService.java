@@ -1,4 +1,4 @@
-package com.adamwberck.android.makeareminder;
+package com.adamwberck.android.makeareminder.Service;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -7,14 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
+import com.adamwberck.android.makeareminder.Activity.AlarmActivity;
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.Task;
+import com.adamwberck.android.makeareminder.GroupLab;
+import com.adamwberck.android.makeareminder.R;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
-
-import java.util.Date;
-import java.util.Locale;
 
 public class ReminderService extends IntentService{
     //TODO start on startup

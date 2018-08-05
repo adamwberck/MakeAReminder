@@ -1,8 +1,7 @@
-package com.adamwberck.android.makeareminder;
+package com.adamwberck.android.makeareminder.Fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.support.v4.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,10 +24,18 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.adamwberck.android.makeareminder.Activity.AlarmActivity;
+import com.adamwberck.android.makeareminder.Dialog.CreateReminderDialog;
+import com.adamwberck.android.makeareminder.Dialog.DatePickerDialog;
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.Elements.Task;
+import com.adamwberck.android.makeareminder.GroupLab;
+import com.adamwberck.android.makeareminder.R;
+import com.adamwberck.android.makeareminder.Service.ReminderService;
+import com.adamwberck.android.makeareminder.Dialog.SetRepeatDialog;
+import com.adamwberck.android.makeareminder.Dialog.TimePickerDialog;
 
 import org.joda.time.DateTime;
 
@@ -53,6 +60,7 @@ public class TaskFragment extends VisibleFragment{
     private static final int REQUEST_REPEAT = 6;
 
     private static final String ARG_TASK_ID = "task_id";
+    private static final String ARG_TASK = "task";
     private static final String ARG_ALARM = "alarm";
 
     private static final String DIALOG_REMINDER = "DialogReminder";
@@ -81,8 +89,7 @@ public class TaskFragment extends VisibleFragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        int taskID = getArguments().getInt(ARG_TASK_ID);
-        mTask = TaskLab.get(getActivity()).getTask(taskID);
+        mTask = (Task) getArguments().getSerializable(ARG_TASK);
         //stop alarms while editing
         ReminderService.cancelServiceAlarm(getContext(),mTask.getID());
     }
@@ -175,7 +182,6 @@ public class TaskFragment extends VisibleFragment{
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mTask.setName(s.toString());
                 updateTask();
-                setTaskChanged((TaskLab.get(getActivity()).getTaskIndex(mTask)));
             }
 
             @Override
@@ -287,7 +293,7 @@ public class TaskFragment extends VisibleFragment{
     }
 
     private void updateTask() {
-        TaskLab.get(getActivity()).updateTask(mTask);
+        //TaskLab.get(getActivity()).updateTask(mTask);
         if(mCallbacks!=null) {
             mCallbacks.onTaskUpdated(mTask);
         }
@@ -306,9 +312,9 @@ public class TaskFragment extends VisibleFragment{
         void onTaskIdSelected(int TaskID);
     }
 
-    public static TaskFragment newInstance(int taskID) {
+    public static TaskFragment newInstance(Task task) {
         Bundle args =  new Bundle();
-        args.putSerializable(ARG_TASK_ID, taskID);
+        args.putSerializable(ARG_TASK, task);
         args.putBoolean(ARG_ALARM,false);
 
         TaskFragment fragment = new TaskFragment();
@@ -404,8 +410,8 @@ public class TaskFragment extends VisibleFragment{
 
     @Override
     public void onDestroy(){
-        TaskLab.get(getContext()).removeUnnamed();
-        TaskLab.saveLab();
+        //TaskLab.get(getContext()).removeUnnamed();
+        GroupLab.saveLab();
         mTask.startAlarm(getActivity().getApplicationContext());
         Log.i(TAG,this.toString()+" destroyed.");
         super.onDestroy();

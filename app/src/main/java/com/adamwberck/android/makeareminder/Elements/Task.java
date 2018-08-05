@@ -3,8 +3,7 @@ package com.adamwberck.android.makeareminder.Elements;
 import android.content.Context;
 
 import com.adamwberck.android.makeareminder.GroupLab;
-import com.adamwberck.android.makeareminder.ReminderService;
-import com.adamwberck.android.makeareminder.SortedObjectList;
+import com.adamwberck.android.makeareminder.Service.ReminderService;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;

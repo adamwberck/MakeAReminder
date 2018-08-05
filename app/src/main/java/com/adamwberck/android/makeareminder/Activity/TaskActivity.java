@@ -1,31 +1,30 @@
-package com.adamwberck.android.makeareminder;
+package com.adamwberck.android.makeareminder.Activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
 import com.adamwberck.android.makeareminder.Elements.Task;
+import com.adamwberck.android.makeareminder.Fragment.TaskFragment;
+import com.adamwberck.android.makeareminder.R;
 
-import java.util.UUID;
-
-public class TaskActivity extends SingleFragmentActivity{
+public class TaskActivity extends SingleFragmentActivity {
 
 
-    private static final String EXTRA_TASK_ID = "com.adamwberck.android.makeareminder.task_id";
+    private static final String EXTRA_TASK = "com.adamwberck.android.makeareminder.task";
     //private static final String EXTRA_ALARM = "com.adamwberck.android.makeareminder.alarm";
 
-    public static Intent newIntent(Context packageContext, int taskID) {
+    public static Intent newIntent(Context packageContext, Task task) {
         Intent intent = new Intent(packageContext,TaskActivity.class);
-        intent.putExtra(EXTRA_TASK_ID,taskID);
+        intent.putExtra(EXTRA_TASK,task);
         return intent;
     }
 
     @Override
     protected Fragment createFragment() {
-        int taskID = getIntent().getExtras().getInt(EXTRA_TASK_ID);
-        return TaskFragment.newInstance(taskID);
+        Task task = (Task) getIntent().getExtras().getSerializable(EXTRA_TASK);
+        return TaskFragment.newInstance(task);
     }
 
 

@@ -1,4 +1,4 @@
-package com.adamwberck.android.makeareminder;
+package com.adamwberck.android.makeareminder.Fragment;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,6 +19,9 @@ import android.widget.Toast;
 
 import com.adamwberck.android.makeareminder.Elements.Group;
 import com.adamwberck.android.makeareminder.Elements.Task;
+import com.adamwberck.android.makeareminder.R;
+import com.adamwberck.android.makeareminder.Service.StartDayService;
+import com.adamwberck.android.makeareminder.Activity.TaskListActivity;
 
 import java.util.ArrayList;
 import java.util.List;

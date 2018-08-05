@@ -1,4 +1,4 @@
-package com.adamwberck.android.makeareminder;
+package com.adamwberck.android.makeareminder.Dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -11,13 +11,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TimePicker;
 
+import com.adamwberck.android.makeareminder.R;
+
 import org.joda.time.DateTime;
 
 /**
  * Created by Adam on 8/21/2017.
  */
 
-public class TimePickerDialog extends DismissDialogFragment {
+public class TimePickerDialog extends DismissDialog {
 
     public static final String EXTRA_TIME =
             "com.bignerdranch.android.criminalintent.date";

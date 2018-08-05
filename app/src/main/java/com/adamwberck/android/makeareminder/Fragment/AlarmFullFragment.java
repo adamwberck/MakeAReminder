@@ -1,4 +1,4 @@
-package com.adamwberck.android.makeareminder;
+package com.adamwberck.android.makeareminder.Fragment;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,8 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.adamwberck.android.makeareminder.Elements.Group;
+import com.adamwberck.android.makeareminder.Dialog.AlarmAlertDialog;
 import com.adamwberck.android.makeareminder.Elements.Task;
+import com.adamwberck.android.makeareminder.GroupLab;
+import com.adamwberck.android.makeareminder.R;
+import com.adamwberck.android.makeareminder.Service.ReminderService;
 
 import org.joda.time.DateTime;
 

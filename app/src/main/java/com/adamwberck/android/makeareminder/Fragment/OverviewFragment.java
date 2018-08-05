@@ -1,4 +1,4 @@
-package com.adamwberck.android.makeareminder;
+package com.adamwberck.android.makeareminder.Fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -17,12 +17,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Elements.Group;
-import com.adamwberck.android.makeareminder.Elements.Task;
+import com.adamwberck.android.makeareminder.R;
 
 import java.util.List;
 
 public class OverviewFragment extends VisibleFragment {
-
+    //TODO auto load if one group
     private RecyclerView mGroupRecyclerView;
     private Callbacks mCallbacks;
     private GroupAdapter mAdapter;

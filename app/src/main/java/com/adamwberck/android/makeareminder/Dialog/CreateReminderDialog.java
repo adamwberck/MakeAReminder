@@ -1,4 +1,4 @@
-package com.adamwberck.android.makeareminder;
+package com.adamwberck.android.makeareminder.Dialog;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -20,7 +20,9 @@ import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
-public class CreateReminderDialog extends DismissDialogFragment {
+import com.adamwberck.android.makeareminder.R;
+
+public class CreateReminderDialog extends DismissDialog {
     private static final String ARG_REMINDER = "reminder";
     public static final String EXTRA_NEW_REMINDER
             = "com.adamwberck.android.makeareminder.newreminder";

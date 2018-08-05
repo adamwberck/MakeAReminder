@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="@string/new_group" android:id="@+id/new_group"/>
-    <item android:title="@string/new_task" android:id="@+id/new_task"/>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:title="@string/new_group" android:id="@+id/new_group"
+        app:showAsAction="ifRoom|withText"/>
+    <item android:title="@string/new_task" android:id="@+id/new_task"
+        app:showAsAction="ifRoom|withText"/>
 </menu>
