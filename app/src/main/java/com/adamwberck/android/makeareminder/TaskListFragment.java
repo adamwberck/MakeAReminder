@@ -80,7 +80,7 @@ public class TaskListFragment extends VisibleFragment{
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.fragment_overview,menu);
+        inflater.inflate(R.menu.fragment_tasklist,menu);
     }
 
     @Override

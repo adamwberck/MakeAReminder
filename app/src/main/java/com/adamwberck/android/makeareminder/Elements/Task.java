@@ -20,9 +20,11 @@ import java.util.Locale;
 
 public class Task implements Serializable{
 
+    //TODO add start date
+
     //TODO add exceptions (meaning on tuesday go off at a different time
 
-
+    //TODO add unnamed tasks;
     private int mID;
     private String mName = "";
     //TODO split into LocalTime and LocalDate
@@ -246,5 +248,10 @@ public class Task implements Serializable{
                     mDate = mDate.plusMonths(rawPeriod);
                 }
         }
+    }
+
+    public boolean isDueToday() {
+        DateTime today = new DateTime();
+        return mDate.getDayOfYear() == today.getDayOfYear() && mDate.getYear() == today.getYear();
     }
 }
