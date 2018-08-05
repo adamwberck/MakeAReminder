@@ -8,6 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="Card" >
+        <item name="android:background">@drawable/ic_card</item>
+    </style>
+
     <style name="CircleButtonOn"
         parent="android:style/Widget.Holo.Button">
         <item name="android:background">@drawable/ic_button_circle_on</item>

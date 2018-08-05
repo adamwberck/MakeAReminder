@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -33,7 +34,7 @@ public class GroupLab implements Serializable{
     private List<Group> mGroups;
     private transient Context mContext;
     private static final String FILE_NAME = "group.info";
-    private AtomicInteger mAtomicInteger;
+    private AtomicInteger mAtomicInteger = new AtomicInteger();
 
     public static void saveLab() {
         try {
@@ -64,12 +65,11 @@ public class GroupLab implements Serializable{
                 sGroupLab = loadLab(context);
                 sGroupLab.mContext = context;
             } catch (IOException e) {
-                Log.i(TAG,"IOException");
+                Log.i(TAG, "IOException");
                 sGroupLab = new GroupLab(context);
-            }
-            catch (ClassNotFoundException c){
+            } catch (ClassNotFoundException c) {
                 c.printStackTrace();
-                Log.i(TAG,"Class not found exception");
+                Log.i(TAG, "Class not found exception");
                 sGroupLab = new GroupLab(context);
             }
         }
@@ -149,7 +149,10 @@ public class GroupLab implements Serializable{
     public List<Task> getTasks() {
         List<Task> tasks = new LinkedList<>();
         for (Group g: mGroups){
-            tasks.addAll(g.getTasks());
+            try {
+                tasks.addAll(g.getTasks());
+            }
+            catch (NullPointerException ignored){}
         }
         return tasks;
     }

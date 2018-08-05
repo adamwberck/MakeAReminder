@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,18 +15,22 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Elements.Group;
+import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
 
 import java.util.List;
 
 public class OverviewFragment extends VisibleFragment {
+    private static final String TAG = "OverviewFragment";
     //TODO auto load if one group
     private RecyclerView mGroupRecyclerView;
     private Callbacks mCallbacks;
     private GroupAdapter mAdapter;
+    private int mWidth;
 
     public interface Callbacks {
         void onGroupSelected(Group group);
@@ -42,19 +47,33 @@ public class OverviewFragment extends VisibleFragment {
     @Override
     public void onCreate(Bundle savedInstanceBundle){
         super.onCreate(savedInstanceBundle);
+        Log.i(TAG,"Created");
         setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle sis){
-        View v = inflater.inflate(R.layout.fragment_overview,container,false);
+        final View view = inflater.inflate(R.layout.fragment_overview,container,false);
 
-        mGroupRecyclerView = v.findViewById(R.id.group_recycler_view);
-        mGroupRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),2));
+        mGroupRecyclerView = view.findViewById(R.id.group_recycler_view);
+
+        //setTaskRecyclerViewItemTouchListener();
         //mGroupRecyclerView.setAdapter(new GroupAdapter(mGroups));
-        return v;
+        updateUI();
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                mGroupRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),
+                        getColumns(view.getWidth())));
+            }
+        });
+        return view;
     }
 
+    private int getColumns(int width) {
+        Log.i(TAG,"width: " + width);
+        return width/200;
+    }
     public void setTaskRecyclerViewItemTouchListener(){
         ItemTouchHelper.SimpleCallback itemTouchCallback =
                 new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT) {
@@ -66,7 +85,7 @@ public class OverviewFragment extends VisibleFragment {
 
                     @Override
                     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                        int position = viewHolder.getAdapterPosition();
+                        //int position = viewHolder.getAdapterPosition();
                         ///Group group = mAdapter.mTasks.get(position);
                         //mDeleteCallBack.onTaskIdSelected(task.getID());
                         //TaskLab.get(getActivity()).removeTask(task);
@@ -75,7 +94,6 @@ public class OverviewFragment extends VisibleFragment {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
         itemTouchHelper.attachToRecyclerView(mGroupRecyclerView);
     }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -112,24 +130,22 @@ public class OverviewFragment extends VisibleFragment {
 
 
     private void newGroup() {
-
+        GroupLab.get(getContext()).addGroup(new Group());
+        updateUI();
     }
 
     private void updateUI(){
-        //TODO add GroupLab replace TaskLab
-        /*
-        TaskLab taskLab = TaskLab.get(getActivity());
-        List<Task> tasks = taskLab.getTasks();
+        GroupLab groupLab = GroupLab.get(getActivity());
+        List<Group> groups = groupLab.getGroups();
 
 
         if (mAdapter == null) {
-            mAdapter = new TaskListFragment.TaskAdapter(tasks);
-            mTaskRecyclerView.setAdapter(mAdapter);
+            mAdapter = new GroupAdapter(groups);
+            mGroupRecyclerView.setAdapter(mAdapter);
         } else {
-            mAdapter.setTasks(tasks);
+            mAdapter.setGroups(groups);
             mAdapter.notifyDataSetChanged();
         }
-        */
     }
 
     private class GroupHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -146,7 +162,9 @@ public class OverviewFragment extends VisibleFragment {
                 @Override
                 public boolean onLongClick(View v) {
                     //TODO add group edit
-                    return false;
+                    GroupLab.get(getContext()).removeGroup(mGroup);
+                    updateUI();
+                    return true;
                 }
             });
             itemView.setOnDragListener(new View.OnDragListener() {
@@ -189,7 +207,7 @@ public class OverviewFragment extends VisibleFragment {
 
         @Override
         public int getItemViewType(int position) {
-            return R.layout.list_item_task;
+            return R.layout.list_item_group;
         }
         /*
         public void setGroups(List<Group> groups) {
@@ -213,6 +231,10 @@ public class OverviewFragment extends VisibleFragment {
         @Override
         public int getItemCount() {
             return mGroups.size();
+        }
+
+        public void setGroups(List<Group> groups) {
+            mGroups = groups;
         }
     }
 }

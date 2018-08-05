@@ -14,7 +14,7 @@
     <string name="when_due">When due.</string>
 
 
-    <string name="group_due">Due: %1$d"</string>
+    <string name="group_due">Due Today: %1$d"</string>
     <string name="group_overdue">Overdue: %1$d"</string>
 
 
@@ -67,7 +67,7 @@
     <string name="snoozed_till">Snoozed until %1$s</string>
     <string name="every_day">Every Day</string>
     <string name="complete">Complete</string>
-    <string name="uncomplete">Uncomplete</string>
+    <string name="uncomplete">Un-Complete</string>
     <string name="start_day">Start Day</string>
     <string name="task_time">1 Jan 1990</string>
     <string name="remove_repeat">Remove Repeat</string>

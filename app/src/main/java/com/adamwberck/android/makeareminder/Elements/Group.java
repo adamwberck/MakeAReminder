@@ -3,18 +3,19 @@ package com.adamwberck.android.makeareminder.Elements;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class Group implements Serializable{
     private UUID mID = UUID.randomUUID();
-    private String mName = "Urgent";
+    private String mName = (mID.toString()).substring(0,6);
     private Repeat mDefaultRepeat;
     private long mDefaultSnooze;
     private DateTime mDefaultTime;
     private List<Reminder> mDefaultReminders;
 
-    private List<Task> mTasks;
+    private List<Task> mTasks = new ArrayList<>();
 
     public int getTaskIndex(Task task) {
         return mTasks.indexOf(task);
@@ -54,7 +55,7 @@ public class Group implements Serializable{
 
     public int getDueToday() {
         int total = 0;
-        for(Task t: mTasks){
+        for(Task t : mTasks){
             if(t.isDueToday()){
                 total++;
             }
