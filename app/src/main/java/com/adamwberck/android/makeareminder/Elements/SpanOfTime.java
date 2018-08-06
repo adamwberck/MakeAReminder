@@ -5,6 +5,9 @@ import android.util.ArrayMap;
 
 import com.adamwberck.android.makeareminder.R;
 
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,6 +20,19 @@ public class SpanOfTime implements Serializable{
     //TODO Change Everything to JodaTime
     private long mMinutes;
     private Type mTimeType;
+
+
+    public static DateTime floorDate(final DateTime dateTime, final int minutes) {
+        if (minutes < 1 || 60 % minutes != 0) {
+            throw new IllegalArgumentException("minutes must be a factor of 60");
+        }
+
+        final DateTime hour = dateTime.hourOfDay().roundFloorCopy();
+        final long millisSinceHour = new Duration(hour, dateTime).getMillis();
+        final int roundedMinutes = ((int)Math.floor(
+                millisSinceHour / 60000.0 / minutes)) * minutes;
+        return hour.plusMinutes(roundedMinutes);
+    }
 
     public long getTime(Type type) {
         switch (type) {

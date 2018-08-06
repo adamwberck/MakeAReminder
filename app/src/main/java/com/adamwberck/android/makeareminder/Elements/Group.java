@@ -1,5 +1,10 @@
 package com.adamwberck.android.makeareminder.Elements;
 
+import android.content.Context;
+import android.graphics.Color;
+
+import com.adamwberck.android.makeareminder.GroupLab;
+
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
@@ -9,11 +14,13 @@ import java.util.UUID;
 
 public class Group implements Serializable{
     private UUID mID = UUID.randomUUID();
+    private int mRGBColor = 0x3333ff;
     private String mName = (mID.toString()).substring(0,6);
     private Repeat mDefaultRepeat;
     private long mDefaultSnooze;
     private DateTime mDefaultTime;
-    private List<Reminder> mDefaultReminders;
+    private List<Reminder> mDefaultReminders = new SortedObjectList<>(10,
+            Reminder.getComparator());
 
     private List<Task> mTasks = new ArrayList<>();
 
@@ -84,5 +91,51 @@ public class Group implements Serializable{
             }
         }
         return false;
+    }
+
+    public void setName(String name) {
+        mName = name;
+    }
+
+    public DateTime getDefaultTime() {
+        return mDefaultTime;
+    }
+
+    public Repeat getDefaultRepeat() {
+        return mDefaultRepeat;
+    }
+
+    public List<Reminder> getDefaultReminders() {
+        return mDefaultReminders;
+    }
+
+    public void removeReminder(Reminder reminder) {
+        mDefaultReminders.remove(reminder);
+    }
+
+    public void addReminder(SpanOfTime span, boolean isAlarm) {
+        Reminder r = new Reminder(span, isAlarm);
+        addReminder(r);
+    }
+
+    public void addReminder(Reminder r){
+        mDefaultReminders.add(r);
+        GroupLab.saveLab();
+    }
+
+    public void setDefaultTime(DateTime defaultTime) {
+        if(defaultTime!=null) {
+            mDefaultTime = SpanOfTime.floorDate(defaultTime,1);
+            addReminder(new Reminder(SpanOfTime.ofMinutes(0), true));
+        }
+        mDefaultTime = defaultTime;
+    }
+
+    public void setDefaultRepeat(Repeat defaultRepeat) {
+        mDefaultRepeat = defaultRepeat;
+    }
+
+    public int getColor() {
+        return mRGBColor;
     }
 }

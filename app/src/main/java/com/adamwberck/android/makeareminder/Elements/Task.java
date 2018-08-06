@@ -71,8 +71,11 @@ public class Task implements Serializable{
     }
 
     public void setDate(DateTime date) {
-        this.mDate = floorDate(date,1);
-        addReminder(new Reminder(this,SpanOfTime.ofMinutes(0)));
+        if(date!=null) {
+            this.mDate = SpanOfTime.floorDate(date,1);
+            addReminder(new Reminder(this, SpanOfTime.ofMinutes(0)));
+        }
+        mDate = date;
         String s = mDate.toString("hh:mm a", Locale.getDefault());
         GroupLab.saveLab();
     }
@@ -109,18 +112,6 @@ public class Task implements Serializable{
         mID = GroupLab.get(appContext).nextValue();
     }
 
-
-    private DateTime floorDate(final DateTime dateTime, final int minutes) {
-        if (minutes < 1 || 60 % minutes != 0) {
-            throw new IllegalArgumentException("minutes must be a factor of 60");
-        }
-
-        final DateTime hour = dateTime.hourOfDay().roundFloorCopy();
-        final long millisSinceHour = new Duration(hour, dateTime).getMillis();
-        final int roundedMinutes = ((int)Math.floor(
-                millisSinceHour / 60000.0 / minutes)) * minutes;
-        return hour.plusMinutes(roundedMinutes);
-    }
 
     @Override
     public boolean equals(Object o) {

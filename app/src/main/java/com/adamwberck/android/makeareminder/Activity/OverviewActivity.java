@@ -1,5 +1,6 @@
 package com.adamwberck.android.makeareminder.Activity;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 
 import com.adamwberck.android.makeareminder.Elements.Group;
@@ -16,5 +17,11 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
     @Override
     public void onGroupSelected(Group group) {
         //TODO show tasklist
+    }
+
+    @Override
+    public void onGroupEdited(Group group) {
+        Intent intent = GroupActivity.newIntent(this,group);
+        startActivity(intent);
     }
 }

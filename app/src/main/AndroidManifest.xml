@@ -19,6 +19,7 @@
         </activity>
         <activity android:name=".Activity.TaskListActivity"/>
         <activity android:name=".Activity.TaskActivity"/>
+        <activity android:name=".Activity.GroupActivity"/>
         <activity android:name=".Activity.AlarmActivity" android:theme="@style/Theme.AppCompat.Translucent"/>
         <service android:name=".Service.ReminderService"/>
         <service android:name=".Service.StartDayService"/>

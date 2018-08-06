@@ -227,7 +227,7 @@ public class AlarmAlertDialog extends DialogFragment {
             }
 
         });
-        setupButtons(v.findViewById(R.id.snooze_buttons));
+        setupButtons(v.findViewById(R.id.color_buttons));
         String name = getArguments().getString(ARG_NAME);
 
         //End Buttons

@@ -10,30 +10,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/task_name_label"
-        android:labelFor="@+id/task_name"
+        android:text="@string/group_name_label"
+        android:labelFor="@+id/task_title"
         />
     <EditText
         android:id="@+id/task_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-
+    <Button
+        android:id="@+id/group_color_button"
+        android:text="@string/select_color"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/date_button"
-            android:layout_width="0dp"
-            android:layout_weight="4"
-            android:layout_height="wrap_content"
-            android:text="@string/date"/>
         <Button
             android:id="@+id/time_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4"
+            android:layout_weight="8"
             android:text="@string/time"/>
         <ImageButton
             android:id="@+id/clear_time_button"
@@ -50,11 +47,10 @@
         android:orientation="horizontal">
         <Button
             android:id="@+id/repeat_button"
+            android:layout_weight="8"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="8"
-            android:text="@string/repeat"
-            />
+            android:text="@string/repeat" />
         <ImageButton
             android:id="@+id/clear_repeat_button"
             android:background="#00000000"
@@ -70,8 +66,8 @@
         android:orientation="horizontal">
         <Button
             android:id="@+id/location_button"
-            android:layout_width="0dp"
             android:layout_weight="8"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/location"/>
         <ImageButton

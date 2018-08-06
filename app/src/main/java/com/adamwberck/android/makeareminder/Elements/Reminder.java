@@ -22,6 +22,11 @@ public class Reminder implements Serializable{
         mIsAlarm = isAlarm;
     }
 
+    public Reminder(SpanOfTime duration, boolean isAlarm) {
+        mTimeBefore = duration;
+        mIsAlarm = isAlarm;
+    }
+
     @Override
     public boolean equals(Object o){
         return getMinutes()==((Reminder)o).getMinutes();

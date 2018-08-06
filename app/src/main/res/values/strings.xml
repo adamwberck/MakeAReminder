@@ -72,6 +72,10 @@
     <string name="task_time">1 Jan 1990</string>
     <string name="remove_repeat">Remove Repeat</string>
     <string name="new_group">New Group</string>
+    <string name="group_name_label">Group Name</string>
+    <string name="task_name_label">Task Name</string>
+    <string name="select_color">Select Color</string>
+    <string name="change_color">Change Color</string>
     <string-array name="snooze_array">
         <item>15 Mins</item>
         <item>30 Mins</item>

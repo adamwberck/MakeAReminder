@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Elements.Group;
@@ -34,6 +35,7 @@ public class OverviewFragment extends VisibleFragment {
 
     public interface Callbacks {
         void onGroupSelected(Group group);
+        void onGroupEdited(Group group);
     }
 
     public static Fragment newInstance() {
@@ -149,6 +151,7 @@ public class OverviewFragment extends VisibleFragment {
     }
 
     private class GroupHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private final ImageButton mEditButton;
         private TextView mGroupNameTextView;
         private TextView mDueTextView;
         private TextView mOverdueTextView;
@@ -179,6 +182,13 @@ public class OverviewFragment extends VisibleFragment {
             mGroupNameTextView = itemView.findViewById(R.id.group_name);
             mDueTextView = itemView.findViewById(R.id.num_task_due);
             mOverdueTextView = itemView.findViewById(R.id.num_task_overdue);
+            mEditButton = itemView.findViewById(R.id.edit_group_button);
+            mEditButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mCallbacks.onGroupEdited(mGroup);
+                }
+            });
         }
 
         @Override

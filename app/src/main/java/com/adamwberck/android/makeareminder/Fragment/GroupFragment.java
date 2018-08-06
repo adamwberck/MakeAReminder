@@ -25,45 +25,45 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.adamwberck.android.makeareminder.Activity.AlarmActivity;
+import com.adamwberck.android.makeareminder.Dialog.ColorChooserDialog;
 import com.adamwberck.android.makeareminder.Dialog.CreateReminderDialog;
 import com.adamwberck.android.makeareminder.Dialog.DatePickerDialog;
+import com.adamwberck.android.makeareminder.Dialog.SetRepeatDialog;
+import com.adamwberck.android.makeareminder.Dialog.TimePickerDialog;
+import com.adamwberck.android.makeareminder.Elements.Group;
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
-import com.adamwberck.android.makeareminder.Elements.Task;
 import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
-import com.adamwberck.android.makeareminder.Service.ReminderService;
-import com.adamwberck.android.makeareminder.Dialog.SetRepeatDialog;
-import com.adamwberck.android.makeareminder.Dialog.TimePickerDialog;
+import com.skydoves.colorpickerpreference.ColorPickerDialog;
 
 import org.joda.time.DateTime;
 
 import java.util.List;
-import java.util.Locale;
+import java.util.UUID;
 
 import static android.app.Activity.RESULT_OK;
 
-public class TaskFragment extends VisibleFragment{
-    private static final String TAG = "TaskFragment";
-    private Task mTask;
+public class GroupFragment extends VisibleFragment{
+    private static final String TAG = "GroupFragment";
+
+    private Group mGroup;
     private Callbacks mCallbacks;
     private EditText mNameField;
 
 
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_TIME = 1;
-    private static final int REQUEST_PHOTO = 2;
+    private static final int REQUEST_COLOR = 2;
     private static final int REQUEST_REMINDER = 3;
     private static final int REQUEST_EDIT = 4;
     private static final int REQUEST_SNOOZE = 5;
     private static final int REQUEST_REPEAT = 6;
 
-    private static final String ARG_TASK_ID = "task_id";
-    private static final String ARG_TASK = "task";
-    private static final String ARG_ALARM = "alarm";
+    private static final String ARG_GROUP = "group";
 
+    private static final String DIALOG_COLOR = "DialogColor";
     private static final String DIALOG_REMINDER = "DialogReminder";
     private static final String DIALOG_REPEAT = "DialogRepeat";
     private static final String DIALOG_DATE  = "DialogDate";
@@ -75,7 +75,6 @@ public class TaskFragment extends VisibleFragment{
             "com.adamwberck.android.makeareminder.task_changed";
     private static final String EXTRA_TASK_ID =
             "com.adamwberck.android.makeareminder.task_id";
-    private Button mDateButton;
     private Button mTimeButton;
     private Button mAddReminderButton;
     private ListView mReminderListView;
@@ -91,15 +90,13 @@ public class TaskFragment extends VisibleFragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mTask = (Task) getArguments().getSerializable(ARG_TASK);
-        //stop alarms while editing
-        ReminderService.cancelServiceAlarm(getContext(),mTask.getID());
+        mGroup = (Group) getArguments().getSerializable(ARG_GROUP);
     }
 
     @Override
     public void  onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.fragment_task,menu);
+        inflater.inflate(R.menu.fragment_group,menu);
     }
 
     @Override
@@ -114,54 +111,43 @@ public class TaskFragment extends VisibleFragment{
     }
 
     @Override
-    public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_task, container,false);
+    public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle SIState) {
+        View v = inflater.inflate(R.layout.fragment_group, container,false);
         super.setupUI(v);
         mNameField = v.findViewById(R.id.task_name);
-        if(mTask.getName()!=null) {
-            mNameField.setText(mTask.getName());
+        if(mGroup.getName()!=null) {
+            mNameField.setText(mGroup.getName());
         }
 
-        mCompleteButton = v.findViewById(R.id.complete_button);
-        mCompleteButton.setOnClickListener(new View.OnClickListener() {
+        Button colorButton =  v.findViewById(R.id.group_color_button);
+        colorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mTask.setComplete(!mTask.isComplete());
-                updateUI();
+                //Start Color picker
+                FragmentManager manager = getFragmentManager();
+                int rgb =  mGroup.getColor();
+                //int red = (rgb>>16)&0x0ff;
+                //int green=(rgb>>8) &0x0ff;
+                //int blue= (rgb)    &0x0ff;
+                //int rgb = ((r&0x0ff)<<16)|((g&0x0ff)<<8)|(b&0x0ff);
+                ColorChooserDialog chooserDialog = ColorChooserDialog.newInstance(rgb);
+                chooserDialog.setTargetFragment(GroupFragment.this,REQUEST_COLOR);
+                chooserDialog.show(manager,DIALOG_COLOR);
             }
         });
 
         mSnoozeButton = v.findViewById(R.id.snooze_button);
-
         mSnoozeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int id = mTask.getID();
-                String name = mTask.getName();
-                String title = mTask.getName();
-                Intent i = AlarmActivity.newIntent(getActivity(),id,true,name,title);
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivity(i);
+                UUID id = mGroup.getID();
+                String name = mGroup.getName();
+                String title = mGroup.getName();
+                //TODO create default snooze dialog or use one
                 updateUI();
             }
         });
 
-
-        mTestAlarmButton = v.findViewById(R.id.alarm_test_button);
-        mTestAlarmButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int id = mTask.getID();
-                String name = mTask.getName();
-                String title = mTask.getName()+" Test";
-                Intent i = AlarmActivity.newIntent(getActivity(),id,true,name,title);
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivity(i);
-                updateUI();
-            }
-        });
         mNameField.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -182,25 +168,13 @@ public class TaskFragment extends VisibleFragment{
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mTask.setName(s.toString());
-                updateTask();
+                mGroup.setName(s.toString());
+                updateGroup();
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 // pass
-            }
-        });
-
-        mDateButton = v.findViewById(R.id.date_button);
-        mDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentManager manager = getFragmentManager();
-                DatePickerDialog dialog = DatePickerDialog
-                        .newInstance(mTask.getDate());
-                dialog.setTargetFragment(TaskFragment.this, REQUEST_DATE);
-                dialog.show(manager,DIALOG_DATE);
             }
         });
 
@@ -210,8 +184,8 @@ public class TaskFragment extends VisibleFragment{
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
                 TimePickerDialog dialog = TimePickerDialog
-                        .newInstance(mTask.getDate());
-                dialog.setTargetFragment(TaskFragment.this, REQUEST_TIME);
+                        .newInstance(mGroup.getDefaultTime());
+                dialog.setTargetFragment(GroupFragment.this, REQUEST_TIME);
                 dialog.show(manager,DIALOG_TIME);
             }
         });
@@ -220,10 +194,9 @@ public class TaskFragment extends VisibleFragment{
         mClearDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mTask.setDate(null);
+                mGroup.setDefaultTime(null);
             }
         });
-
 
         updateDate();
 
@@ -233,13 +206,13 @@ public class TaskFragment extends VisibleFragment{
             public void onClick(View v) {
                 //TODO make generic method to do this
                 FragmentManager manager = getFragmentManager();
-                SetRepeatDialog dialog = SetRepeatDialog.newInstance(mTask.getRepeat());
-                dialog.setTargetFragment(TaskFragment.this,REQUEST_REPEAT);
+                SetRepeatDialog dialog = SetRepeatDialog.newInstance(mGroup.getDefaultRepeat());
+                dialog.setTargetFragment(GroupFragment.this,REQUEST_REPEAT);
                 dialog.show(manager,DIALOG_REPEAT);
             }
         });
 
-        mReminderAdapter = new ReminderAdapter(getContext(),mTask.getReminders());
+        mReminderAdapter = new ReminderAdapter(getContext(),mGroup.getDefaultReminders());
         mReminderListView = v.findViewById(R.id.reminder_list_view);
         mReminderListView.setAdapter(mReminderAdapter);
 
@@ -250,7 +223,7 @@ public class TaskFragment extends VisibleFragment{
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
                 CreateReminderDialog dialog = CreateReminderDialog.newInstance();
-                dialog.setTargetFragment(TaskFragment.this, REQUEST_REMINDER);
+                dialog.setTargetFragment(GroupFragment.this, REQUEST_REMINDER);
                 dialog.show(manager,DIALOG_REMINDER);
             }
         });
@@ -259,12 +232,10 @@ public class TaskFragment extends VisibleFragment{
     }
 
     private void updateDate() {
-        if(mTask.getDate()!=null) {
-            mDateButton.setText(mTask.getDate().toString("MM/dd/yyyy"));
-            mTimeButton.setText(mTask.getDate().toString("hh:mm a"));
+        if(mGroup.getDefaultTime()!=null) {
+            mTimeButton.setText(mGroup.getDefaultTime().toString("hh:mm a"));
         }
         else {
-            mDateButton.setText(R.string.set_date);
             mTimeButton.setText(R.string.set_time);
         }
     }
@@ -289,7 +260,7 @@ public class TaskFragment extends VisibleFragment{
         if(context instanceof Callbacks) {
             mCallbacks = (Callbacks) context;
         }
-        TaskFragment taskFragment = (TaskFragment) getActivity().getSupportFragmentManager()
+        GroupFragment taskFragment = (GroupFragment) getActivity().getSupportFragmentManager()
                 .findFragmentById(R.id.detail_fragment_container);
         if(taskFragment !=null) {
             //mDeleteCallBack = (OnDeleteCrimeListener) context;
@@ -302,32 +273,27 @@ public class TaskFragment extends VisibleFragment{
         getActivity().setResult(RESULT_OK, data);
     }
 
-    private void updateTask() {
+    private void updateGroup() {
         //TaskLab.get(getActivity()).updateTask(mTask);
         if(mCallbacks!=null) {
-            mCallbacks.onTaskUpdated(mTask);
+            mCallbacks.onGroupUpdated(mGroup);
         }
     }
 
-    public Task getTask() {
-        return mTask;
+    public Group getGroup() {
+        return mGroup;
     }
 
 
     public interface Callbacks{
-        void onTaskUpdated(Task task);
+        void onGroupUpdated(Group group);
     }
 
-    public interface OnDeleteTaskListener {
-        void onTaskIdSelected(int TaskID);
-    }
 
-    public static TaskFragment newInstance(Task task) {
+    public static GroupFragment newInstance(Group group) {
         Bundle args =  new Bundle();
-        args.putSerializable(ARG_TASK, task);
-        args.putBoolean(ARG_ALARM,false);
-
-        TaskFragment fragment = new TaskFragment();
+        args.putSerializable(ARG_GROUP, group);
+        GroupFragment fragment = new GroupFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -380,7 +346,7 @@ public class TaskFragment extends VisibleFragment{
                 public void onClick(View v) {
                     FragmentManager manager = getFragmentManager();
                     CreateReminderDialog dialog = CreateReminderDialog.newInstance(reminder);
-                    dialog.setTargetFragment(TaskFragment.this, REQUEST_EDIT);
+                    dialog.setTargetFragment(GroupFragment.this, REQUEST_EDIT);
                     dialog.show(manager,DIALOG_REMINDER);
                 }
             });
@@ -395,7 +361,7 @@ public class TaskFragment extends VisibleFragment{
             delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mTask.removeReminder(reminder);
+                    mGroup.removeReminder(reminder);
                     updateUI();
                 }
             });
@@ -422,7 +388,6 @@ public class TaskFragment extends VisibleFragment{
     public void onDestroy(){
         //TaskLab.get(getContext()).removeUnnamed();
         GroupLab.saveLab();
-        mTask.startAlarm(getActivity().getApplicationContext());
         Log.i(TAG,this.toString()+" destroyed.");
         super.onDestroy();
     }
@@ -438,9 +403,9 @@ public class TaskFragment extends VisibleFragment{
             if(requestCode==REQUEST_EDIT){
                 Reminder reminder = (Reminder) data
                         .getSerializableExtra(CreateReminderDialog.EXTRA_DELETE_REMINDER);
-                mTask.removeReminder(reminder);
+                mGroup.removeReminder(reminder);
             }
-            mTask.addReminder(span,isAlarm);
+            mGroup.addReminder(span,isAlarm);
         }
         if(requestCode == REQUEST_DATE || requestCode == REQUEST_TIME){
             DateTime date;
@@ -450,25 +415,19 @@ public class TaskFragment extends VisibleFragment{
             else {
                 date = (DateTime) data.getSerializableExtra(DatePickerDialog.EXTRA_DATE);
             }
-            mTask.setDate(date);
+            mGroup.setDefaultTime(date);
             updateDate();
         }
         if(requestCode == REQUEST_REPEAT){
             Repeat repeat = (Repeat) data.getSerializableExtra(SetRepeatDialog.EXTRA_REPEAT);
-            mTask.setRepeat(repeat);
+            mGroup.setDefaultRepeat(repeat);
         }
         updateUI();
     }
 
     private void updateUI() {
-        if(!mTask.isComplete()) {
-            mCompleteButton.setText(R.string.complete);
-        }
-        else{
-            mCompleteButton.setText(R.string.uncomplete);
-        }
 
-        List<Reminder> reminders = mTask.getReminders();
+        List<Reminder> reminders = mGroup.getDefaultReminders();
 
         if (mReminderAdapter== null) {
             mReminderAdapter = new ReminderAdapter(getContext(),reminders);
@@ -477,7 +436,7 @@ public class TaskFragment extends VisibleFragment{
             mReminderListView.setAdapter(mReminderAdapter);
             mReminderAdapter.notifyDataSetChanged();
         }
-        Repeat repeat = mTask.getRepeat();
+        Repeat repeat = mGroup.getDefaultRepeat();
         if(repeat!=null){
             String s = repeat.getRepeatTime().getTimeString(getContext(),"Every ",
                     "");
@@ -487,36 +446,5 @@ public class TaskFragment extends VisibleFragment{
             mRepeatButton.setText(R.string.repeat);
         }
 
-        if(mTask.isOverdue()){
-            mSnoozeButton.setVisibility(View.VISIBLE);
-            DateTime snoozeTime = mTask.getSnoozeTime();
-            mSnoozeButton.setText(R.string.set_snooze);
-            if(snoozeTime!=null){
-                String time;
-                if(isSameDay(snoozeTime)) {
-                    time = snoozeTime.toString("hh:mm a", Locale.getDefault());
-                }
-                else {
-                    time = snoozeTime.toString("MMM, dd hh:,mm a",Locale.getDefault());
-                }
-                String dateText = getResources().getString(R.string.snoozed_till, time);
-                mSnoozeButton.setText(dateText);
-            }
-        }
-        else {
-            mSnoozeButton.setVisibility(View.GONE);
-        }
-
-    }
-
-    private boolean isSameDay(DateTime snoozeTime) {
-        DateTime today = new DateTime();
-        if(snoozeTime.getDayOfYear()!=today.getDayOfYear()){
-            return false;
-        }
-        if(snoozeTime.getYear()!=today.getYear()){
-            return false;
-        }
-        return true;
     }
 }
