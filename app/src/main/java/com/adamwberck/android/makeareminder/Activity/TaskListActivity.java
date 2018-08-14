@@ -46,7 +46,8 @@ public class TaskListActivity extends SingleFragmentActivity implements TaskList
         if (isSingleFragment()) {
             Intent intent = TaskActivity.newIntent(this, task);
             startActivity(intent);
-        } else {
+        }
+        else {
             TaskFragment tf = (TaskFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.detail_fragment_container);
 

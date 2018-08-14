@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class Group implements Serializable{
-    private UUID mID = UUID.randomUUID();
-    private int mRGBColor = 0x3333ff;
+    private final UUID mID = UUID.randomUUID();
+    private String mColor;
     private String mName = (mID.toString()).substring(0,6);
     private Repeat mDefaultRepeat;
     private long mDefaultSnooze;
@@ -135,7 +135,11 @@ public class Group implements Serializable{
         mDefaultRepeat = defaultRepeat;
     }
 
-    public int getColor() {
-        return mRGBColor;
+    public void setColor(String color) {
+        mColor = color;
+    }
+
+    public String getColor() {
+        return mColor;
     }
 }

@@ -15,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -24,6 +23,7 @@ import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
 
 import java.util.List;
+import java.util.UUID;
 
 public class OverviewFragment extends VisibleFragment {
     private static final String TAG = "OverviewFragment";
@@ -34,8 +34,8 @@ public class OverviewFragment extends VisibleFragment {
     private int mWidth;
 
     public interface Callbacks {
-        void onGroupSelected(Group group);
-        void onGroupEdited(Group group);
+        void onGroupSelected(UUID id);
+        void onGroupEdit(UUID id);
     }
 
     public static Fragment newInstance() {
@@ -52,6 +52,13 @@ public class OverviewFragment extends VisibleFragment {
         Log.i(TAG,"Created");
         setHasOptionsMenu(true);
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        updateUI();
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle sis){
@@ -133,6 +140,7 @@ public class OverviewFragment extends VisibleFragment {
 
     private void newGroup() {
         GroupLab.get(getContext()).addGroup(new Group());
+        GroupLab.saveLab();
         updateUI();
     }
 
@@ -186,14 +194,14 @@ public class OverviewFragment extends VisibleFragment {
             mEditButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mCallbacks.onGroupEdited(mGroup);
+                    mCallbacks.onGroupEdit(mGroup.getID());
                 }
             });
         }
 
         @Override
         public void onClick(View v) {
-            mCallbacks.onGroupSelected(mGroup);
+            mCallbacks.onGroupSelected(mGroup.getID());
         }
 
         public void bind(Group group){

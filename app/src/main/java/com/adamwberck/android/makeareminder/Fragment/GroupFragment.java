@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
@@ -61,7 +62,7 @@ public class GroupFragment extends VisibleFragment{
     private static final int REQUEST_SNOOZE = 5;
     private static final int REQUEST_REPEAT = 6;
 
-    private static final String ARG_GROUP = "group";
+    private static final String ARG_GROUP_ID = "group_id";
 
     private static final String DIALOG_COLOR = "DialogColor";
     private static final String DIALOG_REMINDER = "DialogReminder";
@@ -90,7 +91,8 @@ public class GroupFragment extends VisibleFragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mGroup = (Group) getArguments().getSerializable(ARG_GROUP);
+        UUID ID = (UUID) getArguments().getSerializable(ARG_GROUP_ID);
+        mGroup = GroupLab.get(getContext()).getGroup(ID);
     }
 
     @Override
@@ -125,12 +127,8 @@ public class GroupFragment extends VisibleFragment{
             public void onClick(View v) {
                 //Start Color picker
                 FragmentManager manager = getFragmentManager();
-                int rgb =  mGroup.getColor();
-                //int red = (rgb>>16)&0x0ff;
-                //int green=(rgb>>8) &0x0ff;
-                //int blue= (rgb)    &0x0ff;
-                //int rgb = ((r&0x0ff)<<16)|((g&0x0ff)<<8)|(b&0x0ff);
-                ColorChooserDialog chooserDialog = ColorChooserDialog.newInstance(rgb);
+                String color  =  mGroup.getColor();
+                ColorChooserDialog chooserDialog = ColorChooserDialog.newInstance(color);
                 chooserDialog.setTargetFragment(GroupFragment.this,REQUEST_COLOR);
                 chooserDialog.show(manager,DIALOG_COLOR);
             }
@@ -290,9 +288,9 @@ public class GroupFragment extends VisibleFragment{
     }
 
 
-    public static GroupFragment newInstance(Group group) {
+    public static GroupFragment newInstance(UUID uuid) {
         Bundle args =  new Bundle();
-        args.putSerializable(ARG_GROUP, group);
+        args.putSerializable(ARG_GROUP_ID, uuid);
         GroupFragment fragment = new GroupFragment();
         fragment.setArguments(args);
         return fragment;
@@ -421,6 +419,10 @@ public class GroupFragment extends VisibleFragment{
         if(requestCode == REQUEST_REPEAT){
             Repeat repeat = (Repeat) data.getSerializableExtra(SetRepeatDialog.EXTRA_REPEAT);
             mGroup.setDefaultRepeat(repeat);
+        }
+
+        if(requestCode == REQUEST_COLOR){
+            mGroup.setColor(data.getStringExtra(ColorChooserDialog.EXTRA_COLOR));
         }
         updateUI();
     }

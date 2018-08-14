@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import com.adamwberck.android.makeareminder.Elements.Group;
 import com.adamwberck.android.makeareminder.Fragment.OverviewFragment;
 
+import java.util.UUID;
+
 public class OverviewActivity extends SingleFragmentActivity implements OverviewFragment.Callbacks{
 
     @Override
@@ -15,13 +17,13 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
 
 
     @Override
-    public void onGroupSelected(Group group) {
+    public void onGroupSelected(UUID uuid) {
         //TODO show tasklist
     }
 
     @Override
-    public void onGroupEdited(Group group) {
-        Intent intent = GroupActivity.newIntent(this,group);
+    public void onGroupEdit(UUID uuid) {
+        Intent intent = GroupActivity.newIntent(this,uuid);
         startActivity(intent);
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--
     <integer-array name="color_picker">
         <item>0xa4fff9</item>
         <item>0xC70039</item>
@@ -16,5 +17,5 @@
         <item>0xaeb6bf</item>
         <item>0x73c6b6</item>
         <item>0x2ecc71</item>
-    </integer-array>
+    </integer-array>-->
 </resources>

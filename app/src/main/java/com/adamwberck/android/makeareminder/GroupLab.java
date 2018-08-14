@@ -110,7 +110,7 @@ public class GroupLab implements Serializable{
 
     public Group getGroup(UUID id){
         for(Group g: mGroups){
-            if(g.getID()==id){
+            if(g.getID().equals(id)){
                 return g;
             }
         }
