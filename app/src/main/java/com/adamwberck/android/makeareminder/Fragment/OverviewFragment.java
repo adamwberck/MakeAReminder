@@ -1,6 +1,8 @@
 package com.adamwberck.android.makeareminder.Fragment;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -160,6 +162,7 @@ public class OverviewFragment extends VisibleFragment {
 
     private class GroupHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final ImageButton mEditButton;
+        private final View mParent;
         private TextView mGroupNameTextView;
         private TextView mDueTextView;
         private TextView mOverdueTextView;
@@ -168,6 +171,7 @@ public class OverviewFragment extends VisibleFragment {
 
         private GroupHolder(LayoutInflater inflater, ViewGroup parent,int viewType){
             super(inflater.inflate(viewType,parent,false));
+            mParent = parent;
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -211,8 +215,9 @@ public class OverviewFragment extends VisibleFragment {
             mDueTextView.setText(getResources().getString(R.string.group_due,mGroup.getDueToday()));
             mOverdueTextView.setText(getResources().getString(R.string.group_overdue,
                     mGroup.getOverdue()));
-
-
+            View card = itemView.findViewById(R.id.card_layout);
+            card.getBackground().setColorFilter(Color.parseColor(mGroup.getColor()),
+                PorterDuff.Mode.DARKEN);
         }
     }
 

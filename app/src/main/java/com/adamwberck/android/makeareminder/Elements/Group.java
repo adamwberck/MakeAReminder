@@ -9,12 +9,13 @@ import org.joda.time.DateTime;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 public class Group implements Serializable{
     private final UUID mID = UUID.randomUUID();
-    private String mColor;
+    private String mColor = "#ffa4fff9";
     private String mName = (mID.toString()).substring(0,6);
     private Repeat mDefaultRepeat;
     private long mDefaultSnooze;
