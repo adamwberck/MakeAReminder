@@ -77,21 +77,22 @@
     <string name="select_color">Select Color</string>
     <string name="change_color">Change Color</string>
     <string-array name="color_picker">
-        <item>#ffa4fff9</item>
+        <item>#ffff0000</item>
+        <item>#ff0000ff</item>
+        <item>#ff008000</item>
+
+        <item>#ffff8c00</item>
+        <item>#FFffff00</item>
+        <item>#ff00ff00</item>
+
+        <item>#ff00bfff</item>
         <item>#ffC70039</item>
-        <item>#ffFFC300</item>
+        <item>#ffffc0cb</item>
 
-        <item>#ff0bfa00</item>
-        <item>#fffa7900</item>
-        <item>#ffe486ff</item>
 
-        <item>#ffea3355</item>
-        <item>#ff979a9a</item>
-        <item>#ff9b59b6</item>
-
-        <item>#ffaeb6bf</item>
-        <item>#ff73c6b6</item>
-        <item>#ff2ecc71</item>
+        <item>#ffee82ee</item>
+        <item>#ffc0c0c0</item>
+        <item>#ff000000</item>
     </string-array>
     <string-array name="snooze_array">
         <item>15 Mins</item>

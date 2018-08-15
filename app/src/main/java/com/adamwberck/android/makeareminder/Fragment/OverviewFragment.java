@@ -24,6 +24,7 @@ import com.adamwberck.android.makeareminder.Elements.Group;
 import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -210,7 +211,10 @@ public class OverviewFragment extends VisibleFragment {
 
         public void bind(Group group){
             mGroup = group;
-
+            List<TextView> texts = new ArrayList<>();
+            texts.add(mGroupNameTextView);
+            texts.add(mDueTextView);
+            texts.add(mOverdueTextView);
             mGroupNameTextView.setText(mGroup.getName());
             mDueTextView.setText(getResources().getString(R.string.group_due,mGroup.getDueToday()));
             mOverdueTextView.setText(getResources().getString(R.string.group_overdue,
@@ -218,7 +222,34 @@ public class OverviewFragment extends VisibleFragment {
             View card = itemView.findViewById(R.id.card_layout);
             card.getBackground().setColorFilter(Color.parseColor(mGroup.getColor()),
                 PorterDuff.Mode.DARKEN);
+            int textColor = isDark(Color.parseColor(mGroup.getColor()))?
+                    Color.parseColor("#ffffffff") :
+                    Color.parseColor("#ff000000");
+            for(TextView tv : texts){
+                tv.setTextColor(textColor);
+                ImageButton ib = itemView.findViewById(R.id.edit_group_button);
+                ib.setColorFilter(textColor,PorterDuff.Mode.SRC_ATOP);
+            }
         }
+    }
+
+    private boolean isDark(int argb) {
+        double rgb[] = new double[3];
+        rgb[0] = (argb>>16)&0xFF;
+        rgb[1] = (argb>>8)&0xFF;
+        rgb[2] = (argb)&0xFF;
+        for(int i = 0; i<rgb.length;i++){
+            rgb[i] = rgb[i] / 255.0;
+            if (rgb[i]<=0.03928){
+                rgb[i] = rgb[i]/12.92;
+            }
+            else {
+                rgb[i] = Math.pow(((rgb[i]+0.055)/1.055),2.4);
+            }
+        }
+        double l = 0.2126 * rgb[0] +0.7152 * rgb[1] + 0.0722 * rgb[2];
+        //int a = (argb>>24)&0xFF;
+        return l < 0.179;
     }
 
     private class GroupAdapter extends RecyclerView.Adapter<GroupHolder> {
