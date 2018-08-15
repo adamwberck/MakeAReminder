@@ -7,9 +7,13 @@ import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
 import com.adamwberck.android.makeareminder.Elements.Task;
+import com.adamwberck.android.makeareminder.Elements.Group;
 import com.adamwberck.android.makeareminder.Fragment.TaskFragment;
 import com.adamwberck.android.makeareminder.Fragment.TaskListFragment;
+import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
+
+import java.util.UUID;
 
 public class TaskListActivity extends SingleFragmentActivity implements TaskListFragment.Callbacks,
         TaskFragment.Callbacks, TaskListFragment.OnDeleteTaskListener,
@@ -18,6 +22,20 @@ public class TaskListActivity extends SingleFragmentActivity implements TaskList
     private static final String EXTRA_TASK_ID = "com.adamwberck.android.makeareminder.task_id";
     private static final String EXTRA_ALARM = "com.adamwberck.android.makeareminder.alarm";
     private static final String EXTRA_NAME = "com.adamwberck.android.makeareminder.name";
+    private static final String EXTRA_GROUP_ID = "com.adamwberck.android.makeareminder.group_id";
+
+    public static Intent newIntent(Context packageContext, int id) {
+        Intent intent = new Intent(packageContext, TaskListActivity.class);
+        intent.putExtra(EXTRA_TASK_ID, id);
+        return intent;
+    }
+
+
+    public static Intent newIntent(Context packageContext, UUID uuid){
+        Intent intent = new Intent(packageContext, TaskListActivity.class);
+        intent.putExtra(EXTRA_GROUP_ID, uuid);
+        return intent;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -32,7 +50,8 @@ public class TaskListActivity extends SingleFragmentActivity implements TaskList
 
     @Override
     protected Fragment createFragment() {
-        return TaskListFragment.newInstance();
+        UUID id = (UUID) getIntent().getExtras().getSerializable(EXTRA_GROUP_ID);
+        return TaskListFragment.newInstance(id);
     }
 
     @Override
@@ -94,15 +113,7 @@ public class TaskListActivity extends SingleFragmentActivity implements TaskList
         }
     }
 
-    public static Intent newIntent(Context packageContext, int id) {
-        Intent intent = new Intent(packageContext, TaskListActivity.class);
-        intent.putExtra(EXTRA_TASK_ID, id);
-        return intent;
-    }
-    public static Intent newIntent(Context packageContext){
-        Intent intent = new Intent(packageContext, TaskListActivity.class);
-        return intent;
-    }
+
 
     public Task getTask() {
         if (isSingleFragment()) {

@@ -18,7 +18,8 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
 
     @Override
     public void onGroupSelected(UUID uuid) {
-        //TODO show tasklist
+        Intent intent = TaskListActivity.newIntent(this,uuid);
+        startActivity(intent);
     }
 
     @Override

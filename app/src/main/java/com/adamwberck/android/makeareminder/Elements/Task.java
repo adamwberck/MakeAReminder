@@ -85,7 +85,7 @@ public class Task implements Serializable{
         //addReminder(new Reminder(this,SpanOfTime.ofMinutes(2),true));
         String id = Math.abs(mID)+"";
         setRepeat(new Repeat(1,SpanOfTime.ofDays(1)));
-        id = id.substring(Math.min(0,id.length()-7));
+        //id = id.substring(Math.min(0,id.length()-7));
         setName(id);
     }
 

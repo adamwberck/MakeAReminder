@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.adamwberck.android.makeareminder.Elements.Group;
 import com.adamwberck.android.makeareminder.Elements.Task;
+import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
 import com.adamwberck.android.makeareminder.Service.StartDayService;
 import com.adamwberck.android.makeareminder.Activity.TaskListActivity;
@@ -26,6 +27,7 @@ import com.adamwberck.android.makeareminder.Activity.TaskListActivity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public class TaskListFragment extends VisibleFragment{
 
@@ -33,6 +35,7 @@ public class TaskListFragment extends VisibleFragment{
     private static final String ARG_TASK_ID = "task_id";
     private static final String ARG_ALARM = "alarm";
     private static final String ARG_NAME = "name";
+    private static final String ARG_GROUP_ID = "group_id";
     
     private static final int REQUEST_SNOOZE = 0;
     private static final String DIALOG_ALARM = "Dialog_ALARM";
@@ -58,9 +61,11 @@ public class TaskListFragment extends VisibleFragment{
         return fragment;
     }
 
-    public static Fragment newInstance() {
+    public static Fragment newInstance(UUID uuid) {
         Bundle args =  new Bundle();
         TaskListFragment fragment = new TaskListFragment();
+        args.putSerializable(ARG_GROUP_ID,uuid);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -81,6 +86,8 @@ public class TaskListFragment extends VisibleFragment{
     public void onCreate(Bundle savedInstanceBundle){
         super.onCreate(savedInstanceBundle);
         setHasOptionsMenu(true);
+        UUID id = (UUID) getArguments().getSerializable(ARG_GROUP_ID);
+        mGroup = GroupLab.get(getContext()).getGroup(id);
     }
 
     @Override

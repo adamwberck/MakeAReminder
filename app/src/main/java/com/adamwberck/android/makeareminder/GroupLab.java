@@ -1,6 +1,7 @@
 package com.adamwberck.android.makeareminder;
 
 import android.content.Context;
+import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
 
 import com.adamwberck.android.makeareminder.Elements.Group;
@@ -15,6 +16,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -24,6 +26,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GroupLab implements Serializable{
     private final static String TAG = "GroupLab";
+    private static final Random RANDOM = new Random();
+
+    private static List<String> sGroupColors;
+    private static List<Integer> sColorUsed = new ArrayList<>(12);
 
 
     //public static final long MINUTE = 60000;
@@ -34,7 +40,7 @@ public class GroupLab implements Serializable{
     private List<Group> mGroups;
     private transient Context mContext;
     private static final String FILE_NAME = "group.info";
-    private AtomicInteger mAtomicInteger = new AtomicInteger();
+    private AtomicInteger mAtomicInteger = new AtomicInteger(Integer.MIN_VALUE);
 
     public static void saveLab() {
         try {
@@ -73,6 +79,10 @@ public class GroupLab implements Serializable{
                 sGroupLab = new GroupLab(context);
             }
         }
+        if(sGroupColors==null){
+            sGroupColors = Arrays.asList(context.getResources()
+                    .getStringArray(R.array.color_picker));
+        }
         return sGroupLab;
     }
 
@@ -86,6 +96,13 @@ public class GroupLab implements Serializable{
     }
 
     public void addGroup(Group g){
+        if(sColorUsed.size()==0){
+            for(int i=0;i<sGroupColors.size();i++){
+                sColorUsed.add(i);
+            }
+        }
+        String color = sGroupColors.get(sColorUsed.remove(0));
+        g.setColor(color);
         mGroups.add(g);
         saveLab();
     }
