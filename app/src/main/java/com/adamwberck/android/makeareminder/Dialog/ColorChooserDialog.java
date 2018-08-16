@@ -1,15 +1,12 @@
 package com.adamwberck.android.makeareminder.Dialog;
 
 
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -19,8 +16,6 @@ import android.widget.Button;
 
 import com.adamwberck.android.makeareminder.R;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,7 +44,7 @@ public class ColorChooserDialog extends DialogFragment {
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_color_chooser,
                 null);
         mColor = getArguments().getString(ARG_COLOR);
-        mColorList = Arrays.asList(getResources().getStringArray(R.array.color_picker));
+        mColorList = Arrays.asList(getResources().getStringArray(R.array.group_colors));
         //final Task task = (Task) getArguments().getSerializable(ARG_TASK);
         //final HorizontalScrollView horizontalScrollView =  v.findViewById(R.id.snooze_scrollview);
         mColorButtons = v.findViewById(R.id.color_buttons);

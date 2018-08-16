@@ -1,11 +1,13 @@
 package com.adamwberck.android.makeareminder.Fragment;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -15,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -25,16 +28,24 @@ import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public class OverviewFragment extends VisibleFragment {
+    //TODO change drag so scroll is possible. Handle or long press. favoring handle at the moment
     private static final String TAG = "OverviewFragment";
     //TODO auto load if one group
     private RecyclerView mGroupRecyclerView;
     private Callbacks mCallbacks;
     private GroupAdapter mAdapter;
     private int mWidth;
+    private ItemTouchHelper mItemTouchHelper;
+
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        mItemTouchHelper.startDrag(viewHolder);
+    }
+
 
     public interface Callbacks {
         void onGroupSelected(UUID id);
@@ -62,6 +73,26 @@ public class OverviewFragment extends VisibleFragment {
         updateUI();
     }
 
+    public interface ItemTouchHelperAdapter {
+        boolean onItemMove(int fromPosition, int toPosition);
+        void onItemDismiss(int position);
+    }
+
+    private interface ItemTouchHelperViewHolder {
+
+        /**
+         * Called when the {@link ItemTouchHelper} first registers an item as being moved or swiped.
+         * Implementations should update the item view to indicate it's active state.
+         */
+        void onItemSelected();
+
+
+        /**
+         * Called when the {@link ItemTouchHelper} has completed the move or swipe, and the active item
+         * state should be cleared.
+         */
+        void onItemClear();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle sis){
@@ -79,6 +110,81 @@ public class OverviewFragment extends VisibleFragment {
                         getColumns(view.getWidth())));
             }
         });
+        //setTaskRecyclerViewItemTouchListener();
+
+        ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
+            public final float ALPHA_FULL = 1.0f;
+
+            @Override
+            public int getMovementFlags(RecyclerView recyclerView,
+                                        RecyclerView.ViewHolder viewHolder) {
+                int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN |
+                        ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
+                int swipeFlags = 0;
+                return makeMovementFlags(dragFlags, swipeFlags);
+            }
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder source,
+                                  RecyclerView.ViewHolder target) {
+                mAdapter.onItemMove(source.getAdapterPosition(),target.getAdapterPosition());
+                return true;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+            }
+
+
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView,
+                                    RecyclerView.ViewHolder viewHolder, float dX, float dY,
+                                    int actionState, boolean isCurrentlyActive) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    // Fade out the view as it is swiped out of the parent's bounds
+                    final float alpha = ALPHA_FULL - Math.abs(dX)
+                            / (float) viewHolder.itemView.getWidth();
+                    viewHolder.itemView.setAlpha(alpha);
+                    viewHolder.itemView.setTranslationX(dX);
+                } else {
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState,
+                            isCurrentlyActive);
+                }
+            }
+
+            @Override
+            public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+                // We only want the active item to change
+                if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+                    if (viewHolder instanceof ItemTouchHelperViewHolder) {
+                        // Let the view holder know that this item is being moved or dragged
+                        ItemTouchHelperViewHolder itemViewHolder =
+                                (ItemTouchHelperViewHolder) viewHolder;
+                        itemViewHolder.onItemSelected();
+                    }
+                }
+
+                super.onSelectedChanged(viewHolder, actionState);
+            }
+
+            @Override
+            public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+
+                viewHolder.itemView.setAlpha(ALPHA_FULL);
+
+                if (viewHolder instanceof ItemTouchHelperViewHolder) {
+                    // Tell the view holder it's time to restore the idle state
+                    ItemTouchHelperViewHolder itemViewHolder
+                            = (ItemTouchHelperViewHolder) viewHolder;
+                    itemViewHolder.onItemClear();
+                }
+            }
+        };
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(mGroupRecyclerView);
         return view;
     }
 
@@ -86,6 +192,7 @@ public class OverviewFragment extends VisibleFragment {
         Log.i(TAG,"width: " + width);
         return width/200;
     }
+
     public void setTaskRecyclerViewItemTouchListener(){
         ItemTouchHelper.SimpleCallback itemTouchCallback =
                 new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT) {
@@ -104,8 +211,11 @@ public class OverviewFragment extends VisibleFragment {
                     }
                 };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
+
         itemTouchHelper.attachToRecyclerView(mGroupRecyclerView);
     }
+
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -161,28 +271,30 @@ public class OverviewFragment extends VisibleFragment {
         }
     }
 
-    private class GroupHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private class GroupHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener,ItemTouchHelperViewHolder {
         private final ImageButton mEditButton;
-        private final View mParent;
+        private View mView;
         private TextView mGroupNameTextView;
         private TextView mDueTextView;
         private TextView mOverdueTextView;
         private Group mGroup;
 
 
-        private GroupHolder(LayoutInflater inflater, ViewGroup parent,int viewType){
+        private GroupHolder(LayoutInflater inflater, ViewGroup parent,int viewType)
+        {
             super(inflater.inflate(viewType,parent,false));
-            mParent = parent;
+            mView = itemView.findViewById(R.id.item_view);
             itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            /*itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
                     //TODO add group edit
-                    GroupLab.get(getContext()).removeGroup(mGroup);
-                    updateUI();
+                    //GroupLab.get(getContext()).removeGroup(mGroup);
+                    //updateUI();
                     return true;
                 }
-            });
+            });*/
             itemView.setOnDragListener(new View.OnDragListener() {
                 @Override
                 public boolean onDrag(View v, DragEvent event) {
@@ -231,6 +343,20 @@ public class OverviewFragment extends VisibleFragment {
                 ib.setColorFilter(textColor,PorterDuff.Mode.SRC_ATOP);
             }
         }
+
+        public View getView() {
+            return mView;
+        }
+
+        @Override
+        public void onItemSelected() {
+            //itemView.setBackgroundColor(Color.LTGRAY);
+        }
+
+        @Override
+        public void onItemClear() {
+            //itemView.setBackgroundColor(0);
+        }
     }
 
     private boolean isDark(int argb) {
@@ -252,7 +378,9 @@ public class OverviewFragment extends VisibleFragment {
         return l < 0.179;
     }
 
-    private class GroupAdapter extends RecyclerView.Adapter<GroupHolder> {
+    private class GroupAdapter extends RecyclerView.Adapter<GroupHolder>
+        implements ItemTouchHelperAdapter
+    {
         private List<Group> mGroups;
 
         public GroupAdapter(List<Group> groups) {
@@ -268,6 +396,11 @@ public class OverviewFragment extends VisibleFragment {
             mGroups = groups;
         }*/
 
+        //@Override
+        //public boolean onItemMove(int from,int to){
+        //    return true;
+        //}
+
 
         @NonNull
         @Override
@@ -277,9 +410,20 @@ public class OverviewFragment extends VisibleFragment {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull GroupHolder holder, int position) {
+        public void onBindViewHolder(@NonNull final GroupHolder holder, int position) {
             Group group =  mGroups.get(position);
             holder.bind(group);
+
+            holder.getView().setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        onStartDrag(holder);
+                    }
+                    return false;
+                }
+            });
+
         }
 
         @Override
@@ -289,6 +433,18 @@ public class OverviewFragment extends VisibleFragment {
 
         public void setGroups(List<Group> groups) {
             mGroups = groups;
+        }
+
+        @Override
+        public boolean onItemMove(int fromPosition, int toPosition) {
+            Collections.swap(mGroups, fromPosition, toPosition);
+            notifyItemMoved(fromPosition, toPosition);
+            return false;
+        }
+
+        @Override
+        public void onItemDismiss(int position) {
+
         }
     }
 }

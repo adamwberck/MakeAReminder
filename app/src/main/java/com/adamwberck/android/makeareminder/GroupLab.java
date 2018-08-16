@@ -1,7 +1,6 @@
 package com.adamwberck.android.makeareminder;
 
 import android.content.Context;
-import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
 
 import com.adamwberck.android.makeareminder.Elements.Group;
@@ -81,7 +80,7 @@ public class GroupLab implements Serializable{
         }
         if(sGroupColors==null){
             sGroupColors = Arrays.asList(context.getResources()
-                    .getStringArray(R.array.color_picker));
+                    .getStringArray(R.array.group_colors));
         }
         return sGroupLab;
     }

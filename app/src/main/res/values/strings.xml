@@ -76,7 +76,7 @@
     <string name="task_name_label">Task Name</string>
     <string name="select_color">Select Color</string>
     <string name="change_color">Change Color</string>
-    <string-array name="color_picker">
+    <string-array name="group_colors">
         <item>#ffff0000</item>
         <item>#ff0000ff</item>
         <item>#ff008000</item>
