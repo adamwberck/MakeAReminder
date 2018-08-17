@@ -1,18 +1,18 @@
 package com.adamwberck.android.makeareminder.Fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +41,8 @@ public class OverviewFragment extends VisibleFragment {
     private GroupAdapter mAdapter;
     private int mWidth;
     private ItemTouchHelper mItemTouchHelper;
+    private ImageButton mTrashCan;
+    private Group mDraggingGroup;
 
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
@@ -94,10 +96,13 @@ public class OverviewFragment extends VisibleFragment {
         void onItemClear();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle sis){
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle sis){
         final View view = inflater.inflate(R.layout.fragment_overview,container,false);
 
+        mTrashCan = view.findViewById(R.id.trashcan_circle);
+        //mTrashCan.setVisibility(View.GONE);
         mGroupRecyclerView = view.findViewById(R.id.group_recycler_view);
 
         //setTaskRecyclerViewItemTouchListener();
@@ -113,7 +118,7 @@ public class OverviewFragment extends VisibleFragment {
         //setTaskRecyclerViewItemTouchListener();
 
         ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
-            public final float ALPHA_FULL = 1.0f;
+            final float ALPHA_FULL = 1.0f;
 
             @Override
             public int getMovementFlags(RecyclerView recyclerView,
@@ -121,6 +126,13 @@ public class OverviewFragment extends VisibleFragment {
                 int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN |
                         ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
                 int swipeFlags = 0;
+
+                GroupHolder groupHolder = (GroupHolder) viewHolder;
+                int color = Color.parseColor(groupHolder.mGroup.getColor());
+                color = darkenColor(color,0x33);
+                groupHolder.mCardView.getBackground().setColorFilter(color,PorterDuff.Mode.DARKEN);
+                mTrashCan.setVisibility(View.VISIBLE);
+                mDraggingGroup = groupHolder.mGroup;
                 return makeMovementFlags(dragFlags, swipeFlags);
             }
 
@@ -144,9 +156,7 @@ public class OverviewFragment extends VisibleFragment {
                                     int actionState, boolean isCurrentlyActive) {
                 if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
                     // Fade out the view as it is swiped out of the parent's bounds
-                    final float alpha = ALPHA_FULL - Math.abs(dX)
-                            / (float) viewHolder.itemView.getWidth();
-                    viewHolder.itemView.setAlpha(alpha);
+                    //viewHolder.itemView.setAlpha(alpha);
                     viewHolder.itemView.setTranslationX(dX);
                 } else {
                     super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState,
@@ -173,8 +183,6 @@ public class OverviewFragment extends VisibleFragment {
             public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
                 super.clearView(recyclerView, viewHolder);
 
-                viewHolder.itemView.setAlpha(ALPHA_FULL);
-
                 if (viewHolder instanceof ItemTouchHelperViewHolder) {
                     // Tell the view holder it's time to restore the idle state
                     ItemTouchHelperViewHolder itemViewHolder
@@ -188,33 +196,32 @@ public class OverviewFragment extends VisibleFragment {
         return view;
     }
 
+    private int darkenColor(int color,int darkenValue) {
+        int[] rgb = getRGB(color);
+        StringBuilder cHex = new StringBuilder().append("#ff");
+        for(int c :rgb){
+            //int c = rgb[i];
+            c -= darkenValue;
+            c = Math.max(0,c);
+            String hex = Integer.toHexString(c);
+            hex = c<=0xf?"0"+hex:hex;
+            cHex.append(hex);
+        }
+        return Color.parseColor(cHex.toString());
+    }
+
+    private int[] getRGB(int argb) {
+        int rgb[] = new int[3];
+        rgb[0] = (argb>>16)&0xFF;
+        rgb[1] = (argb>>8)&0xFF;
+        rgb[2] = (argb)&0xFF;
+        return rgb;
+    }
+
     private int getColumns(int width) {
         Log.i(TAG,"width: " + width);
         return width/200;
     }
-
-    public void setTaskRecyclerViewItemTouchListener(){
-        ItemTouchHelper.SimpleCallback itemTouchCallback =
-                new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT) {
-                    @Override
-                    public boolean onMove(RecyclerView recyclerView
-                            ,RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                        return false;
-                    }
-
-                    @Override
-                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                        //int position = viewHolder.getAdapterPosition();
-                        ///Group group = mAdapter.mTasks.get(position);
-                        //mDeleteCallBack.onTaskIdSelected(task.getID());
-                        //TaskLab.get(getActivity()).removeTask(task);
-                    }
-                };
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
-
-        itemTouchHelper.attachToRecyclerView(mGroupRecyclerView);
-    }
-
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -226,7 +233,7 @@ public class OverviewFragment extends VisibleFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.new_task:
-                //TODO create drag drop
+                //TODO create drag drop create task
                 return super.onOptionsItemSelected(item);
             case R.id.new_group:
                 newGroup();
@@ -274,6 +281,7 @@ public class OverviewFragment extends VisibleFragment {
     private class GroupHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener,ItemTouchHelperViewHolder {
         private final ImageButton mEditButton;
+        private final View mCardView;
         private View mView;
         private TextView mGroupNameTextView;
         private TextView mDueTextView;
@@ -286,6 +294,7 @@ public class OverviewFragment extends VisibleFragment {
             super(inflater.inflate(viewType,parent,false));
             mView = itemView.findViewById(R.id.item_view);
             itemView.setOnClickListener(this);
+            mCardView = itemView.findViewById(R.id.card_layout);
             /*itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -295,13 +304,6 @@ public class OverviewFragment extends VisibleFragment {
                     return true;
                 }
             });*/
-            itemView.setOnDragListener(new View.OnDragListener() {
-                @Override
-                public boolean onDrag(View v, DragEvent event) {
-                    //TODO add drag rearrange
-                    return false;
-                }
-            });
 
 
             mGroupNameTextView = itemView.findViewById(R.id.group_name);
@@ -332,6 +334,27 @@ public class OverviewFragment extends VisibleFragment {
             mOverdueTextView.setText(getResources().getString(R.string.group_overdue,
                     mGroup.getOverdue()));
             View card = itemView.findViewById(R.id.card_layout);
+            //TODO third party item rearrange
+            itemView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if(event.getAction()==MotionEvent.ACTION_DOWN){
+                        return true;
+                    }
+                    if(event.getAction()==MotionEvent.ACTION_UP){
+                        if(mDraggingGroup!=null){
+                            int x = (int) event.getRawX();
+                            int y = (int) event.getRawY();
+                            if(isViewInBounds(mTrashCan,x,y)){
+                                GroupLab.get(getContext()).removeGroup(mDraggingGroup);
+                                updateUI();
+                            }
+                            mDraggingGroup=null;
+                        }
+                    }
+                    return false;
+                }
+            });
             card.getBackground().setColorFilter(Color.parseColor(mGroup.getColor()),
                 PorterDuff.Mode.DARKEN);
             int textColor = isDark(Color.parseColor(mGroup.getColor()))?
@@ -342,6 +365,17 @@ public class OverviewFragment extends VisibleFragment {
                 ImageButton ib = itemView.findViewById(R.id.edit_group_button);
                 ib.setColorFilter(textColor,PorterDuff.Mode.SRC_ATOP);
             }
+
+        }
+
+        private boolean isViewInBounds(View view, int x, int y) {
+            Rect outRect = new Rect();
+            int[] location = new int[2];
+
+            view.getDrawingRect(outRect);
+            view.getLocationOnScreen(location);
+            outRect.offset(location[0], location[1]);
+            return outRect.contains(x, y);
         }
 
         public View getView() {
@@ -350,12 +384,15 @@ public class OverviewFragment extends VisibleFragment {
 
         @Override
         public void onItemSelected() {
-            //itemView.setBackgroundColor(Color.LTGRAY);
         }
 
         @Override
         public void onItemClear() {
-            //itemView.setBackgroundColor(0);
+            mCardView.getBackground().setColorFilter(Color.parseColor(mGroup.getColor()),
+                    PorterDuff.Mode.DARKEN);
+            //TODO add fancy animation
+            mTrashCan.setVisibility(View.GONE);
+            //mDraggingGroup=null;
         }
     }
 
@@ -414,15 +451,7 @@ public class OverviewFragment extends VisibleFragment {
             Group group =  mGroups.get(position);
             holder.bind(group);
 
-            holder.getView().setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        onStartDrag(holder);
-                    }
-                    return false;
-                }
-            });
+
 
         }
 
