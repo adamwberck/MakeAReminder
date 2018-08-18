@@ -77,6 +77,7 @@ public class GroupLab implements Serializable{
                 Log.i(TAG, "Class not found exception");
                 sGroupLab = new GroupLab(context);
             }
+            sGroupLab = new GroupLab(context);
         }
         if(sGroupColors==null){
             sGroupColors = Arrays.asList(context.getResources()
