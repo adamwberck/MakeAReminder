@@ -141,7 +141,7 @@ public class GroupFragment extends VisibleFragment{
                 UUID id = mGroup.getID();
                 String name = mGroup.getName();
                 String title = mGroup.getName();
-                //TODO create default snooze dialog or use one
+                //TODO create default snooze dialog or use one already made
                 updateUI();
             }
         });

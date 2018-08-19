@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class Group implements Serializable{
-    private final UUID mID = UUID.randomUUID();
+    public static final UUID SPECIAL_ID = new UUID(0,0);
+    private UUID mID = UUID.randomUUID();
     private String mColor = "#ffa4fff9";
     private String mName = (mID.toString()).substring(0,6);
     private Repeat mDefaultRepeat;
@@ -24,6 +25,13 @@ public class Group implements Serializable{
             Reminder.getComparator());
 
     private List<Task> mTasks = new ArrayList<>();
+
+    public Group() {
+    }
+
+    private Group(UUID uuid) {
+        mID = uuid;
+    }
 
     public int getTaskIndex(Task task) {
         return mTasks.indexOf(task);
@@ -142,5 +150,17 @@ public class Group implements Serializable{
 
     public String getColor() {
         return mColor;
+    }
+
+    public int getColorInt() {
+        return Color.parseColor(getColor());
+    }
+
+    public static Group specialGroup() {
+        return new Group(SPECIAL_ID);
+    }
+
+    public boolean isSpecial() {
+        return mID.equals(SPECIAL_ID);
     }
 }

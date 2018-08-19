@@ -16,6 +16,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -66,6 +68,10 @@ public class GroupLab implements Serializable{
 
     public static GroupLab get(Context context){
         if (sGroupLab == null) {
+            if(sGroupColors==null){
+                sGroupColors = Arrays.asList(context.getResources()
+                        .getStringArray(R.array.group_colors));
+            }
             try {
                 sGroupLab = loadLab(context);
                 sGroupLab.mContext = context;
@@ -78,10 +84,7 @@ public class GroupLab implements Serializable{
                 sGroupLab = new GroupLab(context);
             }
             sGroupLab = new GroupLab(context);
-        }
-        if(sGroupColors==null){
-            sGroupColors = Arrays.asList(context.getResources()
-                    .getStringArray(R.array.group_colors));
+            sGroupLab.mGroups.add(Group.specialGroup());
         }
         return sGroupLab;
     }
@@ -103,7 +106,11 @@ public class GroupLab implements Serializable{
         }
         String color = sGroupColors.get(sColorUsed.remove(0));
         g.setColor(color);
-        mGroups.add(g);
+        mGroups.add(mGroups.size()-1,g);
+        if(!mGroups.get(mGroups.size()-1).getID().equals(Group.SPECIAL_ID)){
+            mGroups.remove(Group.specialGroup());
+            mGroups.add(Group.specialGroup());
+        }
         saveLab();
     }
 

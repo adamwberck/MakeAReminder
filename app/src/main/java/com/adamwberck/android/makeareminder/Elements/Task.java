@@ -10,6 +10,7 @@ import org.joda.time.Duration;
 import org.joda.time.LocalTime;
 
 import java.io.Serializable;
+import java.security.acl.Group;
 import java.util.List;
 import java.util.Locale;
 
@@ -148,7 +149,7 @@ public class Task implements Serializable{
     }
 
     public boolean isOverdue() {
-        return mDate.isBeforeNow();
+        return mDate!=null&&mDate.isBeforeNow();
     }
 
     public void setSnoozeTime(DateTime date) {

@@ -34,6 +34,7 @@ import java.util.UUID;
 
 public class OverviewFragment extends VisibleFragment {
     private static final String TAG = "OverviewFragment";
+    final float[] ADD_POS = new float[2];
     //TODO auto load if one group
     private RecyclerView mGroupRecyclerView;
     private Callbacks mCallbacks;
@@ -45,6 +46,7 @@ public class OverviewFragment extends VisibleFragment {
     public int mDraggingColor;
     private boolean mOverTrashcan = true;
     private ImageButton mAddTask;
+    private boolean mHasTaskJustAdded = false;
 
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
@@ -54,6 +56,7 @@ public class OverviewFragment extends VisibleFragment {
     public interface Callbacks {
         void onGroupSelected(UUID id);
         void onGroupEdit(UUID id);
+        void onTaskAdded(Group group);
     }
 
     public static Fragment newInstance() {
@@ -65,15 +68,19 @@ public class OverviewFragment extends VisibleFragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceBundle){
-        super.onCreate(savedInstanceBundle);
-        Log.i(TAG,"Created");
-        setHasOptionsMenu(true);
-    }
-
-    @Override
     public void onResume(){
         super.onResume();
+        Log.i(TAG,"Resume");
+        if(mHasTaskJustAdded){
+            mAddTask.animate()
+                    .x(ADD_POS[0])
+                    .y(ADD_POS[1])
+                    .setDuration(400)
+                    .start();
+            mAddTask.getBackground().setColorFilter(getResources()
+                    .getColor(R.color.lightGray), PorterDuff.Mode.DARKEN);
+        }
+        mHasTaskJustAdded=false;
         updateUI();
     }
 
@@ -95,7 +102,8 @@ public class OverviewFragment extends VisibleFragment {
 
         mTrashCan = view.findViewById(R.id.trashcan_circle);
         mAddTask = view.findViewById(R.id.add_task_circle);
-        final float[] ADD_POS = new float[2];
+        Log.i(TAG,"onCreateView");
+
         mAddTask.post(new Runnable() {
             @Override
             public void run() {
@@ -107,7 +115,9 @@ public class OverviewFragment extends VisibleFragment {
 
         mAddTask.setOnTouchListener(new View.OnTouchListener() {
             float dX, dY;
-
+            boolean onCard;
+            Group mGroup;
+            //TODO fix gray circle
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
@@ -115,6 +125,7 @@ public class OverviewFragment extends VisibleFragment {
                     case MotionEvent.ACTION_DOWN:
                         dX = v.getX() - event.getRawX();
                         dY = v.getY() - event.getRawY();
+                        onCard =false;
                         break;
 
                     case MotionEvent.ACTION_MOVE:
@@ -124,13 +135,49 @@ public class OverviewFragment extends VisibleFragment {
                                 .y(event.getRawY() + dY)
                                 .setDuration(0)
                                 .start();
+                        onCard = false;
+                        for (int i = 0; i < mGroupRecyclerView.getChildCount(); i++) {
+                            View innerView = mGroupRecyclerView.getChildAt(i);
+                            GroupHolder groupHolder =
+                                    (GroupHolder) mGroupRecyclerView.getChildViewHolder(innerView);
+                            Group hoverGroup = groupHolder.getGroup();
+                            if(hoverGroup.isSpecial()){
+                                return true;
+                            }
+                            View card = groupHolder.mCardView;
+                            if(isViewInBounds(innerView,(int)event.getRawX(),(int)event.getRawY())){
+                                mGroup = hoverGroup;
+                                card.getBackground().setColorFilter(alterColor(mGroup.getColorInt(),
+                                        0x77), PorterDuff.Mode.DARKEN);
+                                mAddTask.getBackground().setColorFilter(getResources()
+                                    .getColor(R.color.darkGray), PorterDuff.Mode.DARKEN);
+                                onCard = true;
+                            }
+                            else {
+                                card.getBackground().setColorFilter(hoverGroup.getColorInt(),
+                                        PorterDuff.Mode.DARKEN);
+                            }
+                        }
+                        if(!onCard){
+                            mAddTask.getBackground().setColorFilter(getResources()
+                                    .getColor(R.color.lightGray), PorterDuff.Mode.DARKEN);
+                        }
                         break;
                     case MotionEvent.ACTION_UP:
-                        v.animate()
-                                .x(ADD_POS[0])
-                                .y(ADD_POS[1])
-                                .setDuration(400)
-                                .start();
+
+                        if(onCard) {
+                            mCallbacks.onTaskAdded(mGroup);
+                            mHasTaskJustAdded = true;
+                        }
+                        else {
+                            v.animate()
+                                    .x(ADD_POS[0])
+                                    .y(ADD_POS[1])
+                                    .setDuration(400)
+                                    .start();
+                            mAddTask.getBackground().setColorFilter(getResources()
+                                    .getColor(R.color.lightGray), PorterDuff.Mode.DARKEN);
+                        }
                     default:
                         return false;
                 }
@@ -216,18 +263,24 @@ public class OverviewFragment extends VisibleFragment {
             @Override
             public int getMovementFlags(RecyclerView recyclerView,
                                         RecyclerView.ViewHolder viewHolder) {
+                GroupHolder groupHolder = (GroupHolder) viewHolder;
+                mDraggingGroupHolder = groupHolder;
+                if(mDraggingGroupHolder.getGroup().isSpecial()){
+                    return 0;
+                }
+
                 int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN |
                         ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
                 int swipeFlags = 0;
 
-                GroupHolder groupHolder = (GroupHolder) viewHolder;
+
                 int color = Color.parseColor(groupHolder.mGroup.getColor());
                 mDraggingColor = alterColor(color,0x33);
                 groupHolder.mCardView.getBackground().setColorFilter(color,PorterDuff.Mode.DARKEN);
                 turnOnTrashcan();
                 mTrashCan.getBackground().setColorFilter(getResources().getColor(R.color.lightGray),
                                 PorterDuff.Mode.DARKEN);
-                mDraggingGroupHolder = groupHolder;
+
                 Log.i(TAG,"Drag Flags: "+dragFlags);
                 return makeMovementFlags(dragFlags, swipeFlags);
             }
@@ -343,26 +396,6 @@ public class OverviewFragment extends VisibleFragment {
         return width/200;
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.fragment_overview,menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.new_task:
-                //TODO create drag drop create task
-                return super.onOptionsItemSelected(item);
-            case R.id.new_group:
-                newGroup();
-                updateUI();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     @Override
     public void onAttach(Context context){
@@ -379,9 +412,11 @@ public class OverviewFragment extends VisibleFragment {
 
 
     private void newGroup() {
-        GroupLab.get(getContext()).addGroup(new Group());
+        Group group = new Group();
+        GroupLab.get(getContext()).addGroup(group);
         GroupLab.saveLab();
-        updateUI();
+        mCallbacks.onGroupEdit(group.getID());
+        //updateUI();
     }
 
     private void updateUI(){
@@ -430,6 +465,10 @@ public class OverviewFragment extends VisibleFragment {
 
         @Override
         public void onClick(View v) {
+            if(mGroup.isSpecial()) {
+                newGroup();
+                return;
+            }
             mCallbacks.onGroupSelected(mGroup.getID());
         }
 
@@ -444,8 +483,25 @@ public class OverviewFragment extends VisibleFragment {
             mOverdueTextView.setText(getResources().getString(R.string.group_overdue,
                     mGroup.getOverdue()));
             View card = itemView.findViewById(R.id.card_layout);
-            card.getBackground().setColorFilter(Color.parseColor(mGroup.getColor()),
-                PorterDuff.Mode.DARKEN);
+            if(mGroup.isSpecial()){
+                card.getBackground().setColorFilter(0xFFffffff,
+                        PorterDuff.Mode.DARKEN);
+                mGroupNameTextView.setText("");
+                mDueTextView.setText(R.string.new_group);
+                mDueTextView.setTextSize(40f);
+                mDueTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                mEditButton.setVisibility(View.GONE);
+                mOverdueTextView.setText("");
+                card.setBackgroundResource(R.drawable.ic_card_new);
+            }
+            else {
+                mDueTextView.setTextSize(24f);
+                mDueTextView.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                mEditButton.setVisibility(View.VISIBLE);
+                card.setBackgroundResource(R.drawable.ic_card);
+                card.getBackground().setColorFilter(Color.parseColor(mGroup.getColor()),
+                        PorterDuff.Mode.DARKEN);
+            }
             int textColor = isDark(Color.parseColor(mGroup.getColor()))?
                     Color.parseColor("#ffffffff") :
                     Color.parseColor("#ff000000");
@@ -518,16 +574,6 @@ public class OverviewFragment extends VisibleFragment {
         public int getItemViewType(int position) {
             return R.layout.list_item_group;
         }
-        /*
-        public void setGroups(List<Group> groups) {
-            mGroups = groups;
-        }*/
-
-        //@Override
-        //public boolean onItemMove(int from,int to){
-        //    return true;
-        //}
-
 
         @NonNull
         @Override
@@ -557,7 +603,7 @@ public class OverviewFragment extends VisibleFragment {
         public boolean onItemMove(int fromPosition, int toPosition) {
             Log.i(TAG,"From Pos: "+fromPosition);
             Log.i(TAG,"To   Pos: "+toPosition);
-            if(!mOverTrashcan) {
+            if(!mOverTrashcan && !(toPosition==mGroups.size()-1)) {
                 Collections.swap(mGroups, fromPosition, toPosition);
                 notifyItemMoved(fromPosition, toPosition);
             }
