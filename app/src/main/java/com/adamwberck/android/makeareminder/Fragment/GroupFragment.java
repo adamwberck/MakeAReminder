@@ -4,17 +4,28 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -24,6 +35,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Dialog.ColorChooserDialog;
@@ -77,7 +89,10 @@ public class GroupFragment extends VisibleFragment{
     private static final String EXTRA_TASK_ID =
             "com.adamwberck.android.makeareminder.task_id";
     private Button mTimeButton;
-    private Button mAddReminderButton;
+
+
+    private int mTitleId;
+
     private ListView mReminderListView;
     private ReminderAdapter mReminderAdapter;
     private Button mRepeatButton;
@@ -85,6 +100,9 @@ public class GroupFragment extends VisibleFragment{
     private Button mSnoozeButton;
     private Button mCompleteButton;
     private ImageButton mClearDateButton;
+    private ImageButton mColorButton;
+    private ActionBar mActionBar;
+    private TextView mActionBarTitle;
 
 
     @Override
@@ -93,12 +111,53 @@ public class GroupFragment extends VisibleFragment{
         setHasOptionsMenu(true);
         UUID ID = (UUID) getArguments().getSerializable(ARG_GROUP_ID);
         mGroup = GroupLab.get(getContext()).getGroup(ID);
+        mActionBar = ((AppCompatActivity)getActivity())
+                .getSupportActionBar();
+        mActionBar.setBackgroundDrawable(new ColorDrawable(mGroup.getColorInt()));
+        TextView tv = setActionBarTextColor(getResources().getString(R.string.app_name)
+                ,mGroup,getContext());
+
+        mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        mActionBar.setCustomView(tv);
+        getActivity().invalidateOptionsMenu();
+    }
+
+    @NonNull
+    public static TextView setActionBarTextColor(CharSequence title,Group group,Context context) {
+        Resources resources = context.getResources();
+        int abColor = OverviewFragment.isDark(group.getColorInt()) ?
+                resources.getColor(R.color.white) : resources.getColor(R.color.black);
+        TextView tv = new TextView(context);
+        tv.setText(title);
+        tv.setTextColor(abColor);
+        tv.setTextSize(18);
+        return tv;
     }
 
     @Override
     public void  onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_group,menu);
+    }
+
+    private void styleMenuButton() {
+        // Find the menu item you want to style
+        View view = getActivity().findViewById(R.id.save_group);
+
+
+        // Cast to a TextView instance if the menu item was found
+        if (view != null && view instanceof TextView) {
+            Resources resources = getResources();
+            int abColor = OverviewFragment.isDark(mGroup.getColorInt()) ?
+                    resources.getColor(R.color.white) : resources.getColor(R.color.black);
+            ((TextView) view).setTextColor(abColor);
+            //((TextView) view).setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        styleMenuButton();
     }
 
     @Override
@@ -121,8 +180,9 @@ public class GroupFragment extends VisibleFragment{
             mNameField.setText(mGroup.getName());
         }
 
-        Button colorButton =  v.findViewById(R.id.group_color_button);
-        colorButton.setOnClickListener(new View.OnClickListener() {
+        mColorButton =  v.findViewById(R.id.group_color_square);
+        mColorButton.setColorFilter(mGroup.getColorInt(), PorterDuff.Mode.DARKEN);
+        mColorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Start Color picker
@@ -133,6 +193,7 @@ public class GroupFragment extends VisibleFragment{
                 chooserDialog.show(manager,DIALOG_COLOR);
             }
         });
+
 
         mSnoozeButton = v.findViewById(R.id.snooze_button);
         mSnoozeButton.setOnClickListener(new View.OnClickListener() {
@@ -210,15 +271,13 @@ public class GroupFragment extends VisibleFragment{
             }
         });
 
-        mReminderAdapter = new ReminderAdapter(getContext(),mGroup.getDefaultReminders());
         mReminderListView = v.findViewById(R.id.reminder_list_view);
-        mReminderListView.setAdapter(mReminderAdapter);
-
-
-        mAddReminderButton = v.findViewById(R.id.add_reminder_button);
-        mAddReminderButton.setOnClickListener(new View.OnClickListener() {
+        View footer = getLayoutInflater().inflate(R.layout.list_reminder_footer, mReminderListView,
+                false);
+        footer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Add reminder button
                 FragmentManager manager = getFragmentManager();
                 CreateReminderDialog dialog = CreateReminderDialog.newInstance();
                 dialog.setTargetFragment(GroupFragment.this, REQUEST_REMINDER);
@@ -226,6 +285,10 @@ public class GroupFragment extends VisibleFragment{
             }
         });
 
+
+        mReminderListView.addFooterView(footer);
+
+        updateUI();
         return v;
     }
 
@@ -297,12 +360,10 @@ public class GroupFragment extends VisibleFragment{
     }
 
 
-
     private class ReminderAdapter extends BaseAdapter{
         private Context mContext;
         private LayoutInflater mInflater;
         private List<Reminder> mDataSource;
-
         private ReminderAdapter(Context context, List<Reminder> reminders){
             mContext = context;
             mDataSource = reminders;
@@ -312,33 +373,23 @@ public class GroupFragment extends VisibleFragment{
         public int getCount() {
             return mDataSource.size();
         }
-
         @Override
         public Object getItem(int position) {
             return mDataSource.get(position);
         }
-
         @Override
         public long getItemId(int position) {
             return position;
         }
-
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             // Get view for row item
-            //TODO ViewHolder
             @SuppressLint("ViewHolder")
             View rowView = mInflater.inflate(R.layout.list_reminder, parent, false);
-            TextView infoTextView = rowView.findViewById(R.id.text_reminder_info);
-
-            /*
-            ViewHolder holder = new ViewHolder();
-            holder.text = (TextView) convertView.findViewById(R.id.text_reminder_info);
-            holder.button = (ImageButton) convertView.findViewById(R.id.image_button_delete);
-            convertView.setTag(holder);*/
             final Reminder reminder = (Reminder) getItem(position);
-            //TODO Swipe dismiss reminder
-            infoTextView.setText(reminder.getInfo(getContext()));
+
+            TextView infoTextView = rowView.findViewById(R.id.text_reminder_info);
+            infoTextView.setText(reminder.getInfo(getContext()).trim());
             infoTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -348,13 +399,13 @@ public class GroupFragment extends VisibleFragment{
                     dialog.show(manager,DIALOG_REMINDER);
                 }
             });
-            ImageView isAlarm = rowView.findViewById(R.id.image_is_alarm);
-            if(reminder.isAlarm()) {
-                isAlarm.setImageDrawable(getResources().getDrawable(R.drawable.ic_alarm));
-            }
-            else {
-                isAlarm.setImageDrawable(getResources().getDrawable(R.drawable.ic_notification));
-            }
+
+            ImageView imageView = rowView.findViewById(R.id.image_is_alarm);
+            Resources r = getResources();
+            Drawable icon = mDataSource.get(position).isAlarm()?r.getDrawable(R.drawable.ic_alarm) :
+                    r.getDrawable(R.drawable.ic_notification);
+            imageView.setImageDrawable(icon);
+
             ImageView delete = rowView.findViewById(R.id.image_delete_reminder);
             delete.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -363,17 +414,11 @@ public class GroupFragment extends VisibleFragment{
                     updateUI();
                 }
             });
-            updateUI();
+
             return rowView;
         }
-
     }
-    /*
-    private static class ViewHolder{
-        TextView text;
-        ImageButton button;
-        int position;
-    }*/
+
 
     @Override
     public void onResume(){
@@ -423,6 +468,13 @@ public class GroupFragment extends VisibleFragment{
 
         if(requestCode == REQUEST_COLOR){
             mGroup.setColor(data.getStringExtra(ColorChooserDialog.EXTRA_COLOR));
+            mActionBar.setBackgroundDrawable(new ColorDrawable(mGroup.getColorInt()));
+            TextView tv = setActionBarTextColor(getResources().getString(R.string.app_name)
+                    ,mGroup,getContext());
+
+            mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            mActionBar.setCustomView(tv);
+            mColorButton.setColorFilter(mGroup.getColorInt(), PorterDuff.Mode.DARKEN);
         }
         updateUI();
     }
@@ -447,6 +499,6 @@ public class GroupFragment extends VisibleFragment{
         else {
             mRepeatButton.setText(R.string.repeat);
         }
-
+        getActivity().invalidateOptionsMenu();
     }
 }

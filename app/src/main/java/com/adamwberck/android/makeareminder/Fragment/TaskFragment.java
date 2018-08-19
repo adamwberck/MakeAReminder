@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
@@ -338,7 +340,6 @@ public class TaskFragment extends VisibleFragment{
         private Context mContext;
         private LayoutInflater mInflater;
         private List<Reminder> mDataSource;
-
         private ReminderAdapter(Context context, List<Reminder> reminders){
             mContext = context;
             mDataSource = reminders;
@@ -348,32 +349,22 @@ public class TaskFragment extends VisibleFragment{
         public int getCount() {
             return mDataSource.size();
         }
-
         @Override
         public Object getItem(int position) {
             return mDataSource.get(position);
         }
-
         @Override
         public long getItemId(int position) {
             return position;
         }
-
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             // Get view for row item
-            //TODO ViewHolder
             @SuppressLint("ViewHolder")
             View rowView = mInflater.inflate(R.layout.list_reminder, parent, false);
-            TextView infoTextView = rowView.findViewById(R.id.text_reminder_info);
-
-            /*
-            ViewHolder holder = new ViewHolder();
-            holder.text = (TextView) convertView.findViewById(R.id.text_reminder_info);
-            holder.button = (ImageButton) convertView.findViewById(R.id.image_button_delete);
-            convertView.setTag(holder);*/
             final Reminder reminder = (Reminder) getItem(position);
-            //TODO Swipe dismiss reminder
+
+            TextView infoTextView = rowView.findViewById(R.id.text_reminder_info);
             infoTextView.setText(reminder.getInfo(getContext()));
             infoTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -384,13 +375,13 @@ public class TaskFragment extends VisibleFragment{
                     dialog.show(manager,DIALOG_REMINDER);
                 }
             });
-            ImageView isAlarm = rowView.findViewById(R.id.image_is_alarm);
-            if(reminder.isAlarm()) {
-                isAlarm.setImageDrawable(getResources().getDrawable(R.drawable.ic_alarm));
-            }
-            else {
-                isAlarm.setImageDrawable(getResources().getDrawable(R.drawable.ic_notification));
-            }
+
+            ImageView imageView = rowView.findViewById(R.id.image_is_alarm);
+            Resources r = getResources();
+            Drawable icon = mDataSource.get(position).isAlarm()?r.getDrawable(R.drawable.ic_alarm) :
+                    r.getDrawable(R.drawable.ic_notification);
+            imageView.setImageDrawable(icon);
+
             ImageView delete = rowView.findViewById(R.id.image_delete_reminder);
             delete.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -399,17 +390,9 @@ public class TaskFragment extends VisibleFragment{
                     updateUI();
                 }
             });
-            updateUI();
             return rowView;
         }
-
     }
-    /*
-    private static class ViewHolder{
-        TextView text;
-        ImageButton button;
-        int position;
-    }*/
 
     @Override
     public void onResume(){
@@ -465,7 +448,7 @@ public class TaskFragment extends VisibleFragment{
             mCompleteButton.setText(R.string.complete);
         }
         else{
-            mCompleteButton.setText(R.string.uncomplete);
+            mCompleteButton.setText(R.string.incomplete);
         }
 
         List<Reminder> reminders = mTask.getReminders();

@@ -2,24 +2,28 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="30dp">
+    android:layout_height="50dp">
     <TextView
         android:textColor="@color/black"
         android:id="@+id/text_reminder_info"
-        android:textSize="17sp"
+        android:textSize="22sp"
         android:layout_width="0dp"
-        android:layout_height="30dp"
+        android:layout_height="match_parent"
+        android:text="@string/new_reminder"
+        android:gravity="bottom"
         android:layout_weight="7"/>
     <ImageView
         android:id="@+id/image_is_alarm"
         android:src="@drawable/ic_alarm"
         android:layout_width="0dp"
         android:layout_height="30dp"
+        android:layout_gravity="center_vertical"
         android:layout_weight="1"/>
     <ImageView
         android:id="@+id/image_delete_reminder"
         android:src="@drawable/ic_close_black_24dp"
         android:layout_width="0dp"
+        android:layout_gravity="center_vertical"
         android:layout_height="30dp"
         android:layout_weight="1"/>
 </LinearLayout>

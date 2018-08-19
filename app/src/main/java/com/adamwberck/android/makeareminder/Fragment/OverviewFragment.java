@@ -117,7 +117,6 @@ public class OverviewFragment extends VisibleFragment {
             float dX, dY;
             boolean onCard;
             Group mGroup;
-            //TODO fix gray circle
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
@@ -484,12 +483,12 @@ public class OverviewFragment extends VisibleFragment {
                     mGroup.getOverdue()));
             View card = itemView.findViewById(R.id.card_layout);
             if(mGroup.isSpecial()){
-                card.getBackground().setColorFilter(0xFFffffff,
-                        PorterDuff.Mode.DARKEN);
                 mGroupNameTextView.setText("");
                 mDueTextView.setText(R.string.new_group);
+
                 mDueTextView.setTextSize(40f);
                 mDueTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                mDueTextView.setTextColor(getResources().getColor(R.color.gray));
                 mEditButton.setVisibility(View.GONE);
                 mOverdueTextView.setText("");
                 card.setBackgroundResource(R.drawable.ic_card_new);
@@ -501,14 +500,14 @@ public class OverviewFragment extends VisibleFragment {
                 card.setBackgroundResource(R.drawable.ic_card);
                 card.getBackground().setColorFilter(Color.parseColor(mGroup.getColor()),
                         PorterDuff.Mode.DARKEN);
-            }
-            int textColor = isDark(Color.parseColor(mGroup.getColor()))?
-                    Color.parseColor("#ffffffff") :
-                    Color.parseColor("#ff000000");
-            for(TextView tv : texts){
-                tv.setTextColor(textColor);
-                ImageButton ib = itemView.findViewById(R.id.edit_group_button);
-                ib.setColorFilter(textColor,PorterDuff.Mode.SRC_ATOP);
+                int textColor = isDark(Color.parseColor(mGroup.getColor()))?
+                        Color.parseColor("#ffffffff") :
+                        Color.parseColor("#ff000000");
+                for(TextView tv : texts){
+                    tv.setTextColor(textColor);
+                    ImageButton ib = itemView.findViewById(R.id.edit_group_button);
+                    ib.setColorFilter(textColor,PorterDuff.Mode.SRC_ATOP);
+                }
             }
 
         }
@@ -524,11 +523,6 @@ public class OverviewFragment extends VisibleFragment {
             mCardView.getBackground().setColorFilter(Color.parseColor(mGroup.getColor()),
                     PorterDuff.Mode.DARKEN);
             turnOnAddCircle();
-            //if(mDraggingGroupHolder!=null&&mOverTrashcan){
-                //Group group = mDraggingGroupHolder.mGroup;
-                //GroupLab.get(getContext()).removeGroup(group);
-                //updateUI();
-            //}
             mOverTrashcan = false;
             mDraggingGroupHolder=null;
             mDraggingColor=0x000000;
@@ -543,7 +537,7 @@ public class OverviewFragment extends VisibleFragment {
         }
     }
 
-    private boolean isDark(int argb) {
+    public static boolean isDark(int argb) {
         double rgb[] = new double[3];
         rgb[0] = (argb>>16)&0xFF;
         rgb[1] = (argb>>8)&0xFF;

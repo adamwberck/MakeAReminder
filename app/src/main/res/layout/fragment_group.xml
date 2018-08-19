@@ -13,25 +13,41 @@
         android:text="@string/group_name_label"
         android:labelFor="@+id/task_title"
         />
-    <EditText
-        android:id="@+id/task_name"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <Button
-        android:id="@+id/group_color_button"
-        android:text="@string/select_color"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/task_name"
+            android:layout_width="0dp"
+            android:textSize="40sp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"/>
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center">
+            <ImageButton
+                android:id="@+id/group_color_square"
+                android:background="#00000000"
+                android:src="@drawable/ic_button_square_color"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <Button
             android:id="@+id/time_button"
+            android:textSize="25sp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="8"
-            android:text="@string/time"/>
+            android:layout_weight="3"
+            android:text="@string/default_time"/>
         <ImageButton
             android:id="@+id/clear_time_button"
             android:background="#00000000"
@@ -47,10 +63,11 @@
         android:orientation="horizontal">
         <Button
             android:id="@+id/repeat_button"
-            android:layout_weight="8"
+            android:textSize="25sp"
+            android:layout_weight="3"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/repeat" />
+            android:text="@string/default_repeat" />
         <ImageButton
             android:id="@+id/clear_repeat_button"
             android:background="#00000000"
@@ -60,54 +77,20 @@
             android:layout_gravity="center_vertical"
             android:layout_weight="1"/>
     </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/location_button"
-            android:layout_weight="8"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/location"/>
-        <ImageButton
-            android:id="@+id/clear_location_button"
-            android:background="#00000000"
-            android:src="@drawable/ic_close_black_24dp"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"/>
-    </LinearLayout>
     <TextView
-        android:textSize="19sp"
+        android:textSize="25sp"
         android:text="@string/reminders"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <ListView
         android:id="@+id/reminder_list_view"
         android:layout_width="match_parent"
-        android:layout_height="100dp">
+        android:layout_height="200dp">
     </ListView>
     <Button
-        android:id="@+id/add_reminder_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/add_reminder"/>
-    <Button
-        android:id="@+id/alarm_test_button"
-        android:text="@string/test_alarm"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <Button
         android:id="@+id/snooze_button"
-        android:text="@string/snooze"
+        android:text="@string/default_snooze"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <Button
-        android:text="@string/complete"
-        android:id="@+id/complete_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
 
 </LinearLayout>

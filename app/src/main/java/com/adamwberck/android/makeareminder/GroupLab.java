@@ -68,10 +68,6 @@ public class GroupLab implements Serializable{
 
     public static GroupLab get(Context context){
         if (sGroupLab == null) {
-            if(sGroupColors==null){
-                sGroupColors = Arrays.asList(context.getResources()
-                        .getStringArray(R.array.group_colors));
-            }
             try {
                 sGroupLab = loadLab(context);
                 sGroupLab.mContext = context;
@@ -92,6 +88,9 @@ public class GroupLab implements Serializable{
     private GroupLab(Context context) {
         mGroups = new ArrayList<>();
         mContext = context;
+        if(sGroupColors==null){
+            initGroupColors();
+        }
     }
 
     public int getGroupIndex(Group group) {
@@ -99,12 +98,10 @@ public class GroupLab implements Serializable{
     }
 
     public void addGroup(Group g){
-        if(sColorUsed.size()==0){
-            for(int i=0;i<sGroupColors.size();i++){
-                sColorUsed.add(i);
-            }
+        if(sGroupColors.size()==0){
+            initGroupColors();
         }
-        String color = sGroupColors.get(sColorUsed.remove(0));
+        String color = sGroupColors.remove(sGroupColors.size()-1);
         g.setColor(color);
         mGroups.add(mGroups.size()-1,g);
         if(!mGroups.get(mGroups.size()-1).getID().equals(Group.SPECIAL_ID)){
@@ -112,6 +109,14 @@ public class GroupLab implements Serializable{
             mGroups.add(Group.specialGroup());
         }
         saveLab();
+    }
+
+    private void initGroupColors() {
+        List<String> gc =
+                Arrays.asList(mContext.getResources().getStringArray(R.array.group_colors));
+        sGroupColors = new ArrayList<>();
+        sGroupColors.addAll(gc);
+        Collections.shuffle(sGroupColors);
     }
 
     public void updateTask(Task task) {

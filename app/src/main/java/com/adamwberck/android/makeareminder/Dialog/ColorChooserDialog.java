@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,32 +40,16 @@ public class ColorChooserDialog extends DialogFragment {
         return fragment;
     }
 
+
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_color_chooser,
                 null);
         mColor = getArguments().getString(ARG_COLOR);
         mColorList = Arrays.asList(getResources().getStringArray(R.array.group_colors));
-        //final Task task = (Task) getArguments().getSerializable(ARG_TASK);
-        //final HorizontalScrollView horizontalScrollView =  v.findViewById(R.id.snooze_scrollview);
         mColorButtons = v.findViewById(R.id.color_buttons);
         setupButtons(mColorButtons);
-
-        //End Buttons
-        Button snoozeButton = v.findViewById(R.id.change_color_button);
-        snoozeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendResult(Activity.RESULT_OK,mColor);
-            }
-        });
-        Button cancelButton = v.findViewById(R.id.cancel_dialog_button);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendResult(Activity.RESULT_OK,null);
-            }
-        });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setView(v)
@@ -106,26 +91,12 @@ public class ColorChooserDialog extends DialogFragment {
         }
     }
 
-    private void updateSelected(View view) {
-        // Set up touch listener for non-text box views to hide keyboard.
-        for(int i=0;i<mColorList.size();i++){
-            Button b = view.findViewById(i);
-            if (b.getId() == mSelectedButton) {
-                b.setBackground(getResources().getDrawable(R.drawable.ic_button_square_color_on));
-            } else {
-                b.setBackground(getResources().getDrawable(R.drawable.ic_button_square_color_off));
-            }
-            String color = mColorList.get(i);
-            b.getBackground().setColorFilter(Color.parseColor(color), PorterDuff.Mode.DARKEN);
-            b.invalidate();
-        }
-    }
 
     private void buttonClick(View v) {
         int buttonNum = v.getId();
         mSelectedButton = buttonNum;
         mColor = mColorList.get(buttonNum);
-        updateSelected(mColorButtons);
+        sendResult(Activity.RESULT_OK,mColor);
     }
 
     private void sendResult(int resultCode, String color ){
