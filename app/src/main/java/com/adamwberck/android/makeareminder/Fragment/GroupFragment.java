@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -14,18 +13,14 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -35,9 +30,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.adamwberck.android.makeareminder.Dialog.ChooseSnoozeDialog;
 import com.adamwberck.android.makeareminder.Dialog.ColorChooserDialog;
 import com.adamwberck.android.makeareminder.Dialog.CreateReminderDialog;
 import com.adamwberck.android.makeareminder.Dialog.DatePickerDialog;
@@ -49,7 +44,6 @@ import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
-import com.skydoves.colorpickerpreference.ColorPickerDialog;
 
 import org.joda.time.DateTime;
 
@@ -91,18 +85,12 @@ public class GroupFragment extends VisibleFragment{
     private Button mTimeButton;
 
 
-    private int mTitleId;
-
     private ListView mReminderListView;
     private ReminderAdapter mReminderAdapter;
     private Button mRepeatButton;
-    private Button mTestAlarmButton;
     private Button mSnoozeButton;
-    private Button mCompleteButton;
-    private ImageButton mClearDateButton;
     private ImageButton mColorButton;
     private ActionBar mActionBar;
-    private TextView mActionBarTitle;
 
 
     @Override
@@ -203,7 +191,10 @@ public class GroupFragment extends VisibleFragment{
                 String name = mGroup.getName();
                 String title = mGroup.getName();
                 //TODO create default snooze dialog or use one already made
-                updateUI();
+                FragmentManager manager = getFragmentManager();
+                ChooseSnoozeDialog d = ChooseSnoozeDialog.newInstance(null,mGroup.getName());
+                d.setTargetFragment(GroupFragment.this,REQUEST_SNOOZE);
+                d.show(manager,DIALOG_ALARM);
             }
         });
 
@@ -249,14 +240,6 @@ public class GroupFragment extends VisibleFragment{
             }
         });
 
-        mClearDateButton = v.findViewById(R.id.clear_time_button);
-        mClearDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mGroup.setDefaultTime(null);
-            }
-        });
-
         updateDate();
 
         mRepeatButton = v.findViewById(R.id.repeat_button);
@@ -294,10 +277,10 @@ public class GroupFragment extends VisibleFragment{
 
     private void updateDate() {
         if(mGroup.getDefaultTime()!=null) {
-            mTimeButton.setText(mGroup.getDefaultTime().toString("hh:mm a"));
+            mTimeButton.setText(mGroup.getDefaultTime().toString("h:mm a"));
         }
         else {
-            mTimeButton.setText(R.string.set_time);
+            mTimeButton.setText(R.string.set_default_time);
         }
     }
 
@@ -476,6 +459,11 @@ public class GroupFragment extends VisibleFragment{
             mActionBar.setCustomView(tv);
             mColorButton.setColorFilter(mGroup.getColorInt(), PorterDuff.Mode.DARKEN);
         }
+
+        if(requestCode == REQUEST_SNOOZE){
+            long snooze = data.getExtras().getLong(ChooseSnoozeDialog.EXTRA_INTERVAL);
+            mGroup.setDefaultSnooze(snooze);
+        }
         updateUI();
     }
 
@@ -492,13 +480,18 @@ public class GroupFragment extends VisibleFragment{
         }
         Repeat repeat = mGroup.getDefaultRepeat();
         if(repeat!=null){
-            String s = repeat.getRepeatTime().getTimeString(getContext(),"Every ",
+            String s = repeat.getRepeatTime().getTimeString(getContext(),getString(R.string.every),
                     "");
             mRepeatButton.setText(s);
         }
         else {
-            mRepeatButton.setText(R.string.repeat);
+            mRepeatButton.setText(R.string.set_default_repeat);
         }
+        long snooze = mGroup.getDefaultSnooze();
+        String snoozeText = snooze>0?(SpanOfTime.ofMillis(snooze)).getTimeString(getContext(),
+                getString(R.string.snooze_for),"") :
+                getString(R.string.set_default_snooze);
+        mSnoozeButton.setText(snoozeText);
         getActivity().invalidateOptionsMenu();
     }
 }

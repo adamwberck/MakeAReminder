@@ -82,12 +82,10 @@ public class SetRepeatDialog extends DismissDialog {
         timeText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                //pass
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //pass
             }
 
             @Override
@@ -175,10 +173,11 @@ public class SetRepeatDialog extends DismissDialog {
                         setRepeat();
                     }
                 })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.clear_time, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        cancel();
+                        mRepeat = null;
+                        sendResult(Activity.RESULT_OK);
                     }
                 });
 

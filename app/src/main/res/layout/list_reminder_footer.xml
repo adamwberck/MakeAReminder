@@ -9,6 +9,6 @@
         android:textStyle="bold"
         android:textColor="@color/black"
         android:layout_width="match_parent"
-        android:gravity="center_vertical"
+        android:gravity="bottom"
         android:layout_height="50dp"/>
 </LinearLayout>

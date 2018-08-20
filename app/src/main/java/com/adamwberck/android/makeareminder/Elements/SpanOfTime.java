@@ -104,6 +104,10 @@ public class SpanOfTime implements Serializable{
         return TimeUnit.MINUTES.toMillis(mMinutes);
     }
 
+    public static SpanOfTime ofMillis(long m) {
+        return SpanOfTime.ofMinutes(TimeUnit.MILLISECONDS.toMinutes(m));
+    }
+
 
     private class TimeResource{
         public TimeResource(String string, int time) {

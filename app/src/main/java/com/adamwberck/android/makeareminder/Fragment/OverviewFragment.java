@@ -327,6 +327,8 @@ public class OverviewFragment extends VisibleFragment {
         };
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mGroupRecyclerView);
+
+
         return view;
     }
 

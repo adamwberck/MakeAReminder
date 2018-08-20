@@ -6,6 +6,7 @@ import android.graphics.Color;
 import com.adamwberck.android.makeareminder.GroupLab;
 
 import org.joda.time.DateTime;
+import org.joda.time.Interval;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class Group implements Serializable{
     private List<Task> mTasks = new ArrayList<>();
 
     public Group() {
+        mDefaultReminders.add(new Reminder(null,SpanOfTime.ofMinutes(0)));
     }
 
     private Group(UUID uuid) {
@@ -163,5 +165,13 @@ public class Group implements Serializable{
 
     public boolean isSpecial() {
         return mID.equals(SPECIAL_ID);
+    }
+
+    public void setDefaultSnooze(long interval) {
+        mDefaultSnooze = interval;
+    }
+
+    public long getDefaultSnooze() {
+        return mDefaultSnooze;
     }
 }

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TimePicker;
 
 import com.adamwberck.android.makeareminder.R;
@@ -39,6 +40,8 @@ public class TimePickerDialog extends DismissDialog {
 
         TimePickerDialog fragment = new TimePickerDialog();
         fragment.setArguments(args);
+
+
         return fragment;
     }
 
@@ -86,6 +89,12 @@ public class TimePickerDialog extends DismissDialog {
                         sendResult(Activity.RESULT_OK,new DateTime(year,month,day,hour,minute));
                     }
                 })
+                .setNegativeButton(R.string.clear_time, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        sendResult(Activity.RESULT_OK,null);
+                    }
+                })
                 .create();
     }
 
@@ -93,11 +102,8 @@ public class TimePickerDialog extends DismissDialog {
         if (getTargetFragment() == null) {
             return;
         }
-
         Intent intent = new Intent();
         intent.putExtra(EXTRA_TIME, date);
-
-        getTargetFragment()
-                .onActivityResult(getTargetRequestCode(), resultCode, intent);
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
     }
 }

@@ -76,9 +76,14 @@
     <string name="task_name_label">Task Name</string>
     <string name="select_color">Select Color</string>
     <string name="change_color">Change Color</string>
-    <string name="default_snooze">Default Snooze</string>
-    <string name="default_time">Default Time</string>
-    <string name="default_repeat">Default Repeat</string>
+    <string name="set_default_snooze">Set Default Snooze</string>
+    <string name="set_default_time">Set Default Time</string>
+    <string name="set_default_repeat">Set Default Repeat</string>
+    <string name="clear_time">Clear Time</string>
+    <string name="clear_default_snooze">Clear Default Snooze</string>
+    <string name="clear_snooze">clear_snooze</string>
+    <string name="snooze_for">Snooze For:</string>
+    <string name="every">Every</string>
     <string-array name="group_colors">
         <item>#ffff0000</item>
         <item>#ff0000ff</item>

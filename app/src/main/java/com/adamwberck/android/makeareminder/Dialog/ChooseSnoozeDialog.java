@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
-public class AlarmAlertDialog extends DialogFragment {
+public class ChooseSnoozeDialog extends DismissDialog {
     private static final DateTime START_TIME = new DateTime();
     private static final String ARG_TASK = "task";
     private static final String ARG_NAME = "name";
@@ -49,9 +49,9 @@ public class AlarmAlertDialog extends DialogFragment {
     private int mButtonNumber = 0;
     private TextView mSnoozeText2;
 
-    public static AlarmAlertDialog newInstance(Task task, String name){
+    public static ChooseSnoozeDialog newInstance(Task task, String name){
         Bundle args = new Bundle();
-        AlarmAlertDialog fragment = new AlarmAlertDialog();
+        ChooseSnoozeDialog fragment = new ChooseSnoozeDialog();
         args.putSerializable(ARG_TASK,task);
         args.putString(ARG_NAME,name);
         fragment.setArguments(args);
@@ -234,17 +234,20 @@ public class AlarmAlertDialog extends DialogFragment {
 
         //End Buttons
         Button snoozeButton = v.findViewById(R.id.alarm_snooze_button);
+        snoozeButton.setText(R.string.clear_snooze);
         snoozeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendResult(Activity.RESULT_OK,new Interval(START_TIME,mSnoozeTime));
+                sendResult(Activity.RESULT_OK,new Interval(START_TIME,mSnoozeTime)
+                        .toDurationMillis());
             }
         });
         Button dismissButton = v.findViewById(R.id.alarm_dismiss_button);
+        dismissButton.setText(R.string.set_snooze);
         dismissButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendResult(Activity.RESULT_OK,null);
+                sendResult(Activity.RESULT_OK,0);
             }
         });
 
@@ -253,14 +256,11 @@ public class AlarmAlertDialog extends DialogFragment {
                 .setTitle(name).create();
     }
 
-    private void sendResult(int resultCode, Interval interval ){
+    private void sendResult(int resultCode, long interval ){
         Intent intent = new Intent();
-        DateTime endTime = null;
-        if(interval!=null) {
-            endTime = new DateTime().plus(interval.toDurationMillis());
-        }
-        intent.putExtra(EXTRA_INTERVAL,endTime);
+        intent.putExtra(EXTRA_INTERVAL, interval);
         getTargetFragment().onActivityResult(getTargetRequestCode(),resultCode,intent);
+        getDialog().dismiss();
     }
     private void cancel() {
         this.getDialog().cancel();
