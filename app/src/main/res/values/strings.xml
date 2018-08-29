@@ -84,6 +84,10 @@
     <string name="clear_snooze">clear_snooze</string>
     <string name="snooze_for">Snooze For:</string>
     <string name="every">Every</string>
+    <string name="default_time">Default Time</string>
+    <string name="default_repeat">Default Repeat</string>
+    <string name="default_snooze">Default Snooze</string>
+    <string name="default_reminders">Default Reminders</string>
     <string-array name="group_colors">
         <item>#ffff0000</item>
         <item>#ff0000ff</item>

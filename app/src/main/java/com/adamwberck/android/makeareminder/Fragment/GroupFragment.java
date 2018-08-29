@@ -91,6 +91,7 @@ public class GroupFragment extends VisibleFragment{
     private Button mSnoozeButton;
     private ImageButton mColorButton;
     private ActionBar mActionBar;
+    private Menu mMenu;
 
 
     @Override
@@ -125,6 +126,7 @@ public class GroupFragment extends VisibleFragment{
     @Override
     public void  onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        mMenu = menu;
         inflater.inflate(R.menu.fragment_group,menu);
     }
 
@@ -151,7 +153,7 @@ public class GroupFragment extends VisibleFragment{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.save_task:
+            case R.id.save_group:
                 getActivity().finish();
                 return true;
             default:
@@ -280,7 +282,7 @@ public class GroupFragment extends VisibleFragment{
             mTimeButton.setText(mGroup.getDefaultTime().toString("h:mm a"));
         }
         else {
-            mTimeButton.setText(R.string.set_default_time);
+            mTimeButton.setText(R.string.default_time);
         }
     }
 
@@ -458,6 +460,7 @@ public class GroupFragment extends VisibleFragment{
             mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
             mActionBar.setCustomView(tv);
             mColorButton.setColorFilter(mGroup.getColorInt(), PorterDuff.Mode.DARKEN);
+            getActivity().invalidateOptionsMenu();
         }
 
         if(requestCode == REQUEST_SNOOZE){
@@ -485,12 +488,12 @@ public class GroupFragment extends VisibleFragment{
             mRepeatButton.setText(s);
         }
         else {
-            mRepeatButton.setText(R.string.set_default_repeat);
+            mRepeatButton.setText(R.string.default_repeat);
         }
         long snooze = mGroup.getDefaultSnooze();
         String snoozeText = snooze>0?(SpanOfTime.ofMillis(snooze)).getTimeString(getContext(),
                 getString(R.string.snooze_for),"") :
-                getString(R.string.set_default_snooze);
+                getString(R.string.default_snooze);
         mSnoozeButton.setText(snoozeText);
         getActivity().invalidateOptionsMenu();
     }
