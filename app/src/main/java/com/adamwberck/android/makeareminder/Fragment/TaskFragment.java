@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -98,15 +99,8 @@ public class TaskFragment extends VisibleFragment{
         setHasOptionsMenu(true);
         int ID = getArguments().getInt(ARG_TASK_ID);
         mTask = GroupLab.get(getContext()).getTask(ID);
-        //mActionBar = ((AppCompatActivity)getActivity())
-                //.getSupportActionBar();
-        //mActionBar.setBackgroundDrawable(new ColorDrawable(mTask.getGroup().getColorInt()));
-        //TextView tv = setActionBarTextColor(getResources().getString(R.string.app_name)
-        //       ,mTask.getGroup(),getContext());
-
-        //mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        //mActionBar.setCustomView(tv);
-        getActivity().invalidateOptionsMenu();
+        int colorInt = mTask.getGroup().getColorInt();
+        VisibleFragment.alterActionBar(colorInt,getContext(),getActivity());
     }
 
     @NonNull
@@ -130,7 +124,6 @@ public class TaskFragment extends VisibleFragment{
 
     private void styleMenuButton() {
         // Find the menu item you want to style
-        /*
         View view = getActivity().findViewById(R.id.save_task);
 
 
@@ -140,9 +133,8 @@ public class TaskFragment extends VisibleFragment{
             int abColor = OverviewFragment.isDark(mTask.getGroup().getColorInt()) ?
                     resources.getColor(R.color.white) : resources.getColor(R.color.black);
             ((TextView) view).setTextColor(abColor);
-            //((TextView) view).setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+            ((TextView) view).setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
         }
-        */
     }
 
     @Override

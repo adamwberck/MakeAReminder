@@ -100,28 +100,10 @@ public class GroupFragment extends VisibleFragment{
         setHasOptionsMenu(true);
         UUID ID = (UUID) getArguments().getSerializable(ARG_GROUP_ID);
         mGroup = GroupLab.get(getContext()).getGroup(ID);
-        mActionBar = ((AppCompatActivity)getActivity())
-                .getSupportActionBar();
-        mActionBar.setBackgroundDrawable(new ColorDrawable(mGroup.getColorInt()));
-        TextView tv = setActionBarTextColor(getResources().getString(R.string.app_name)
-                ,mGroup,getContext());
-
-        mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        mActionBar.setCustomView(tv);
-        getActivity().invalidateOptionsMenu();
+        VisibleFragment.alterActionBar(mGroup.getColorInt(),getContext(),getActivity());
     }
 
-    @NonNull
-    public static TextView setActionBarTextColor(CharSequence title,Group group,Context context) {
-        Resources resources = context.getResources();
-        int abColor = OverviewFragment.isDark(group.getColorInt()) ?
-                resources.getColor(R.color.white) : resources.getColor(R.color.black);
-        TextView tv = new TextView(context);
-        tv.setText(title);
-        tv.setTextColor(abColor);
-        tv.setTextSize(18);
-        return tv;
-    }
+
 
     @Override
     public void  onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -453,13 +435,9 @@ public class GroupFragment extends VisibleFragment{
 
         if(requestCode == REQUEST_COLOR){
             mGroup.setColor(data.getStringExtra(ColorChooserDialog.EXTRA_COLOR));
-            mActionBar.setBackgroundDrawable(new ColorDrawable(mGroup.getColorInt()));
-            TextView tv = setActionBarTextColor(getResources().getString(R.string.app_name)
-                    ,mGroup,getContext());
-
-            mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-            mActionBar.setCustomView(tv);
             mColorButton.setColorFilter(mGroup.getColorInt(), PorterDuff.Mode.DARKEN);
+
+            VisibleFragment.alterActionBar(mGroup.getColorInt(),getContext(),getActivity());
             getActivity().invalidateOptionsMenu();
         }
 

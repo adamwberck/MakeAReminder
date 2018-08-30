@@ -88,6 +88,7 @@ public class TaskListFragment extends VisibleFragment{
         setHasOptionsMenu(true);
         UUID id = (UUID) getArguments().getSerializable(ARG_GROUP_ID);
         mGroup = GroupLab.get(getContext()).getGroup(id);
+        VisibleFragment.alterActionBar(mGroup.getColorInt(),getContext(),getActivity());
     }
 
     @Override

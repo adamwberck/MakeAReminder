@@ -112,6 +112,7 @@ public class Task implements Serializable{
 
     public Task(Context appContext,Group group) {
         mID = GroupLab.get(appContext).nextValue();
+        mGroup = group;
     }
 
 
