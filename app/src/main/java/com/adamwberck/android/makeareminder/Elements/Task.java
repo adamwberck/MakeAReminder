@@ -10,7 +10,6 @@ import org.joda.time.Duration;
 import org.joda.time.LocalTime;
 
 import java.io.Serializable;
-import java.security.acl.Group;
 import java.util.List;
 import java.util.Locale;
 
@@ -29,7 +28,9 @@ public class Task implements Serializable{
     private DateTime mSnoozeTime;
     private boolean mHasRepeat = false;
     private boolean mComplete = false;
-    private List<Reminder> mReminders = new SortedObjectList<>(10,Reminder.getComparator());
+    private List<Reminder> mReminders
+            = new SortedObjectList<>(10,Reminder.getComparator());
+    private Group mGroup;
 
     public void addReminder(Reminder r){
         mReminders.add(r);
@@ -109,7 +110,7 @@ public class Task implements Serializable{
         return mID;
     }
 
-    public Task(Context appContext) {
+    public Task(Context appContext,Group group) {
         mID = GroupLab.get(appContext).nextValue();
     }
 
@@ -240,5 +241,9 @@ public class Task implements Serializable{
     public boolean isDueToday() {
         DateTime today = new DateTime();
         return mDate.getDayOfYear() == today.getDayOfYear() && mDate.getYear() == today.getYear();
+    }
+
+    public Group getGroup() {
+        return mGroup;
     }
 }

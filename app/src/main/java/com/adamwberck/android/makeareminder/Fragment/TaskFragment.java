@@ -5,9 +5,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -27,28 +31,28 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.adamwberck.android.makeareminder.Activity.AlarmActivity;
+import com.adamwberck.android.makeareminder.Dialog.ChooseSnoozeDialog;
 import com.adamwberck.android.makeareminder.Dialog.CreateReminderDialog;
 import com.adamwberck.android.makeareminder.Dialog.DatePickerDialog;
+import com.adamwberck.android.makeareminder.Dialog.SetRepeatDialog;
+import com.adamwberck.android.makeareminder.Dialog.TimePickerDialog;
+import com.adamwberck.android.makeareminder.Elements.Task;
+import com.adamwberck.android.makeareminder.Elements.Group;
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
-import com.adamwberck.android.makeareminder.Elements.Task;
 import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
-import com.adamwberck.android.makeareminder.Service.ReminderService;
-import com.adamwberck.android.makeareminder.Dialog.SetRepeatDialog;
-import com.adamwberck.android.makeareminder.Dialog.TimePickerDialog;
 
 import org.joda.time.DateTime;
 
 import java.util.List;
-import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
 
 public class TaskFragment extends VisibleFragment{
     private static final String TAG = "TaskFragment";
+
     private Task mTask;
     private Callbacks mCallbacks;
     private EditText mNameField;
@@ -56,16 +60,15 @@ public class TaskFragment extends VisibleFragment{
 
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_TIME = 1;
-    private static final int REQUEST_PHOTO = 2;
+    private static final int REQUEST_COLOR = 2;
     private static final int REQUEST_REMINDER = 3;
     private static final int REQUEST_EDIT = 4;
     private static final int REQUEST_SNOOZE = 5;
     private static final int REQUEST_REPEAT = 6;
 
-    private static final String ARG_TASK_ID = "task_id";
-    private static final String ARG_TASK = "task";
-    private static final String ARG_ALARM = "alarm";
+    private static final String ARG_TASK_ID = "Task_id";
 
+    private static final String DIALOG_COLOR = "DialogColor";
     private static final String DIALOG_REMINDER = "DialogReminder";
     private static final String DIALOG_REPEAT = "DialogRepeat";
     private static final String DIALOG_DATE  = "DialogDate";
@@ -73,35 +76,78 @@ public class TaskFragment extends VisibleFragment{
     private static final String DIALOG_TIME  = "DialogTime";
     private static final String DIALOG_ALARM = "DialogAlarm";
 
-    private static final String EXTRA_TASK_CHANGED =
-            "com.adamwberck.android.makeareminder.task_changed";
-    private static final String EXTRA_TASK_ID =
-            "com.adamwberck.android.makeareminder.task_id";
-    private Button mDateButton;
+    private static final String EXTRA_Tsk_CHANGED =
+            "com.adamwberck.android.makeareminder.Tsk_changed";
+    private static final String EXTRA_Tsk_ID =
+            "com.adamwberck.android.makeareminder.Tsk_id";
     private Button mTimeButton;
-    private Button mAddReminderButton;
+
+
     private ListView mReminderListView;
     private ReminderAdapter mReminderAdapter;
     private Button mRepeatButton;
-    private Button mTestAlarmButton;
     private Button mSnoozeButton;
-    private Button mCompleteButton;
-    private ImageButton mClearDateButton;
+    private ImageButton mColorButton;
+    private ActionBar mActionBar;
+    private Menu mMenu;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mTask = (Task) getArguments().getSerializable(ARG_TASK);
-        //stop alarms while editing
-        ReminderService.cancelServiceAlarm(getContext(),mTask.getID());
+        int ID = getArguments().getInt(ARG_TASK_ID);
+        mTask = GroupLab.get(getContext()).getTask(ID);
+        //mActionBar = ((AppCompatActivity)getActivity())
+                //.getSupportActionBar();
+        //mActionBar.setBackgroundDrawable(new ColorDrawable(mTask.getGroup().getColorInt()));
+        //TextView tv = setActionBarTextColor(getResources().getString(R.string.app_name)
+        //       ,mTask.getGroup(),getContext());
+
+        //mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        //mActionBar.setCustomView(tv);
+        getActivity().invalidateOptionsMenu();
+    }
+
+    @NonNull
+    public static TextView setActionBarTextColor(CharSequence title,Group group,Context context) {
+        Resources resources = context.getResources();
+        int abColor = OverviewFragment.isDark(group.getColorInt()) ?
+                resources.getColor(R.color.white) : resources.getColor(R.color.black);
+        TextView tv = new TextView(context);
+        tv.setText(title);
+        tv.setTextColor(abColor);
+        tv.setTextSize(18);
+        return tv;
     }
 
     @Override
     public void  onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        mMenu = menu;
         inflater.inflate(R.menu.fragment_task,menu);
+    }
+
+    private void styleMenuButton() {
+        // Find the menu item you want to style
+        /*
+        View view = getActivity().findViewById(R.id.save_task);
+
+
+        // Cast to a TextView instance if the menu item was found
+        if (view != null && view instanceof TextView) {
+            Resources resources = getResources();
+            int abColor = OverviewFragment.isDark(mTask.getGroup().getColorInt()) ?
+                    resources.getColor(R.color.white) : resources.getColor(R.color.black);
+            ((TextView) view).setTextColor(abColor);
+            //((TextView) view).setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        }
+        */
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        styleMenuButton();
     }
 
     @Override
@@ -116,7 +162,7 @@ public class TaskFragment extends VisibleFragment{
     }
 
     @Override
-    public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle SIState) {
         View v = inflater.inflate(R.layout.fragment_task, container,false);
         super.setupUI(v);
         mNameField = v.findViewById(R.id.task_name);
@@ -124,46 +170,25 @@ public class TaskFragment extends VisibleFragment{
             mNameField.setText(mTask.getName());
         }
 
-        mCompleteButton = v.findViewById(R.id.complete_button);
-        mCompleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mTask.setComplete(!mTask.isComplete());
-                updateUI();
-            }
-        });
+
+        //TODO color button should be group change button
+
 
         mSnoozeButton = v.findViewById(R.id.snooze_button);
-
         mSnoozeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int id = mTask.getID();
                 String name = mTask.getName();
                 String title = mTask.getName();
-                Intent i = AlarmActivity.newIntent(getActivity(),id,true,name,title);
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivity(i);
-                updateUI();
+                //TODO create default snooze dialog or use one already made
+                FragmentManager manager = getFragmentManager();
+                ChooseSnoozeDialog d = ChooseSnoozeDialog.newInstance(null,mTask.getName());
+                d.setTargetFragment(TaskFragment.this,REQUEST_SNOOZE);
+                d.show(manager,DIALOG_ALARM);
             }
         });
 
-
-        mTestAlarmButton = v.findViewById(R.id.alarm_test_button);
-        mTestAlarmButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int id = mTask.getID();
-                String name = mTask.getName();
-                String title = mTask.getName()+" Test";
-                Intent i = AlarmActivity.newIntent(getActivity(),id,true,name,title);
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivity(i);
-                updateUI();
-            }
-        });
         mNameField.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -194,18 +219,6 @@ public class TaskFragment extends VisibleFragment{
             }
         });
 
-        mDateButton = v.findViewById(R.id.date_button);
-        mDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentManager manager = getFragmentManager();
-                DatePickerDialog dialog = DatePickerDialog
-                        .newInstance(mTask.getDate());
-                dialog.setTargetFragment(TaskFragment.this, REQUEST_DATE);
-                dialog.show(manager,DIALOG_DATE);
-            }
-        });
-
         mTimeButton = v.findViewById(R.id.time_button);
         mTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,15 +230,6 @@ public class TaskFragment extends VisibleFragment{
                 dialog.show(manager,DIALOG_TIME);
             }
         });
-
-        mClearDateButton = v.findViewById(R.id.clear_time_button);
-        mClearDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mTask.setDate(null);
-            }
-        });
-
 
         updateDate();
 
@@ -241,15 +245,13 @@ public class TaskFragment extends VisibleFragment{
             }
         });
 
-        mReminderAdapter = new ReminderAdapter(getContext(),mTask.getReminders());
         mReminderListView = v.findViewById(R.id.reminder_list_view);
-        mReminderListView.setAdapter(mReminderAdapter);
-
-
-        mAddReminderButton = v.findViewById(R.id.add_reminder_button);
-        mAddReminderButton.setOnClickListener(new View.OnClickListener() {
+        View footer = getLayoutInflater().inflate(R.layout.list_reminder_footer, mReminderListView,
+                false);
+        footer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Add reminder button
                 FragmentManager manager = getFragmentManager();
                 CreateReminderDialog dialog = CreateReminderDialog.newInstance();
                 dialog.setTargetFragment(TaskFragment.this, REQUEST_REMINDER);
@@ -257,17 +259,19 @@ public class TaskFragment extends VisibleFragment{
             }
         });
 
+
+        mReminderListView.addFooterView(footer);
+
+        updateUI();
         return v;
     }
 
     private void updateDate() {
         if(mTask.getDate()!=null) {
-            mDateButton.setText(mTask.getDate().toString("MM/dd/yyyy"));
-            mTimeButton.setText(mTask.getDate().toString("hh:mm a"));
+            mTimeButton.setText(mTask.getDate().toString("h:mm a"));
         }
         else {
-            mDateButton.setText(R.string.set_date);
-            mTimeButton.setText(R.string.set_time);
+            mTimeButton.setText(R.string.default_time);
         }
     }
 
@@ -291,23 +295,23 @@ public class TaskFragment extends VisibleFragment{
         if(context instanceof Callbacks) {
             mCallbacks = (Callbacks) context;
         }
-        TaskFragment taskFragment = (TaskFragment) getActivity().getSupportFragmentManager()
+        TaskFragment TskFragment = (TaskFragment) getActivity().getSupportFragmentManager()
                 .findFragmentById(R.id.detail_fragment_container);
-        if(taskFragment !=null) {
+        if(TskFragment !=null) {
             //mDeleteCallBack = (OnDeleteCrimeListener) context;
         }
     }
 
-    private void setTaskChanged(int taskChanged){
+    private void setTskChanged(int TskChanged){
         Intent data = new Intent();
-        data.putExtra(EXTRA_TASK_CHANGED, taskChanged);
+        data.putExtra(EXTRA_Tsk_CHANGED, TskChanged);
         getActivity().setResult(RESULT_OK, data);
     }
 
     private void updateTask() {
-        //TaskLab.get(getActivity()).updateTask(mTask);
+        //TskLab.get(getActivity()).updateTsk(mTsk);
         if(mCallbacks!=null) {
-            mCallbacks.onTaskUpdated(mTask);
+            mCallbacks.onTaskUpdated(mTask.getID());
         }
     }
 
@@ -317,23 +321,17 @@ public class TaskFragment extends VisibleFragment{
 
 
     public interface Callbacks{
-        void onTaskUpdated(Task task);
+        void onTaskUpdated(int TaskID);
     }
 
-    public interface OnDeleteTaskListener {
-        void onTaskIdSelected(int TaskID);
-    }
 
-    public static TaskFragment newInstance(Task task) {
+    public static TaskFragment newInstance(int id) {
         Bundle args =  new Bundle();
-        args.putSerializable(ARG_TASK, task);
-        args.putBoolean(ARG_ALARM,false);
-
+        args.putInt(ARG_TASK_ID, id);
         TaskFragment fragment = new TaskFragment();
         fragment.setArguments(args);
         return fragment;
     }
-
 
 
     private class ReminderAdapter extends BaseAdapter{
@@ -365,7 +363,7 @@ public class TaskFragment extends VisibleFragment{
             final Reminder reminder = (Reminder) getItem(position);
 
             TextView infoTextView = rowView.findViewById(R.id.text_reminder_info);
-            infoTextView.setText(reminder.getInfo(getContext()));
+            infoTextView.setText(reminder.getInfo(getContext()).trim());
             infoTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -390,9 +388,11 @@ public class TaskFragment extends VisibleFragment{
                     updateUI();
                 }
             });
+
             return rowView;
         }
     }
+
 
     @Override
     public void onResume(){
@@ -403,9 +403,8 @@ public class TaskFragment extends VisibleFragment{
 
     @Override
     public void onDestroy(){
-        //TaskLab.get(getContext()).removeUnnamed();
+        //TskLab.get(getContext()).removeUnnamed();
         GroupLab.saveLab();
-        mTask.startAlarm(getActivity().getApplicationContext());
         Log.i(TAG,this.toString()+" destroyed.");
         super.onDestroy();
     }
@@ -440,16 +439,17 @@ public class TaskFragment extends VisibleFragment{
             Repeat repeat = (Repeat) data.getSerializableExtra(SetRepeatDialog.EXTRA_REPEAT);
             mTask.setRepeat(repeat);
         }
+
+
+
+        if(requestCode == REQUEST_SNOOZE){
+            long snooze = data.getExtras().getLong(ChooseSnoozeDialog.EXTRA_INTERVAL);
+            //mTask.setDefaultSnooze(snooze);
+        }
         updateUI();
     }
 
     private void updateUI() {
-        if(!mTask.isComplete()) {
-            mCompleteButton.setText(R.string.complete);
-        }
-        else{
-            mCompleteButton.setText(R.string.incomplete);
-        }
 
         List<Reminder> reminders = mTask.getReminders();
 
@@ -462,44 +462,21 @@ public class TaskFragment extends VisibleFragment{
         }
         Repeat repeat = mTask.getRepeat();
         if(repeat!=null){
-            String s = repeat.getRepeatTime().getTimeString(getContext(),"Every ",
+            String s = repeat.getRepeatTime().getTimeString(getContext(),getString(R.string.every),
                     "");
             mRepeatButton.setText(s);
         }
         else {
-            mRepeatButton.setText(R.string.repeat);
+            mRepeatButton.setText(R.string.default_repeat);
         }
 
-        if(mTask.isOverdue()){
-            mSnoozeButton.setVisibility(View.VISIBLE);
-            DateTime snoozeTime = mTask.getSnoozeTime();
-            mSnoozeButton.setText(R.string.set_snooze);
-            if(snoozeTime!=null){
-                String time;
-                if(isSameDay(snoozeTime)) {
-                    time = snoozeTime.toString("hh:mm a", Locale.getDefault());
-                }
-                else {
-                    time = snoozeTime.toString("MMM, dd hh:,mm a",Locale.getDefault());
-                }
-                String dateText = getResources().getString(R.string.snoozed_till, time);
-                mSnoozeButton.setText(dateText);
-            }
-        }
-        else {
-            mSnoozeButton.setVisibility(View.GONE);
-        }
+        //long snooze = mTask.getDefaultSnoozeTime();
+        /*
+        String snoozeText = snooze>0?(SpanOfTime.ofMillis(snooze)).getTimeString(getContext(),
+                getString(R.string.snooze_for),"") :
+                getString(R.string.default_snooze);
+        mSnoozeButton.setText(snoozeText);*/
 
-    }
-
-    private boolean isSameDay(DateTime snoozeTime) {
-        DateTime today = new DateTime();
-        if(snoozeTime.getDayOfYear()!=today.getDayOfYear()){
-            return false;
-        }
-        if(snoozeTime.getYear()!=today.getYear()){
-            return false;
-        }
-        return true;
+        getActivity().invalidateOptionsMenu();
     }
 }

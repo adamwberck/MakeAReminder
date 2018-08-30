@@ -32,7 +32,7 @@ import java.util.UUID;
 public class TaskListFragment extends VisibleFragment{
 
     //TODO sort tasks based on due date and completeness
-    private static final String ARG_TASK_ID = "task_id";
+    private static final String ARG_TASK = "task";
     private static final String ARG_ALARM = "alarm";
     private static final String ARG_NAME = "name";
     private static final String ARG_GROUP_ID = "group_id";
@@ -52,9 +52,9 @@ public class TaskListFragment extends VisibleFragment{
         mGroup.removeTask(taskId);
     }
 
-    public static Fragment newInstance(int id) {
+    public static Fragment newInstance(Task task) {
         Bundle args =  new Bundle();
-        args.putInt(ARG_TASK_ID, id);
+        args.putSerializable(ARG_TASK, task);
 
         TaskListFragment fragment = new TaskListFragment();
         fragment.setArguments(args);
@@ -125,7 +125,7 @@ public class TaskListFragment extends VisibleFragment{
     }
 
     private void newTask() {
-        Task task = new Task(getContext());
+        Task task = new Task(getContext(),mGroup);
         mGroup.addTask(task);
         task.test();
         mCallbacks.onTaskSelected(task);
@@ -177,10 +177,12 @@ public class TaskListFragment extends VisibleFragment{
     public void onAttach(Context context){
         super.onAttach(context);
         mCallbacks = (Callbacks) context;
-        mDeleteCallBack = (OnDeleteTaskListener) context;
+        //mDeleteCallBack = (OnDeleteTaskListener) context;
         try {
-            int taskID = getArguments().getInt(ARG_TASK_ID);
-            Task task = mGroup.getTask(taskID);
+            Task task = (Task) getArguments().getSerializable(ARG_TASK);
+            if(task==null){
+                return;
+            }
             mCallbacks.onTaskSelected(task);
         }
         catch (NullPointerException ignored){}

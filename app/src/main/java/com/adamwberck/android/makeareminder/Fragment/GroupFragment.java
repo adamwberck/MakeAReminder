@@ -165,7 +165,7 @@ public class GroupFragment extends VisibleFragment{
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle SIState) {
         View v = inflater.inflate(R.layout.fragment_group, container,false);
         super.setupUI(v);
-        mNameField = v.findViewById(R.id.task_name);
+        mNameField = v.findViewById(R.id.group_name);
         if(mGroup.getName()!=null) {
             mNameField.setText(mGroup.getName());
         }
