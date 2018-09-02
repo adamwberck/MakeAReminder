@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,7 +39,6 @@ public class TaskListFragment extends VisibleFragment{
     
     private static final int REQUEST_SNOOZE = 0;
     private static final String DIALOG_ALARM = "Dialog_ALARM";
-    private static final String TAG = "TaskListFr";
     private Group mGroup;
     private RecyclerView mTaskRecyclerView;
     private TaskAdapter mAdapter;
@@ -48,11 +46,7 @@ public class TaskListFragment extends VisibleFragment{
     private Callbacks mCallbacks;
 
 
-    public void deleteTask(int taskId) {
-        //Task task = TaskLab.get(getActivity()).getTask(taskId);
-        //TaskLab.get(getActivity()).removeTask(task);
-        mGroup.removeTask(taskId);
-    }
+
 
     public static Fragment newInstance(Task task) {
         Bundle args =  new Bundle();
@@ -74,13 +68,13 @@ public class TaskListFragment extends VisibleFragment{
 
 
     public interface Callbacks {
-        void onTaskSelected(Task task,boolean isNew);
+        void onTaskSelected(Task task);
     }
 
     private OnDeleteTaskListener mDeleteCallBack;
 
     public interface OnDeleteTaskListener {
-        void onTaskIdDeleted(Task task);
+        void onTaskDeleted(Task task);
     }
 
 
@@ -90,7 +84,7 @@ public class TaskListFragment extends VisibleFragment{
         setHasOptionsMenu(true);
         UUID id = (UUID) getArguments().getSerializable(ARG_GROUP_ID);
         mGroup = GroupLab.get(getContext()).getGroup(id);
-        VisibleFragment.alterActionBar(mGroup.getColorInt(),getContext(),getActivity());
+        alterActionBar(mGroup.getColorInt(),getContext(),getActivity());
     }
 
     @Override
@@ -100,10 +94,28 @@ public class TaskListFragment extends VisibleFragment{
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        styleMenuButtons(menu,mGroup.getColorInt(),getActivity());
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.new_task:
-                newTask();
+                Task currentTask = ((TaskListActivity)getActivity()).getTask();
+                if(currentTask!=null) {
+                    String name = currentTask.getName();
+                    if (name.isEmpty()) {
+                        Toast toast = Toast.makeText(getActivity().getApplicationContext(),
+                                R.string.name_task_warning, Toast.LENGTH_SHORT);
+                        toast.show();
+                    } else {
+                        newTask();
+                    }
+                }
+                else {
+                    newTask();
+                }
                 return true;
             case R.id.start_day:
                 StartDayService.testServiceAlarm(getContext());
@@ -114,13 +126,10 @@ public class TaskListFragment extends VisibleFragment{
         }
     }
 
-
-
     private void newTask() {
-        Task task = new Task(getContext(),mGroup.getID());
-        Log.i(TAG,"TaskA1: "+task.toString());
+        Task task = new Task(getContext(),mGroup);
         mGroup.addTask(task);
-        mCallbacks.onTaskSelected(task,true);
+        mCallbacks.onTaskSelected(task);
         updateUI();
     }
 
@@ -151,7 +160,7 @@ public class TaskListFragment extends VisibleFragment{
                     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                         int position = viewHolder.getAdapterPosition();
                         Task task = mAdapter.mTasks.get(position);
-                        mDeleteCallBack.onTaskIdDeleted(task);
+                        mDeleteCallBack.onTaskDeleted(task);
                         mGroup.removeTask(task);
                     }
                 };
@@ -175,7 +184,7 @@ public class TaskListFragment extends VisibleFragment{
             if(task==null){
                 return;
             }
-            mCallbacks.onTaskSelected(task,false);
+            mCallbacks.onTaskSelected(task);
         }
         catch (NullPointerException ignored){}
     }
@@ -247,7 +256,7 @@ public class TaskListFragment extends VisibleFragment{
 
         @Override
         public void onClick(View view) {
-            mCallbacks.onTaskSelected(mTask,false);
+            mCallbacks.onTaskSelected(mTask);
         }
 
 
@@ -263,15 +272,9 @@ public class TaskListFragment extends VisibleFragment{
                 for(TextView t: taskText){
                     t.setTextColor(getResources().getColor(R.color.black));
                 }
-                String dateText;
-                if(mTask.getDate()==null){
-                    dateText = getString(R.string.no_date);
-                }
-                else{
-                    dateText = mTask.getDate()
-                            .toString("dd MMM YYYY hh:mm a",Locale.getDefault());
-                }
-
+                String dateText = mTask.getDate()==null ?
+                        getString(R.string.no_date) :
+                        mTask.getDate().toString("d MMM YYYY hh:mm a", Locale.getDefault());
                 mDateTextView.setText(dateText);
                 if(task.isComplete()){
                     for(TextView t: taskText){

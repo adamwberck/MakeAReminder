@@ -33,6 +33,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static android.graphics.Color.BLACK;
+import static android.graphics.Color.WHITE;
+
 public class OverviewFragment extends VisibleFragment {
     private static final String TAG = "OverviewFragment";
     final float[] ADD_POS = new float[2];
@@ -503,13 +506,11 @@ public class OverviewFragment extends VisibleFragment {
                 card.setBackgroundResource(R.drawable.ic_card);
                 card.getBackground().setColorFilter(Color.parseColor(mGroup.getColor()),
                         PorterDuff.Mode.DARKEN);
-                int textColor = isDark(Color.parseColor(mGroup.getColor()))?
-                        Color.parseColor("#ffffffff") :
-                        Color.parseColor("#ff000000");
+                int textColor = isDark(Color.parseColor(mGroup.getColor()))? WHITE :
+                        BLACK;
                 for(TextView tv : texts){
                     tv.setTextColor(textColor);
-                    ImageButton ib = itemView.findViewById(R.id.edit_group_button);
-                    ib.setColorFilter(textColor,PorterDuff.Mode.SRC_ATOP);
+                    mEditButton.setColorFilter(textColor,PorterDuff.Mode.SRC_ATOP);
                 }
             }
 

@@ -107,21 +107,4 @@ android:layout_height="wrap_content">
             </LinearLayout>
         </HorizontalScrollView>
     </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/cancel_dialog_button"
-            android:text="@string/cancel"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-        <Button
-            android:id="@+id/change_color_button"
-            android:text="@string/change_color"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
 </LinearLayout>

@@ -55,9 +55,4 @@
         android:columnWidth="66dp"
         >
     </GridView>
-    <Button
-        android:id="@+id/remove_repeat_button"
-        android:text="@string/remove_repeat"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 </LinearLayout>

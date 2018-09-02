@@ -12,9 +12,9 @@ import org.joda.time.LocalTime;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
+import java.util.Objects;
 
-public class Task implements Serializable{
+public class Task implements Serializable,Cloneable{
 
     //TODO add start date
 
@@ -35,6 +35,7 @@ public class Task implements Serializable{
 
     public void addReminder(Reminder r){
         mReminders.add(r);
+        GroupLab.saveLab();
     }
 
     public Repeat getRepeat() {
@@ -65,6 +66,7 @@ public class Task implements Serializable{
 
     public void setName(String mName) {
         this.mName = mName;
+        GroupLab.saveLab();
     }
 
     public DateTime getDate() {
@@ -77,6 +79,8 @@ public class Task implements Serializable{
             addReminder(new Reminder(this, SpanOfTime.ofMinutes(0)));
         }
         mDate = date;
+        String s = mDate.toString("hh:mm a", Locale.getDefault());
+        GroupLab.saveLab();
     }
 
 
@@ -99,20 +103,31 @@ public class Task implements Serializable{
         return mID;
     }
 
-    public Task(Context appContext, UUID groupID) {
-        GroupLab lab = GroupLab.get(appContext);
-        mID = lab.nextValue();
-        mGroup = lab.getGroup(groupID);
+    public Task(Context appContext,Group group) {
+        mID = GroupLab.get(appContext).nextValue();
+        mGroup = group;
     }
 
-
     @Override
-    public boolean equals(Object o) {
-        if(o.getClass()!=Task.class){
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final Task other = (Task) obj;
+        if(mID!=other.mID){
             return false;
         }
-        Task t = (Task) o;
-        return mID == t.mID;
+        return  Objects.equals(mHasRepeat,other.mHasRepeat) &&
+                Objects.equals(mComplete,other.mComplete) &&
+                Objects.equals(mName,other.mName) &&
+                Objects.equals(mDate,other.mDate) &&
+                Objects.equals(mRepeat,other.mRepeat) &&
+                Objects.equals(mSnoozeTime,other.mSnoozeTime) &&
+                Objects.equals(mReminders,other.mReminders) &&
+                Objects.equals(mGroup,other.mGroup);
     }
 
     public List<Reminder> getReminders() {
@@ -231,18 +246,17 @@ public class Task implements Serializable{
 
     public boolean isDueToday() {
         DateTime today = new DateTime();
-        return mDate!=null &&
-                mDate.getDayOfYear() == today.getDayOfYear() &&
-                mDate.getYear() == today.getYear();
+        return mDate != null
+                && mDate.getDayOfYear() == today.getDayOfYear()
+                && mDate.getYear() == today.getYear();
     }
-
 
     public Group getGroup() {
         return mGroup;
     }
 
-    public void addToGroup(Context context) {
-        Group group = GroupLab.get(context).getGroup(mGroup.getID());
-        group.addTask(this);
+    public Task clone() throws CloneNotSupportedException {
+        return (Task) super.clone();
     }
+
 }

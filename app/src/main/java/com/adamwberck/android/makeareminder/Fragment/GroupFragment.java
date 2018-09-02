@@ -82,13 +82,13 @@ public class GroupFragment extends VisibleFragment{
             "com.adamwberck.android.makeareminder.task_changed";
     private static final String EXTRA_TASK_ID =
             "com.adamwberck.android.makeareminder.task_id";
-    private Button mTimeButton;
+    private TextView mTimeButton;
 
 
     private ListView mReminderListView;
     private ReminderAdapter mReminderAdapter;
-    private Button mRepeatButton;
-    private Button mSnoozeButton;
+    private TextView mRepeatButton;
+    private TextView mSnoozeButton;
     private ImageButton mColorButton;
     private ActionBar mActionBar;
     private Menu mMenu;
@@ -264,7 +264,7 @@ public class GroupFragment extends VisibleFragment{
             mTimeButton.setText(mGroup.getDefaultTime().toString("h:mm a"));
         }
         else {
-            mTimeButton.setText(R.string.default_time);
+            mTimeButton.setText(R.string.no_default_time);
         }
     }
 
@@ -466,12 +466,11 @@ public class GroupFragment extends VisibleFragment{
             mRepeatButton.setText(s);
         }
         else {
-            mRepeatButton.setText(R.string.default_repeat);
+            mRepeatButton.setText(R.string.no_default_repeat);
         }
         long snooze = mGroup.getDefaultSnooze();
         String snoozeText = snooze>0?(SpanOfTime.ofMillis(snooze)).getTimeString(getContext(),
-                getString(R.string.snooze_for),"") :
-                getString(R.string.default_snooze);
+                getString(R.string.snooze_for),"") : getString(R.string.no_default_time) ;
         mSnoozeButton.setText(snoozeText);
         getActivity().invalidateOptionsMenu();
     }

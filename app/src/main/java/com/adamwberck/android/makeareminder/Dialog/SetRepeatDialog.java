@@ -155,16 +155,6 @@ public class SetRepeatDialog extends DismissDialog {
             }
         });
 
-        Button removeButton = view.findViewById(R.id.remove_repeat_button);
-        removeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mRepeat = null;
-                setRepeat();
-                getDialog().cancel();
-            }
-        });
-
         builder.setTitle(R.string.repeat_title)
                 .setView(view)
                 .setPositiveButton(R.string.repeat_positive, new DialogInterface.OnClickListener() {

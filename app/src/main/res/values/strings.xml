@@ -88,9 +88,10 @@
     <string name="default_repeat">Default Repeat</string>
     <string name="default_snooze">Default Snooze</string>
     <string name="default_reminders">Default Reminders</string>
-    <string name="discard_task">Discard Task</string>
-    <string name="no_date">No Date</string>
     <string name="discard_changes">Discard Changes</string>
+    <string name="no_date">No Date</string>
+    <string name="no_default_time">No Default Time</string>
+    <string name="no_default_repeat">No Default Repeat</string>
     <string-array name="group_colors">
         <item>#ffff0000</item>
         <item>#ff0000ff</item>
