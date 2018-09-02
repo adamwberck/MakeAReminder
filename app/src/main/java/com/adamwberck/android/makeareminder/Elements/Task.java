@@ -12,6 +12,7 @@ import org.joda.time.LocalTime;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public class Task implements Serializable{
 
@@ -34,7 +35,6 @@ public class Task implements Serializable{
 
     public void addReminder(Reminder r){
         mReminders.add(r);
-        GroupLab.saveLab();
     }
 
     public Repeat getRepeat() {
@@ -65,7 +65,6 @@ public class Task implements Serializable{
 
     public void setName(String mName) {
         this.mName = mName;
-        GroupLab.saveLab();
     }
 
     public DateTime getDate() {
@@ -78,18 +77,8 @@ public class Task implements Serializable{
             addReminder(new Reminder(this, SpanOfTime.ofMinutes(0)));
         }
         mDate = date;
-        String s = mDate.toString("hh:mm a", Locale.getDefault());
-        GroupLab.saveLab();
     }
 
-    public void test(){
-        setDate(new DateTime().plusMinutes(1));
-        //addReminder(new Reminder(this,SpanOfTime.ofMinutes(2),true));
-        String id = Math.abs(mID)+"";
-        setRepeat(new Repeat(1,SpanOfTime.ofDays(1)));
-        //id = id.substring(Math.min(0,id.length()-7));
-        setName(id);
-    }
 
     public void startAlarm(Context appContext){
         if(mName.isEmpty()){
@@ -110,9 +99,10 @@ public class Task implements Serializable{
         return mID;
     }
 
-    public Task(Context appContext,Group group) {
-        mID = GroupLab.get(appContext).nextValue();
-        mGroup = group;
+    public Task(Context appContext, UUID groupID) {
+        GroupLab lab = GroupLab.get(appContext);
+        mID = lab.nextValue();
+        mGroup = lab.getGroup(groupID);
     }
 
 
@@ -241,10 +231,18 @@ public class Task implements Serializable{
 
     public boolean isDueToday() {
         DateTime today = new DateTime();
-        return mDate.getDayOfYear() == today.getDayOfYear() && mDate.getYear() == today.getYear();
+        return mDate!=null &&
+                mDate.getDayOfYear() == today.getDayOfYear() &&
+                mDate.getYear() == today.getYear();
     }
+
 
     public Group getGroup() {
         return mGroup;
+    }
+
+    public void addToGroup(Context context) {
+        Group group = GroupLab.get(context).getGroup(mGroup.getID());
+        group.addTask(this);
     }
 }

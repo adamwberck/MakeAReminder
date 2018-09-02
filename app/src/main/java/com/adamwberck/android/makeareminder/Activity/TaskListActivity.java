@@ -16,16 +16,16 @@ import com.adamwberck.android.makeareminder.R;
 import java.util.UUID;
 
 public class TaskListActivity extends SingleFragmentActivity implements TaskListFragment.Callbacks,
-        TaskFragment.Callbacks {
+        TaskFragment.Callbacks, TaskListFragment.OnDeleteTaskListener {
 
-    private static final String EXTRA_TASK_ID = "com.adamwberck.android.makeareminder.task_id";
+    private static final String EXTRA_TASK = "com.adamwberck.android.makeareminder.task";
     private static final String EXTRA_ALARM = "com.adamwberck.android.makeareminder.alarm";
     private static final String EXTRA_NAME = "com.adamwberck.android.makeareminder.name";
     private static final String EXTRA_GROUP_ID = "com.adamwberck.android.makeareminder.group_id";
 
     public static Intent newIntent(Context packageContext, Task task){
         Intent intent = new Intent(packageContext, TaskListActivity.class);
-        intent.putExtra(EXTRA_TASK_ID, task);
+        intent.putExtra(EXTRA_TASK, task);
         return intent;
     }
 
@@ -60,9 +60,9 @@ public class TaskListActivity extends SingleFragmentActivity implements TaskList
 
 
     @Override
-    public void onTaskSelected(Task task) {
+    public void onTaskSelected(Task task,boolean isNew) {
         if (isSingleFragment()) {
-            Intent intent = TaskActivity.newIntent(this, task.getID());
+            Intent intent = TaskActivity.newIntent(this, task,isNew);
             startActivity(intent);
         }
         else {
@@ -72,7 +72,7 @@ public class TaskListActivity extends SingleFragmentActivity implements TaskList
             if (tf != null) {
                 String name = tf.getTask().getName();
                 if (!name.isEmpty()) {
-                    Fragment newDetail = TaskFragment.newInstance(task.getID());
+                    Fragment newDetail = TaskFragment.newInstance(task);
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.detail_fragment_container, newDetail).commit();
                 } else {
@@ -82,7 +82,7 @@ public class TaskListActivity extends SingleFragmentActivity implements TaskList
                 }
             }
             else {
-                Fragment newDetail = TaskFragment.newInstance(task.getID());
+                Fragment newDetail = TaskFragment.newInstance(task);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.detail_fragment_container, newDetail).commit();
             }
@@ -115,4 +115,11 @@ public class TaskListActivity extends SingleFragmentActivity implements TaskList
         super.onBackPressed();
     }
 
+    @Override
+    public void onTaskIdDeleted(Task task) {
+        Group group = task.getGroup();
+        if(group!=null){
+            group.removeTask(task);
+        }
+    }
 }

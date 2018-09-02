@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/group_name_label"
+        android:text="@string/task_name_label"
         android:labelFor="@+id/task_name"
         />
     <EditText
@@ -18,12 +18,25 @@
         android:layout_width="match_parent"
         android:textSize="40sp"
         android:layout_height="wrap_content"/>
-    <Button
-        android:id="@+id/time_button"
-        android:textSize="22sp"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/set_time"/>
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/time_button"
+            android:textSize="22sp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/set_time"/>
+        <Button
+            android:id="@+id/date_button"
+            android:layout_weight="1"
+            android:textSize="22sp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/set_date"/>
+    </LinearLayout>
     <Button
         android:id="@+id/repeat_button"
         android:textSize="22sp"

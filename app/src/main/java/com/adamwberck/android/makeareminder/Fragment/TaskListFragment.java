@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +40,7 @@ public class TaskListFragment extends VisibleFragment{
     
     private static final int REQUEST_SNOOZE = 0;
     private static final String DIALOG_ALARM = "Dialog_ALARM";
+    private static final String TAG = "TaskListFr";
     private Group mGroup;
     private RecyclerView mTaskRecyclerView;
     private TaskAdapter mAdapter;
@@ -72,13 +74,13 @@ public class TaskListFragment extends VisibleFragment{
 
 
     public interface Callbacks {
-        void onTaskSelected(Task task);
+        void onTaskSelected(Task task,boolean isNew);
     }
 
     private OnDeleteTaskListener mDeleteCallBack;
 
     public interface OnDeleteTaskListener {
-        void onTaskIdSelected(int TaskID);
+        void onTaskIdDeleted(Task task);
     }
 
 
@@ -101,20 +103,7 @@ public class TaskListFragment extends VisibleFragment{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.new_task:
-                Task currentTask = ((TaskListActivity)getActivity()).getTask();
-                if(currentTask!=null) {
-                    String name = currentTask.getName();
-                    if (name.isEmpty()) {
-                        Toast toast = Toast.makeText(getActivity().getApplicationContext(),
-                                R.string.name_task_warning, Toast.LENGTH_SHORT);
-                        toast.show();
-                    } else {
-                        newTask();
-                    }
-                }
-                else {
-                    newTask();
-                }
+                newTask();
                 return true;
             case R.id.start_day:
                 StartDayService.testServiceAlarm(getContext());
@@ -125,11 +114,13 @@ public class TaskListFragment extends VisibleFragment{
         }
     }
 
+
+
     private void newTask() {
-        Task task = new Task(getContext(),mGroup);
+        Task task = new Task(getContext(),mGroup.getID());
+        Log.i(TAG,"TaskA1: "+task.toString());
         mGroup.addTask(task);
-        task.test();
-        mCallbacks.onTaskSelected(task);
+        mCallbacks.onTaskSelected(task,true);
         updateUI();
     }
 
@@ -160,7 +151,7 @@ public class TaskListFragment extends VisibleFragment{
                     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                         int position = viewHolder.getAdapterPosition();
                         Task task = mAdapter.mTasks.get(position);
-                        mDeleteCallBack.onTaskIdSelected(task.getID());
+                        mDeleteCallBack.onTaskIdDeleted(task);
                         mGroup.removeTask(task);
                     }
                 };
@@ -178,13 +169,13 @@ public class TaskListFragment extends VisibleFragment{
     public void onAttach(Context context){
         super.onAttach(context);
         mCallbacks = (Callbacks) context;
-        //mDeleteCallBack = (OnDeleteTaskListener) context;
+        mDeleteCallBack = (OnDeleteTaskListener) context;
         try {
             Task task = (Task) getArguments().getSerializable(ARG_TASK);
             if(task==null){
                 return;
             }
-            mCallbacks.onTaskSelected(task);
+            mCallbacks.onTaskSelected(task,false);
         }
         catch (NullPointerException ignored){}
     }
@@ -256,7 +247,7 @@ public class TaskListFragment extends VisibleFragment{
 
         @Override
         public void onClick(View view) {
-            mCallbacks.onTaskSelected(mTask);
+            mCallbacks.onTaskSelected(mTask,false);
         }
 
 
@@ -272,8 +263,16 @@ public class TaskListFragment extends VisibleFragment{
                 for(TextView t: taskText){
                     t.setTextColor(getResources().getColor(R.color.black));
                 }
-                mDateTextView.setText(mTask.getDate().toString("dd MMM YYYY hh:mm a",
-                        Locale.getDefault()));
+                String dateText;
+                if(mTask.getDate()==null){
+                    dateText = getString(R.string.no_date);
+                }
+                else{
+                    dateText = mTask.getDate()
+                            .toString("dd MMM YYYY hh:mm a",Locale.getDefault());
+                }
+
+                mDateTextView.setText(dateText);
                 if(task.isComplete()){
                     for(TextView t: taskText){
                         t.setTextColor(getResources().getColor(R.color.green));

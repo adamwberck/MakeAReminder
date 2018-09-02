@@ -2,7 +2,9 @@ package com.adamwberck.android.makeareminder.Fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.ColorDrawable;
@@ -32,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.adamwberck.android.makeareminder.Activity.TaskActivity;
 import com.adamwberck.android.makeareminder.Dialog.ChooseSnoozeDialog;
 import com.adamwberck.android.makeareminder.Dialog.CreateReminderDialog;
 import com.adamwberck.android.makeareminder.Dialog.DatePickerDialog;
@@ -67,7 +70,7 @@ public class TaskFragment extends VisibleFragment{
     private static final int REQUEST_SNOOZE = 5;
     private static final int REQUEST_REPEAT = 6;
 
-    private static final String ARG_TASK_ID = "Task_id";
+    private static final String ARG_TASK = "Task";
 
     private static final String DIALOG_COLOR = "DialogColor";
     private static final String DIALOG_REMINDER = "DialogReminder";
@@ -91,28 +94,16 @@ public class TaskFragment extends VisibleFragment{
     private ImageButton mColorButton;
     private ActionBar mActionBar;
     private Menu mMenu;
+    private Button mDateButton;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        int ID = getArguments().getInt(ARG_TASK_ID);
-        mTask = GroupLab.get(getContext()).getTask(ID);
+        mTask = (Task) getArguments().getSerializable(ARG_TASK);
         int colorInt = mTask.getGroup().getColorInt();
         VisibleFragment.alterActionBar(colorInt,getContext(),getActivity());
-    }
-
-    @NonNull
-    public static TextView setActionBarTextColor(CharSequence title,Group group,Context context) {
-        Resources resources = context.getResources();
-        int abColor = OverviewFragment.isDark(group.getColorInt()) ?
-                resources.getColor(R.color.white) : resources.getColor(R.color.black);
-        TextView tv = new TextView(context);
-        tv.setText(title);
-        tv.setTextColor(abColor);
-        tv.setTextSize(18);
-        return tv;
     }
 
     @Override
@@ -146,7 +137,13 @@ public class TaskFragment extends VisibleFragment{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.save_task:
-                getActivity().finish();
+                String name = mTask.getName();
+                if(name.isEmpty()){
+                    getActivity().onBackPressed();
+                }
+                else {
+                    getActivity().finish();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -211,13 +208,24 @@ public class TaskFragment extends VisibleFragment{
             }
         });
 
+        mDateButton = v.findViewById(R.id.date_button);
+        mDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager manager = getFragmentManager();
+                DatePickerDialog dialog = DatePickerDialog.newInstance(mTask.getDate());
+                dialog.setTargetFragment(TaskFragment.this, REQUEST_TIME);
+                dialog.show(manager,DIALOG_TIME);
+            }
+        });
+
+
         mTimeButton = v.findViewById(R.id.time_button);
         mTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
-                TimePickerDialog dialog = TimePickerDialog
-                        .newInstance(mTask.getDate());
+                TimePickerDialog dialog = TimePickerDialog.newInstance(mTask.getDate());
                 dialog.setTargetFragment(TaskFragment.this, REQUEST_TIME);
                 dialog.show(manager,DIALOG_TIME);
             }
@@ -263,7 +271,14 @@ public class TaskFragment extends VisibleFragment{
             mTimeButton.setText(mTask.getDate().toString("h:mm a"));
         }
         else {
-            mTimeButton.setText(R.string.default_time);
+            mTimeButton.setText(R.string.set_time);
+        }
+
+        if(mTask.getDate()!=null) {
+            mDateButton.setText(mTask.getDate().toString("MMM dd, yyyy"));
+        }
+        else {
+            mDateButton.setText(R.string.set_date);
         }
     }
 
@@ -287,11 +302,6 @@ public class TaskFragment extends VisibleFragment{
         if(context instanceof Callbacks) {
             mCallbacks = (Callbacks) context;
         }
-        TaskFragment TskFragment = (TaskFragment) getActivity().getSupportFragmentManager()
-                .findFragmentById(R.id.detail_fragment_container);
-        if(TskFragment !=null) {
-            //mDeleteCallBack = (OnDeleteCrimeListener) context;
-        }
     }
 
     private void setTskChanged(int TskChanged){
@@ -314,12 +324,14 @@ public class TaskFragment extends VisibleFragment{
 
     public interface Callbacks{
         void onTaskUpdated(int TaskID);
+
+        void onTaskSelected(Task task, boolean isNew);
     }
 
 
-    public static TaskFragment newInstance(int id) {
+    public static TaskFragment newInstance(Task task) {
         Bundle args =  new Bundle();
-        args.putInt(ARG_TASK_ID, id);
+        args.putSerializable(ARG_TASK, task);
         TaskFragment fragment = new TaskFragment();
         fragment.setArguments(args);
         return fragment;
@@ -459,7 +471,7 @@ public class TaskFragment extends VisibleFragment{
             mRepeatButton.setText(s);
         }
         else {
-            mRepeatButton.setText(R.string.default_repeat);
+            mRepeatButton.setText(R.string.repeat);
         }
 
         //long snooze = mTask.getDefaultSnoozeTime();

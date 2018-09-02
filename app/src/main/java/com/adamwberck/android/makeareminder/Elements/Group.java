@@ -43,7 +43,6 @@ public class Group implements Serializable{
     public void addTask(Task task){
         mTasks.add(task);
         //TODO ensure saving
-
     }
 
     public boolean removeTask(Task t){

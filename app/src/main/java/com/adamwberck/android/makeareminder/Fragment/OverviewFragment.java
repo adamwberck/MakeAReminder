@@ -24,6 +24,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Elements.Group;
+import com.adamwberck.android.makeareminder.Elements.Task;
 import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
 
