@@ -541,24 +541,7 @@ public class OverviewFragment extends VisibleFragment {
         }
     }
 
-    public static boolean isDark(int argb) {
-        double rgb[] = new double[3];
-        rgb[0] = (argb>>16)&0xFF;
-        rgb[1] = (argb>>8)&0xFF;
-        rgb[2] = (argb)&0xFF;
-        for(int i = 0; i<rgb.length;i++){
-            rgb[i] = rgb[i] / 255.0;
-            if (rgb[i]<=0.03928){
-                rgb[i] = rgb[i]/12.92;
-            }
-            else {
-                rgb[i] = Math.pow(((rgb[i]+0.055)/1.055),2.4);
-            }
-        }
-        double l = 0.2126 * rgb[0] +0.7152 * rgb[1] + 0.0722 * rgb[2];
-        //int a = (argb>>24)&0xFF;
-        return l < 0.179;
-    }
+
 
     private class GroupAdapter extends RecyclerView.Adapter<GroupHolder>
     {

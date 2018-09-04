@@ -120,7 +120,7 @@ public class GroupFragment extends VisibleFragment{
         // Cast to a TextView instance if the menu item was found
         if (view != null && view instanceof TextView) {
             Resources resources = getResources();
-            int abColor = OverviewFragment.isDark(mGroup.getColorInt()) ?
+            int abColor = isDark(mGroup.getColorInt()) ?
                     resources.getColor(R.color.white) : resources.getColor(R.color.black);
             ((TextView) view).setTextColor(abColor);
             //((TextView) view).setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
@@ -267,9 +267,11 @@ public class GroupFragment extends VisibleFragment{
             mTimeButton.setText(R.string.no_default_time);
         }
     }
+    //TODO change on click so that it open dialog if you open touch top part
 
     public static void hideSoftKeyboard(Activity activity) {
         View v = activity.getCurrentFocus();
+
         if(v!=null) {
             v.clearFocus();
         }

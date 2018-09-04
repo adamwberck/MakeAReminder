@@ -13,7 +13,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -82,7 +84,7 @@ public class TaskFragment extends VisibleFragment{
     private static final String EXTRA_Tsk_ID =
             "com.adamwberck.android.makeareminder.Tsk_id";
     private Button mTimeButton;
-
+    private Button mDateButton;
 
     private ListView mReminderListView;
     private ReminderAdapter mReminderAdapter;
@@ -91,6 +93,13 @@ public class TaskFragment extends VisibleFragment{
     private ImageButton mColorButton;
     private ActionBar mActionBar;
     private Menu mMenu;
+    private boolean mDueHasValue = false;
+    private ImageButton mCloseDue;
+    private View mDueLayout;
+
+    private boolean mAlertHasValue = false;
+    private View mAlertLayout;
+    private ImageButton mCloseAlert;
 
 
     @Override
@@ -136,6 +145,32 @@ public class TaskFragment extends VisibleFragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle SIState) {
         View v = inflater.inflate(R.layout.fragment_task, container,false);
+
+        mDueLayout = v.findViewById(R.id.due_layout);
+        mAlertLayout = v.findViewById(R.id.alert_layout);
+
+
+        mCloseDue = v.findViewById(R.id.close_due);
+        mCloseDue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTask.setDate(null);
+                mTask.setRepeat(null);
+                updateDate();
+                updateUI();
+            }
+        });
+
+        mCloseAlert = v.findViewById(R.id.close_alerts);
+        mCloseAlert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTask.setQuickSnooze(0);
+                mTask.getReminders().clear();
+                updateUI();
+            }
+        });
+
         super.setupUI(v);
         mNameField = v.findViewById(R.id.task_name);
         if(mTask.getName()!=null) {
@@ -203,6 +238,18 @@ public class TaskFragment extends VisibleFragment{
             }
         });
 
+        mDateButton = v.findViewById(R.id.date_button);
+        mDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager manager = getFragmentManager();
+                DatePickerDialog dialog = DatePickerDialog
+                        .newInstance(mTask.getDate());
+                dialog.setTargetFragment(TaskFragment.this, REQUEST_TIME);
+                dialog.show(manager,DIALOG_TIME);
+            }
+        });
+
         updateDate();
 
         mRepeatButton = v.findViewById(R.id.repeat_button);
@@ -240,37 +287,31 @@ public class TaskFragment extends VisibleFragment{
 
     private void updateDate() {
         if(mTask.getDate()!=null) {
-            mTimeButton.setText(mTask.getDate().toString("h:mm a"));
+            String time = mTask.getDate().toString("h:mm a");
+            mTimeButton.setText(underLine(time));
+
+            time = mTask.getDate().toString("MMM d, yyyy");
+            mDateButton.setText(underLine(time));
         }
         else {
-            mTimeButton.setText(R.string.default_time);
+            mTimeButton.setText(R.string.set_time);
+            mDateButton.setText(R.string.set_date);
         }
     }
 
-    public static void hideSoftKeyboard(Activity activity) {
-        View v = activity.getCurrentFocus();
-        if(v!=null) {
-            v.clearFocus();
-        }
-        InputMethodManager inputMethodManager =
-                (InputMethodManager) activity.getSystemService(
-                        Activity.INPUT_METHOD_SERVICE);
-        if(inputMethodManager!=null) {
-            inputMethodManager.hideSoftInputFromWindow(
-                    activity.getCurrentFocus().getWindowToken(), 0);
-        }
+    private static SpannableString underLine(String time) {
+        SpannableString content = new SpannableString(time);
+        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+        return content;
     }
+
+
 
     @Override
     public void onAttach(Context context){
         super.onAttach(context);
         if(context instanceof Callbacks) {
             mCallbacks = (Callbacks) context;
-        }
-        TaskFragment TskFragment = (TaskFragment) getActivity().getSupportFragmentManager()
-                .findFragmentById(R.id.detail_fragment_container);
-        if(TskFragment !=null) {
-            //mDeleteCallBack = (OnDeleteCrimeListener) context;
         }
     }
 
@@ -437,10 +478,10 @@ public class TaskFragment extends VisibleFragment{
         if(repeat!=null){
             String s = repeat.getRepeatTime().getTimeString(getContext(),getString(R.string.every),
                     "");
-            mRepeatButton.setText(s);
+            mRepeatButton.setText(underLine(s));
         }
         else {
-            mRepeatButton.setText(R.string.default_repeat);
+            mRepeatButton.setText(R.string.set_repeat);
         }
 
         //long snooze = mTask.getDefaultSnoozeTime();
@@ -449,6 +490,18 @@ public class TaskFragment extends VisibleFragment{
                 getString(R.string.snooze_for),"") :
                 getString(R.string.default_snooze);
         mSnoozeButton.setText(snoozeText);*/
+
+
+        mDueHasValue = mTask.getDate() != null ^ mTask.getRepeat() != null;
+        mAlertHasValue = mTask.getSnoozeTime() != null ^ mTask.getReminders().size() > 0;
+
+        int view;
+
+        view = mDueHasValue ? View.VISIBLE:View.GONE;
+        mCloseDue.setVisibility(view);
+
+        view = mAlertHasValue ? View.VISIBLE:View.GONE;
+        mCloseAlert.setVisibility(view);
 
         getActivity().invalidateOptionsMenu();
     }

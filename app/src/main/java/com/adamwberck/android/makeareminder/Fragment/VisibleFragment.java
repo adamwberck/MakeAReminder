@@ -16,16 +16,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.adamwberck.android.makeareminder.Elements.Group;
-import com.adamwberck.android.makeareminder.Elements.Task;
 import com.adamwberck.android.makeareminder.R;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
-import static com.adamwberck.android.makeareminder.Fragment.TaskFragment.hideSoftKeyboard;
 
 public class VisibleFragment extends Fragment {
     public void setupUI(final View view) {
@@ -64,7 +62,7 @@ public class VisibleFragment extends Fragment {
     @NonNull
     public static TextView setActionBarTextColor(CharSequence title,int colorInt, Context context) {
         Resources resources = context.getResources();
-        int abColor = OverviewFragment.isDark(colorInt) ?
+        int abColor = isDark(colorInt) ?
                 resources.getColor(R.color.white) : resources.getColor(R.color.black);
         TextView tv = new TextView(context);
         tv.setText(title);
@@ -83,7 +81,7 @@ public class VisibleFragment extends Fragment {
     private static void styleMenuButton(int colorInt, MenuItem menuItem,Activity activity) {
         // Cast to a TextView instance if the menu item was found
         View view = activity.findViewById(menuItem.getItemId());
-        int abColor = OverviewFragment.isDark(colorInt) ?
+        int abColor = isDark(colorInt) ?
                 WHITE : BLACK;
         Drawable icon = menuItem.getIcon();
         if(icon!=null) {
@@ -96,4 +94,37 @@ public class VisibleFragment extends Fragment {
         }
     }
 
+
+    public static void hideSoftKeyboard(Activity activity) {
+        View v = activity.getCurrentFocus();
+        if(v!=null) {
+            v.clearFocus();
+        }
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        if(inputMethodManager!=null) {
+            inputMethodManager.hideSoftInputFromWindow(
+                    activity.getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+    public static boolean isDark(int argb) {
+        double rgb[] = new double[3];
+        rgb[0] = (argb>>16)&0xFF;
+        rgb[1] = (argb>>8)&0xFF;
+        rgb[2] = (argb)&0xFF;
+        for(int i = 0; i<rgb.length;i++){
+            rgb[i] = rgb[i] / 255.0;
+            if (rgb[i]<=0.03928){
+                rgb[i] = rgb[i]/12.92;
+            }
+            else {
+                rgb[i] = Math.pow(((rgb[i]+0.055)/1.055),2.4);
+            }
+        }
+        double l = 0.2126 * rgb[0] +0.7152 * rgb[1] + 0.0722 * rgb[2];
+        //int a = (argb>>24)&0xFF;
+        return l < 0.179;
+    }
 }

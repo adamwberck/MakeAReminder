@@ -10,7 +10,7 @@
     <TextView
         android:textAllCaps="true"
         android:id="@+id/name_label"
-        android:textSize="22sp"
+        android:textSize="20sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -23,7 +23,7 @@
         android:orientation="horizontal">
         <EditText
             android:id="@+id/group_name"
-            android:inputType="text"
+            android:inputType="textCapWords"
             android:layout_width="0dp"
             android:textSize="24sp"
             android:layout_height="wrap_content"
@@ -104,6 +104,6 @@
         android:id="@+id/reminder_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="5dp">
+        android:layout_marginStart="10dp">
     </ListView>
 </LinearLayout>

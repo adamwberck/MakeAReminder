@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_marginLeft="16dp">
+    android:layout_marginStart="16dp"
+    android:layout_marginBottom="16dp">
     <TextView
         android:id="@+id/name_label"
-        android:textSize="17sp"
+        android:textSize="20sp"
+        android:textAllCaps="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -15,48 +19,126 @@
         />
     <EditText
         android:id="@+id/task_name"
+        android:inputType="textCapWords"
         android:layout_width="match_parent"
-        android:textSize="40sp"
-        android:layout_height="wrap_content"/>
+        android:textSize="24sp"
+        android:layout_height="wrap_content"
+        android:imeOptions="actionDone"/>
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/time_button"
-            android:textSize="22sp"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:text="@string/due"
+                android:id="@+id/open_due"
+                android:textStyle="bold"
+                android:textColor="@color/blue"
+                style="?android:attr/buttonBarStyle"
+                android:gravity="start"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="8"/>
+            <ImageButton
+                android:background="#00000000"
+                android:id="@+id/close_due"
+                android:src="@drawable/ic_circle_close"
+                android:layout_width="wrap_content"
+                android:padding="6dp"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/due_layout"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/set_time"/>
+            android:orientation="horizontal">
+            <Button
+                style="?android:attr/buttonBarStyle"
+                android:gravity="start"
+                android:id="@+id/time_button"
+                android:textSize="22sp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="@string/set_time"/>
+            <Button
+                style="?android:attr/buttonBarStyle"
+                android:gravity="start"
+                android:id="@+id/date_button"
+                android:layout_weight="1"
+                android:textSize="22sp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/set_date"/>
+        </LinearLayout>
         <Button
-            android:id="@+id/date_button"
-            android:layout_weight="1"
+            style="?android:attr/buttonBarStyle"
+            android:gravity="start"
+            android:id="@+id/repeat_button"
             android:textSize="22sp"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/set_date"/>
+            android:text="@string/repeat" />
+        </LinearLayout>
     </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <Button
-        android:id="@+id/repeat_button"
-        android:textSize="22sp"
+        android:id="@+id/open_alerts"
+        android:textStyle="bold"
+        android:textColor="@color/blue"
+        style="?android:attr/buttonBarStyle"
+        android:gravity="start"
+        android:textSize="20sp"
+        android:text="@string/alerts"
+        android:textAllCaps="true"
+        android:layout_width="0dp"
+        android:layout_weight="8"
+        android:layout_height="60dp"/>
+        <ImageButton
+            android:background="#00000000"
+            android:id="@+id/close_alerts"
+            android:src="@drawable/ic_circle_close"
+            android:layout_width="wrap_content"
+            android:padding="6dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/alert_layout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/repeat" />
-    <Button
-        android:textSize="22sp"
-        android:id="@+id/snooze_button"
-        android:text="@string/default_snooze"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:textSize="22sp"
-        android:text="@string/reminders"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <ListView
-        android:id="@+id/reminder_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="200dp">
-    </ListView>
+        android:layout_height="wrap_content">
+        <Button
+            style="?android:attr/buttonBarStyle"
+            android:gravity="start"
+            android:textSize="22sp"
+            android:id="@+id/snooze_button"
+            android:text="@string/set_quick_snooze"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:textSize="18sp"
+            android:text="@string/reminders"
+            android:textAllCaps="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <ListView
+            android:id="@+id/reminder_list_view"
+            android:layout_marginStart="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </ListView>
+    </LinearLayout>
 </LinearLayout>

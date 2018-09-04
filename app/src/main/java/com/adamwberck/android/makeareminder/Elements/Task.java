@@ -27,6 +27,7 @@ public class Task implements Serializable,Cloneable{
     private DateTime mDate;
     private Repeat mRepeat;
     private DateTime mSnoozeTime;
+    private long mQuickSnooze=0;
     private boolean mHasRepeat = false;
     private boolean mComplete = false;
     private List<Reminder> mReminders
@@ -79,7 +80,6 @@ public class Task implements Serializable,Cloneable{
             addReminder(new Reminder(this, SpanOfTime.ofMinutes(0)));
         }
         mDate = date;
-        String s = mDate.toString("hh:mm a", Locale.getDefault());
         GroupLab.saveLab();
     }
 
@@ -259,4 +259,7 @@ public class Task implements Serializable,Cloneable{
         return (Task) super.clone();
     }
 
+    public void setQuickSnooze(long quickSnooze) {
+        mQuickSnooze = quickSnooze;
+    }
 }

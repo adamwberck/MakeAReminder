@@ -163,11 +163,11 @@ public class SetRepeatDialog extends DismissDialog {
                         setRepeat();
                     }
                 })
-                .setNegativeButton(R.string.clear_time, new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mRepeat = null;
-                        sendResult(Activity.RESULT_OK);
+                        sendResult(Activity.RESULT_CANCELED);
                     }
                 });
 
@@ -186,7 +186,6 @@ public class SetRepeatDialog extends DismissDialog {
             span = SpanOfTime.ofWeeks(mDuration);
         }
         else if(mTimeTypeInt==2){
-            //TODO add month support
             span = SpanOfTime.ofMonths(mDuration);
         }
         else {
@@ -331,12 +330,14 @@ public class SetRepeatDialog extends DismissDialog {
 
         private void updateDayButton(int position, Button button) {
             if(mIsWeek) {
-                int background = mRepeat.isRepeatOnWeekDay(position) ? R.drawable.ic_button_circle_on :
+                int background = mRepeat.isRepeatOnWeekDay(position) ?
+                        R.drawable.ic_button_circle_on :
                         R.drawable.ic_button_circle_off;
                 button.setBackgroundResource(background);
             }
             else {
-                int background = mRepeat.isRepeatOnMonthDay(position+1) ? R.drawable.ic_button_circle_on :
+                int background = mRepeat.isRepeatOnMonthDay(position+1) ?
+                        R.drawable.ic_button_circle_on :
                         R.drawable.ic_button_circle_off;
                 button.setBackgroundResource(background);
             }

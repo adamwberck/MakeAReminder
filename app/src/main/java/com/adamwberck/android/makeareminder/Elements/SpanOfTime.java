@@ -170,7 +170,7 @@ public class SpanOfTime implements Serializable{
     }
 
     public static SpanOfTime ofMonths(long months){
-        return new SpanOfTime(TimeUnit.DAYS.toMinutes(months*7*30),Type.MONTH);
+        return new SpanOfTime(TimeUnit.DAYS.toMinutes(months*30),Type.MONTH);
     }
 
 

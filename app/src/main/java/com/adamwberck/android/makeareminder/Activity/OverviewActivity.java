@@ -33,9 +33,9 @@ public class OverviewActivity extends SingleFragmentActivity implements Overview
     @Override
     public void onTaskAdded(Group group){
         //TODO set default task elements
-        Task task = new Task(this,group.getID());
+        Task task = new Task(this,group);
         group.addTask(task);
-        Intent intent = TaskActivity.newIntent(this, task,true);
+        Intent intent = TaskActivity.newIntent(this, task.getID());
         startActivity(intent);
     }
 }

@@ -6,7 +6,6 @@
     <TextView
         android:textSize="22sp"
         android:text="@string/new_reminder"
-        android:textStyle="bold"
         android:textColor="@color/black"
         android:layout_width="match_parent"
         android:gravity="bottom"
