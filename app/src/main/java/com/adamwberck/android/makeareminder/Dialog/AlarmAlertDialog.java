@@ -233,14 +233,14 @@ public class AlarmAlertDialog extends DialogFragment {
         String name = getArguments().getString(ARG_NAME);
 
         //End Buttons
-        Button snoozeButton = v.findViewById(R.id.alarm_snooze_button);
+        Button snoozeButton = v.findViewById(R.id.alarm_left_button);
         snoozeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendResult(Activity.RESULT_OK,new Interval(START_TIME,mSnoozeTime));
             }
         });
-        Button dismissButton = v.findViewById(R.id.alarm_dismiss_button);
+        Button dismissButton = v.findViewById(R.id.alarm_right_button);
         dismissButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

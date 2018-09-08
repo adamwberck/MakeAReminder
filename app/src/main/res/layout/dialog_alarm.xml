@@ -142,13 +142,13 @@ android:layout_height="wrap_content">
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button
-            android:id="@+id/alarm_snooze_button"
+            android:id="@+id/alarm_left_button"
             android:text="@string/snooze"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
         <Button
-            android:id="@+id/alarm_dismiss_button"
+            android:id="@+id/alarm_right_button"
             android:text="@string/complete"
             android:layout_weight="1"
             android:layout_width="0dp"

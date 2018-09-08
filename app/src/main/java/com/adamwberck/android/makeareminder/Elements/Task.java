@@ -27,7 +27,7 @@ public class Task implements Serializable,Cloneable{
     private DateTime mDate;
     private Repeat mRepeat;
     private DateTime mSnoozeTime;
-    private long mQuickSnooze=0;
+    private long mQuickSnoozeTime=0;
     private boolean mHasRepeat = false;
     private boolean mComplete = false;
     private List<Reminder> mReminders
@@ -110,6 +110,7 @@ public class Task implements Serializable,Cloneable{
 
     @Override
     public boolean equals(Object obj) {
+        //TODO change hashcode
         if (this == obj)
             return true;
         if (obj == null)
@@ -117,17 +118,16 @@ public class Task implements Serializable,Cloneable{
         if (getClass() != obj.getClass())
             return false;
         final Task other = (Task) obj;
-        if(mID!=other.mID){
-            return false;
-        }
-        return  Objects.equals(mHasRepeat,other.mHasRepeat) &&
-                Objects.equals(mComplete,other.mComplete) &&
-                Objects.equals(mName,other.mName) &&
-                Objects.equals(mDate,other.mDate) &&
-                Objects.equals(mRepeat,other.mRepeat) &&
-                Objects.equals(mSnoozeTime,other.mSnoozeTime) &&
-                Objects.equals(mReminders,other.mReminders) &&
-                Objects.equals(mGroup,other.mGroup);
+        return  mID == other.mID &&
+                Objects.equals(mHasRepeat, other.mHasRepeat) &&
+                Objects.equals(mComplete, other.mComplete) &&
+                Objects.equals(mName, other.mName) &&
+                Objects.equals(mDate, other.mDate) &&
+                Objects.equals(mRepeat, other.mRepeat) &&
+                Objects.equals(mSnoozeTime, other.mSnoozeTime) &&
+                Objects.equals(mQuickSnoozeTime, other.mQuickSnoozeTime) &&
+                Objects.equals(mReminders, other.mReminders) &&
+                Objects.equals(mGroup, other.mGroup);
     }
 
     public List<Reminder> getReminders() {
@@ -259,7 +259,11 @@ public class Task implements Serializable,Cloneable{
         return (Task) super.clone();
     }
 
-    public void setQuickSnooze(long quickSnooze) {
-        mQuickSnooze = quickSnooze;
+    public void setQuickSnoozeTime(long quickSnooze) {
+        mQuickSnoozeTime = quickSnooze;
+    }
+
+    public long getQuickSnoozeTime() {
+        return mQuickSnoozeTime;
     }
 }

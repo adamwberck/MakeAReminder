@@ -5,19 +5,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,7 +21,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,7 +35,6 @@ import com.adamwberck.android.makeareminder.Dialog.DatePickerDialog;
 import com.adamwberck.android.makeareminder.Dialog.SetRepeatDialog;
 import com.adamwberck.android.makeareminder.Dialog.TimePickerDialog;
 import com.adamwberck.android.makeareminder.Elements.Task;
-import com.adamwberck.android.makeareminder.Elements.Group;
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
@@ -165,7 +159,7 @@ public class TaskFragment extends VisibleFragment{
         mCloseAlert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mTask.setQuickSnooze(0);
+                mTask.setQuickSnoozeTime(0);
                 mTask.getReminders().clear();
                 updateUI();
             }
@@ -181,7 +175,7 @@ public class TaskFragment extends VisibleFragment{
         //TODO color button should be group change button
 
 
-        mSnoozeButton = v.findViewById(R.id.snooze_button);
+        mSnoozeButton = v.findViewById(R.id.quick_snooze_text);
         mSnoozeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -226,7 +220,7 @@ public class TaskFragment extends VisibleFragment{
             }
         });
 
-        mTimeButton = v.findViewById(R.id.time_button);
+        mTimeButton = v.findViewById(R.id.time_text);
         mTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -238,7 +232,7 @@ public class TaskFragment extends VisibleFragment{
             }
         });
 
-        mDateButton = v.findViewById(R.id.date_button);
+        mDateButton = v.findViewById(R.id.date_text);
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -252,7 +246,7 @@ public class TaskFragment extends VisibleFragment{
 
         updateDate();
 
-        mRepeatButton = v.findViewById(R.id.repeat_button);
+        mRepeatButton = v.findViewById(R.id.set_repeat_text);
         mRepeatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -454,11 +448,9 @@ public class TaskFragment extends VisibleFragment{
             mTask.setRepeat(repeat);
         }
 
-
-
         if(requestCode == REQUEST_SNOOZE){
             long snooze = data.getExtras().getLong(ChooseSnoozeDialog.EXTRA_INTERVAL);
-            //mTask.setDefaultSnooze(snooze);
+            mTask.setQuickSnoozeTime(snooze);
         }
         updateUI();
     }
@@ -474,26 +466,23 @@ public class TaskFragment extends VisibleFragment{
             mReminderListView.setAdapter(mReminderAdapter);
             mReminderAdapter.notifyDataSetChanged();
         }
-        Repeat repeat = mTask.getRepeat();
-        if(repeat!=null){
-            String s = repeat.getRepeatTime().getTimeString(getContext(),getString(R.string.every),
-                    "");
-            mRepeatButton.setText(underLine(s));
-        }
-        else {
-            mRepeatButton.setText(R.string.set_repeat);
-        }
 
-        //long snooze = mTask.getDefaultSnoozeTime();
-        /*
+
+        Repeat repeat = mTask.getRepeat();
+        String repeatText = repeat!=null?repeat.getRepeatTime().getTimeString(getContext(),getString(R.string.every),
+                ""):getString(R.string.set_repeat);
+        mRepeatButton.setText(underLine(repeatText));
+
+        long snooze = mTask.getQuickSnoozeTime();
+
         String snoozeText = snooze>0?(SpanOfTime.ofMillis(snooze)).getTimeString(getContext(),
                 getString(R.string.snooze_for),"") :
-                getString(R.string.default_snooze);
-        mSnoozeButton.setText(snoozeText);*/
+                getString(R.string.set_quick_snooze);
+        mSnoozeButton.setText(underLine(snoozeText));
 
 
-        mDueHasValue = mTask.getDate() != null ^ mTask.getRepeat() != null;
-        mAlertHasValue = mTask.getSnoozeTime() != null ^ mTask.getReminders().size() > 0;
+        mDueHasValue = mTask.getDate() != null || mTask.getRepeat() != null;
+        mAlertHasValue = mTask.getQuickSnoozeTime() != 0 || mTask.getReminders().size() > 0;
 
         int view;
 

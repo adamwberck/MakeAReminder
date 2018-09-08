@@ -6,13 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -25,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -82,16 +78,19 @@ public class GroupFragment extends VisibleFragment{
             "com.adamwberck.android.makeareminder.task_changed";
     private static final String EXTRA_TASK_ID =
             "com.adamwberck.android.makeareminder.task_id";
-    private TextView mTimeButton;
+    private View mTimeSection;
 
 
     private ListView mReminderListView;
     private ReminderAdapter mReminderAdapter;
-    private TextView mRepeatButton;
-    private TextView mSnoozeButton;
+    private TextView mRepeatText;
+    private View mRepeatSection;
+    private View mSnoozeSection;
     private ImageButton mColorButton;
     private ActionBar mActionBar;
     private Menu mMenu;
+    private TextView mSnoozeText;
+    private TextView mTimeText;
 
 
     @Override
@@ -167,13 +166,14 @@ public class GroupFragment extends VisibleFragment{
         });
 
 
-        mSnoozeButton = v.findViewById(R.id.snooze_button);
-        mSnoozeButton.setOnClickListener(new View.OnClickListener() {
+        mSnoozeText = v.findViewById(R.id.quick_snooze_text);
+        mSnoozeSection = v.findViewById(R.id.snooze_section);
+        mSnoozeSection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                UUID id = mGroup.getID();
-                String name = mGroup.getName();
-                String title = mGroup.getName();
+                //UUID id = mGroup.getID();
+                //String name = mGroup.getName();
+                //String title = mGroup.getName();
                 //TODO create default snooze dialog or use one already made
                 FragmentManager manager = getFragmentManager();
                 ChooseSnoozeDialog d = ChooseSnoozeDialog.newInstance(null,mGroup.getName());
@@ -212,8 +212,9 @@ public class GroupFragment extends VisibleFragment{
             }
         });
 
-        mTimeButton = v.findViewById(R.id.time_button);
-        mTimeButton.setOnClickListener(new View.OnClickListener() {
+        mTimeText = v.findViewById(R.id.time_text);
+        mTimeSection = v.findViewById(R.id.time_section);
+        mTimeSection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
@@ -226,8 +227,9 @@ public class GroupFragment extends VisibleFragment{
 
         updateDate();
 
-        mRepeatButton = v.findViewById(R.id.repeat_button);
-        mRepeatButton.setOnClickListener(new View.OnClickListener() {
+        mRepeatText = v.findViewById(R.id.set_repeat_text);
+        mRepeatSection = v.findViewById(R.id.repeat_section);
+        mRepeatSection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //TODO make generic method to do this
@@ -261,10 +263,10 @@ public class GroupFragment extends VisibleFragment{
 
     private void updateDate() {
         if(mGroup.getDefaultTime()!=null) {
-            mTimeButton.setText(mGroup.getDefaultTime().toString("h:mm a"));
+            mTimeText.setText(mGroup.getDefaultTime().toString("h:mm a"));
         }
         else {
-            mTimeButton.setText(R.string.no_default_time);
+            mTimeText.setText(R.string.no_default_time);
         }
     }
     //TODO change on click so that it open dialog if you open touch top part
@@ -462,18 +464,16 @@ public class GroupFragment extends VisibleFragment{
             mReminderAdapter.notifyDataSetChanged();
         }
         Repeat repeat = mGroup.getDefaultRepeat();
-        if(repeat!=null){
-            String s = repeat.getRepeatTime().getTimeString(getContext(),getString(R.string.every),
-                    "");
-            mRepeatButton.setText(s);
-        }
-        else {
-            mRepeatButton.setText(R.string.no_default_repeat);
-        }
+        String s = repeat!=null ? repeat.getRepeatTime()
+                    .getTimeString(getContext(),getString(R.string.every),"")
+                : getString(R.string.no_default_repeat);
+        mRepeatText.setText(s);
+
+
         long snooze = mGroup.getDefaultSnooze();
         String snoozeText = snooze>0?(SpanOfTime.ofMillis(snooze)).getTimeString(getContext(),
                 getString(R.string.snooze_for),"") : getString(R.string.no_default_time) ;
-        mSnoozeButton.setText(snoozeText);
+        mSnoozeText.setText(snoozeText);
         getActivity().invalidateOptionsMenu();
     }
 }

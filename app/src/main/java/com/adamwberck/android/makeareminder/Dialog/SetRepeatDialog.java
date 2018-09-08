@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.util.ArrayMap;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,7 +59,7 @@ public class SetRepeatDialog extends DismissDialog {
     private TextView mMoreOftenText;
     private boolean mMoreOftenPressed = false;
     private ArrayAdapter mTimeValueArray;
-    private Map<SpanOfTime.Type,Integer> mTimeValueMap = new ArrayMap<>(4);
+    private Map<SpanOfTime.Type,List<Integer>> mTimeValueMap = new ArrayMap<>(4);
 
     //TODO more often should be open
 
@@ -81,10 +80,10 @@ public class SetRepeatDialog extends DismissDialog {
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        mTimeValueMap.put(SpanOfTime.Type.DAY,60);
-        mTimeValueMap.put(SpanOfTime.Type.WEEK,52);
-        mTimeValueMap.put(SpanOfTime.Type.MONTH,36);
-        mTimeValueMap.put(SpanOfTime.Type.YEAR,9);
+        mTimeValueMap.put(SpanOfTime.Type.DAY,intArray(60));
+        mTimeValueMap.put(SpanOfTime.Type.WEEK,intArray(52));
+        mTimeValueMap.put(SpanOfTime.Type.MONTH,intArray(36));
+        mTimeValueMap.put(SpanOfTime.Type.YEAR,intArray(5));
 
         mRepeat = (Repeat) getArguments().getSerializable(ARG_REPEAT);
         if(mRepeat==null){
@@ -164,11 +163,10 @@ public class SetRepeatDialog extends DismissDialog {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(!parent.getItemAtPosition(position).toString().equals("")) {
                     mTimeTypeInt = position;
-                    mRepeat.setRepeatTime(getTimeType());
+                    mRepeat.setRepeatTime(getSpanOfTime());
                     updateGridView(gridView, weekAdapter, monthAdapter);
                     mTimeValueArray.clear();
-                    mTimeValueArray.addAll(intArray(
-                            mTimeValueMap.get(getTimeType().getTimeType())));
+                    mTimeValueArray.addAll(mTimeValueMap.get(getSpanOfTime().getTimeType()));
                     timeSpinner.setSelection(0);
                     updateUI();
                 }
@@ -209,7 +207,7 @@ public class SetRepeatDialog extends DismissDialog {
         return list;
     }
 
-    private SpanOfTime getTimeType() {
+    private SpanOfTime getSpanOfTime() {
         SpanOfTime span;
         if(mTimeTypeInt==0){
             span = SpanOfTime.ofDays(mDuration);

@@ -233,8 +233,8 @@ public class ChooseSnoozeDialog extends DismissDialog {
         String name = getArguments().getString(ARG_NAME);
 
         //End Buttons
-        Button snoozeButton = v.findViewById(R.id.alarm_snooze_button);
-        snoozeButton.setText(R.string.clear_snooze);
+        Button snoozeButton = v.findViewById(R.id.alarm_right_button);
+        snoozeButton.setText(R.string.set_snooze);
         snoozeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -242,8 +242,8 @@ public class ChooseSnoozeDialog extends DismissDialog {
                         .toDurationMillis());
             }
         });
-        Button dismissButton = v.findViewById(R.id.alarm_dismiss_button);
-        dismissButton.setText(R.string.set_snooze);
+        Button dismissButton = v.findViewById(R.id.alarm_left_button);
+        dismissButton.setText(R.string.clear_snooze);
         dismissButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
