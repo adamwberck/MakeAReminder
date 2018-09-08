@@ -13,11 +13,26 @@ public class Repeat implements Serializable{
     private SpanOfTime mRepeatTime;
     private List<Integer> mDaysOfTheWeek = new SortedObjectList<>(7,
             new IntComparator());
+
     private List<Integer> mDaysOfMonth = new SortedObjectList<>(31,
             new IntComparator());
+    private boolean mLastDayOfMonth = false;
+
     private List<DateTime> mDates;
     private List<LocalTime> mTimes = new SortedObjectList<LocalTime>(
             10,new TimeComparator());
+
+    public void setLastDayOfMonth(boolean lastDayOfMonth) {
+        mLastDayOfMonth = lastDayOfMonth;
+    }
+
+    public boolean isLastDayOfMonth() {
+        return mLastDayOfMonth;
+    }
+
+    public void toggleLastDay() {
+        mLastDayOfMonth = !mLastDayOfMonth;
+    }
 
 
     private class IntComparator implements Comparator<Integer>, Serializable{
@@ -28,7 +43,7 @@ public class Repeat implements Serializable{
     }
 
     public boolean isMoreOften(){
-        return mTimes.size()!=0&&getTimeType()== SpanOfTime.Type.DAY;
+        return mTimes.size()>0&&getTimeType()== SpanOfTime.Type.DAY;
     }
 
     public void addTime(LocalTime localTime){

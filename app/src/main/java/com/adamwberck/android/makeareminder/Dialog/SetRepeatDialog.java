@@ -8,9 +8,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.util.ArrayMap;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -36,6 +36,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
+import static android.graphics.Color.BLACK;
+import static android.graphics.Color.GRAY;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class SetRepeatDialog extends DismissDialog {
     public static final String ARG_REPEAT = "repeat";
@@ -43,13 +49,18 @@ public class SetRepeatDialog extends DismissDialog {
     private static final int REQUEST_TIME = 0;
     private static final String DIALOG_TIME = "DialogTime";
     private static final String EXTRA_REMOVE = "com.adamwberck.android.makeareminder.removerepeat";
+    private static final String TAG = "SetRepeatDialog";
 
     private long mDuration;
     private int mTimeTypeInt;
     private int mWeekInt;
     private Repeat mRepeat;
-    private ListView mListView;
+    private ListView mMoreOftenList;
     private TimeListAdapter mTimeListAdapter;
+    private TextView mMoreOftenText;
+    private boolean mMoreOftenPressed = false;
+    private ArrayAdapter mTimeValueArray;
+    private Map<SpanOfTime.Type,Integer> mTimeValueMap = new ArrayMap<>(4);
 
     //TODO more often should be open
 
@@ -67,7 +78,14 @@ public class SetRepeatDialog extends DismissDialog {
     }
 
     @Override
+    @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        mTimeValueMap.put(SpanOfTime.Type.DAY,60);
+        mTimeValueMap.put(SpanOfTime.Type.WEEK,52);
+        mTimeValueMap.put(SpanOfTime.Type.MONTH,36);
+        mTimeValueMap.put(SpanOfTime.Type.YEAR,9);
+
         mRepeat = (Repeat) getArguments().getSerializable(ARG_REPEAT);
         if(mRepeat==null){
             mRepeat = new Repeat(1,SpanOfTime.ofDays(1));
@@ -77,45 +95,43 @@ public class SetRepeatDialog extends DismissDialog {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View view = inflater.inflate(R.layout.dialog_repeat,null);
         //TODO change edit text to dropdown
-        EditText timeText = view.findViewById(R.id.repeat_time_text);
-        timeText.setText(String.format(Locale.getDefault(),"%d", mRepeat.getRawPeriod()));
-        timeText.addTextChangedListener(new TextWatcher() {
+        mTimeValueArray = new ArrayAdapter(getContext(),R.layout.spinner_item_right);
+        final Spinner timeSpinner = view.findViewById(R.id.repeat_time_spinner);
+        timeSpinner.setAdapter(mTimeValueArray);
+        timeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String s1 = s.toString();
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String s  = parent.getItemAtPosition(position).toString();
                 try {
-                    mDuration = Long.parseLong(s1);
+                    mDuration = Long.parseLong(s);
                 }catch(NumberFormatException ignored){ }
             }
-        });
-        mListView = view.findViewById(R.id.time_repeat_list);
-        mListView.setAdapter(mTimeListAdapter);
-        final TextView moreOften = view.findViewById(R.id.more_often_option);
-        final View moreOftenGroup = view.findViewById(R.id.more_often_group) ;
 
-        int vis = mRepeat.isMoreOften()? View.VISIBLE:View.GONE;
-        moreOftenGroup.setVisibility(vis);
-
-        moreOftenVisibility(moreOften);
-        moreOften.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                int vis = moreOftenGroup.getVisibility()==View.GONE ? View.VISIBLE:View.GONE;
-                moreOftenGroup.setVisibility(vis);
+            public void onNothingSelected(AdapterView<?> parent) {
+                //pass
             }
         });
-        final Button addRepeatTime = moreOftenGroup.findViewById(R.id.add_repeat_time_button);
-        addRepeatTime.setOnClickListener(new View.OnClickListener() {
+
+
+
+        mMoreOftenText= view.findViewById(R.id.more_often_option);
+        mMoreOftenText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                mMoreOftenPressed=!mMoreOftenPressed;
+                updateUI();
+            }
+        });
+        mMoreOftenList = view.findViewById(R.id.more_often_repeat_list);
+        mMoreOftenList.setAdapter(mTimeListAdapter);
+        View footer = inflater
+                .inflate(R.layout.list_time_repeat_footer, mMoreOftenList, false);
+        footer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Add reminder button
                 FragmentManager manager = getFragmentManager();
                 TimePickerDialog dialog = TimePickerDialog
                         .newInstance(new DateTime());
@@ -123,30 +139,38 @@ public class SetRepeatDialog extends DismissDialog {
                 dialog.show(manager,DIALOG_TIME);
             }
         });
+        mMoreOftenList.addFooterView(footer);
 
-        Spinner spinner = view.findViewById(R.id.repeat_time_spinner);
+
+
+
         final GridView gridView = view.findViewById(R.id.day_buttons);
         final DayAdapter weekAdapter = new DayAdapter(getContext(),Arrays.asList(getResources()
                 .getStringArray(R.array.days_of_the_week)),true);
-        final DayAdapter monthAdapter = new DayAdapter(getContext(),daysOfMonthList(),
-                false);
+        List<String> list = daysOfMonthList();
+        list.add(getString(R.string.every_day));
+        final DayAdapter monthAdapter = new DayAdapter(getContext(),list, false);
 
         updateGridView(gridView, weekAdapter, monthAdapter);
+
+
         //Setup WeekButton Listeners
-
-
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.time_type_repeat,R.layout.spinner_item);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        Spinner typeSpinner = view.findViewById(R.id.repeat_time_type_spinner);
+        typeSpinner.setAdapter(adapter);
+        typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(!parent.getItemAtPosition(position).toString().equals("")) {
-                    moreOftenGroup.setVisibility(View.GONE);
                     mTimeTypeInt = position;
                     mRepeat.setRepeatTime(getTimeType());
-                    moreOftenVisibility(moreOften);
                     updateGridView(gridView, weekAdapter, monthAdapter);
+                    mTimeValueArray.clear();
+                    mTimeValueArray.addAll(intArray(
+                            mTimeValueMap.get(getTimeType().getTimeType())));
+                    timeSpinner.setSelection(0);
+                    updateUI();
                 }
             }
             @Override
@@ -172,9 +196,17 @@ public class SetRepeatDialog extends DismissDialog {
                 });
 
 
-        spinner.setSelection(setSpinnerNumber(mRepeat.getTimeType()));
+        typeSpinner.setSelection(setSpinnerNumber(mRepeat.getTimeType()));
         updateUI();
         return builder.create();
+    }
+
+    private static List<Integer> intArray(int size) {
+        List<Integer> list = new ArrayList<>(size);
+        for(int i=1;i<=size;i++){
+            list.add(i);
+        }
+        return list;
     }
 
     private SpanOfTime getTimeType() {
@@ -189,7 +221,6 @@ public class SetRepeatDialog extends DismissDialog {
             span = SpanOfTime.ofMonths(mDuration);
         }
         else {
-            //TODO add year support
             span = SpanOfTime.ofYears(mDuration);
         }
         return span;
@@ -207,18 +238,11 @@ public class SetRepeatDialog extends DismissDialog {
         }
         updateUI();
     }
-    private void moreOftenVisibility(TextView moreOften) {
-        if(mTimeTypeInt==0){
-            moreOften.setVisibility(View.VISIBLE);
-        }
-        else {
-            moreOften.setVisibility(View.GONE);
-        }
-    }
+
 
     private void updateGridView(GridView gridView, DayAdapter weekAdapter, DayAdapter monthAdapter) {
         if(mTimeTypeInt==1||mTimeTypeInt==2){
-            gridView.setVisibility(View.VISIBLE);
+            gridView.setVisibility(VISIBLE);
             if(mTimeTypeInt==1){
                 gridView.setAdapter(weekAdapter);
             }else {
@@ -226,7 +250,7 @@ public class SetRepeatDialog extends DismissDialog {
             }
         }
         else {
-            gridView.setVisibility(View.GONE);
+            gridView.setVisibility(GONE);
         }
     }
 
@@ -319,6 +343,9 @@ public class SetRepeatDialog extends DismissDialog {
                     if(mIsWeek) {
                         mRepeat.toggleWeek(position);
                     }
+                    else if(position==31){
+                        mRepeat.toggleLastDay();
+                    }
                     else {
                         mRepeat.toggleDayOfMonth(position+1);
                     }
@@ -336,10 +363,18 @@ public class SetRepeatDialog extends DismissDialog {
                 button.setBackgroundResource(background);
             }
             else {
-                int background = mRepeat.isRepeatOnMonthDay(position+1) ?
-                        R.drawable.ic_button_circle_on :
-                        R.drawable.ic_button_circle_off;
-                button.setBackgroundResource(background);
+                if(position<31) {
+                    int background = mRepeat.isRepeatOnMonthDay(position + 1) ?
+                            R.drawable.ic_button_circle_on :
+                            R.drawable.ic_button_circle_off;
+                    button.setBackgroundResource(background);
+                }
+                else {
+                    int background = mRepeat.isLastDayOfMonth() ?
+                            R.drawable.ic_button_circle_on :
+                            R.drawable.ic_button_circle_off;
+                    button.setBackgroundResource(background);
+                }
             }
         }
 
@@ -381,17 +416,7 @@ public class SetRepeatDialog extends DismissDialog {
             View v = mInflater.inflate(R.layout.list_time_repeat, parent, false);
             TextView textTime = v.findViewById(R.id.text_time_repeat);
             //TODO add option to change time format
-            textTime.setText(localTime.toString("hh:mm a",Locale.getDefault()));
-            textTime.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    FragmentManager manager = getFragmentManager();
-                    TimePickerDialog dialog = TimePickerDialog
-                            .newInstance(new DateTime());
-                    dialog.setTargetFragment(SetRepeatDialog.this, REQUEST_TIME);
-                    dialog.show(manager,DIALOG_TIME);
-                }
-            });
+            textTime.setText(localTime.toString("h:mm a",Locale.getDefault()));
             ImageView close = v.findViewById(R.id.time_delete);
             close.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -409,11 +434,19 @@ public class SetRepeatDialog extends DismissDialog {
 
         if (mTimeListAdapter == null) {
             mTimeListAdapter = new TimeListAdapter(getContext(),times);
-            mListView.setAdapter(mTimeListAdapter);
+            mMoreOftenList.setAdapter(mTimeListAdapter);
         } else {
-            mListView.setAdapter(mTimeListAdapter);
+            mMoreOftenList.setAdapter(mTimeListAdapter);
             mTimeListAdapter.notifyDataSetChanged();
         }
-
+        int vis;
+        SpanOfTime.Type type = mRepeat.getTimeType();
+        vis = type== SpanOfTime.Type.DAY && (mRepeat.isMoreOften() || mMoreOftenPressed)
+                ? VISIBLE : GONE;
+        mMoreOftenList.setVisibility(vis);
+        vis = type == SpanOfTime.Type.DAY ? VISIBLE:GONE;
+        mMoreOftenText.setVisibility(vis);
+        int color = mTimeListAdapter.getCount()>0?GRAY:BLACK;
+        mMoreOftenText.setTextColor(color);
     }
 }

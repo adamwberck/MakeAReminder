@@ -4,19 +4,24 @@
     android:layout_height="wrap_content"
     android:padding="16dp"
     android:orientation="vertical">
+    <TextView
+        android:text="@string/every"
+        android:textSize="20sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        <EditText
-            android:id="@+id/repeat_time_text"
+        <Spinner
+            android:id="@+id/repeat_time_spinner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:inputType="number"
             android:gravity="end"/>
         <Spinner
-            android:id="@+id/repeat_time_spinner"
+            android:id="@+id/repeat_time_type_spinner"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
@@ -30,23 +35,13 @@
         android:text="@string/more_often"
         android:textSize="20sp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <LinearLayout
-        android:id="@+id/more_often_group"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <Button
-        android:id="@+id/add_repeat_time_button"
-        android:text="@string/add_repeat_time"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="60dp"/>
+
     <ListView
-        android:id="@+id/time_repeat_list"
+        android:id="@+id/more_often_repeat_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </ListView>
-    </LinearLayout>
     <GridView
         android:id="@+id/day_buttons"
         android:layout_width="match_parent"
