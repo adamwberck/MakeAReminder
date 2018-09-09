@@ -33,6 +33,9 @@ public class SpanOfTime implements Serializable{
                 millisSinceHour / 60000.0 / minutes)) * minutes;
         return hour.plusMinutes(roundedMinutes);
     }
+    public static DateTime roundTime(final DateTime dateTime, final int minutes) {
+        return floorDate(dateTime.plus(TimeUnit.MINUTES.toMillis(minutes)/2),minutes);
+    }
 
     public long getTime(Type type) {
         switch (type) {

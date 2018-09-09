@@ -1,10 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
-
+    android:layout_marginTop="2.5dp"
+    android:layout_marginBottom="2.5dp">
+    <RelativeLayout
+        android:orientation="horizontal"
+        android:id="@+id/background"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:background="@color/lightGreen"
+        tools:layout_width="match_parent">
+        <ImageView
+            android:src="@drawable/ic_check"
+            android:layout_centerVertical="true"
+            android:layout_width="30dp"
+            android:layout_marginStart="20dp"
+            android:layout_height="30dp" />
+        <TextView
+            android:text="@string/complete"
+            android:layout_centerVertical="true"
+            android:textAllCaps="true"
+            android:layout_marginStart="80dp"
+            android:textSize="24sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+    <LinearLayout
+        android:id="@+id/foreground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical">
     <TextView
         android:id="@+id/task_title"
         android:layout_width="match_parent"
@@ -28,3 +58,4 @@
         android:textSize="16sp"
         tools:ignore="HardcodedText" />
 </LinearLayout>
+</FrameLayout>

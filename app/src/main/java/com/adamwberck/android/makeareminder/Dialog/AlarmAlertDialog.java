@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.adamwberck.android.makeareminder.Elements.Task;
 import com.adamwberck.android.makeareminder.R;
@@ -178,6 +179,9 @@ public class AlarmAlertDialog extends DialogFragment {
                 Interval interval = new Interval(DateTime.now(), snoozeTime);
                 mSnoozeTime = START_TIME.plus(interval.toDurationMillis());
             }
+            else{
+                mSnoozeTime = START_TIME.plus(task.getQuickSnoozeTime());
+            }
         }
         ImageButton resetButton = v.findViewById(R.id.reset_button);
         resetButton.setOnClickListener(new View.OnClickListener() {
@@ -237,6 +241,11 @@ public class AlarmAlertDialog extends DialogFragment {
         snoozeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(mSnoozeTime.getMillis()==START_TIME.getMillis()){
+                    Toast.makeText(getContext(),R.string.set_snooze_duration,Toast.LENGTH_SHORT)
+                    .show();
+                    return;
+                }
                 sendResult(Activity.RESULT_OK,new Interval(START_TIME,mSnoozeTime));
             }
         });

@@ -43,7 +43,7 @@ public class TaskActivity extends SingleFragmentActivity {
 
     @Override
     public void onBackPressed(){
-        //Todo check changed
+        //check changed
         final Task task = ((TaskFragment)getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_container)).getTask();
         if(task.equals(mOldTask)){
@@ -72,11 +72,11 @@ public class TaskActivity extends SingleFragmentActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     GroupLab.saveLab();
+                    task.startAlarm(getApplicationContext());
                     TaskActivity.this.finish();
                 }
             });
         }
         b.show();
     }
-
 }

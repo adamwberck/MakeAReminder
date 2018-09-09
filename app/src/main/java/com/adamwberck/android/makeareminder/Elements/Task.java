@@ -28,7 +28,6 @@ public class Task implements Serializable,Cloneable{
     private Repeat mRepeat;
     private DateTime mSnoozeTime;
     private long mQuickSnoozeTime=0;
-    private boolean mHasRepeat = false;
     private boolean mComplete = false;
     private List<Reminder> mReminders
             = new SortedObjectList<>(10,Reminder.getComparator());
@@ -39,18 +38,13 @@ public class Task implements Serializable,Cloneable{
         GroupLab.saveLab();
     }
 
+
     public Repeat getRepeat() {
         return mRepeat;
     }
 
     public void setRepeat(Repeat repeat) {
         mRepeat = repeat;
-        if(repeat!=null) {
-            mHasRepeat = true;
-        }
-        else {
-            mHasRepeat = false;
-        }
     }
 
     public void addReminder(SpanOfTime span){
@@ -106,6 +100,12 @@ public class Task implements Serializable,Cloneable{
     public Task(Context appContext,Group group) {
         mID = GroupLab.get(appContext).nextValue();
         mGroup = group;
+        LocalTime localTime = mGroup.getDefaultTime();
+        mDate = localTime!=null ? localTime.toDateTimeToday() : null;
+        mRepeat = mGroup.getDefaultRepeat();
+        mQuickSnoozeTime = mGroup.getDefaultSnooze();
+        mReminders.addAll(mGroup.getDefaultReminders());
+
     }
 
     @Override
@@ -119,7 +119,6 @@ public class Task implements Serializable,Cloneable{
             return false;
         final Task other = (Task) obj;
         return  mID == other.mID &&
-                Objects.equals(mHasRepeat, other.mHasRepeat) &&
                 Objects.equals(mComplete, other.mComplete) &&
                 Objects.equals(mName, other.mName) &&
                 Objects.equals(mDate, other.mDate) &&
@@ -140,7 +139,7 @@ public class Task implements Serializable,Cloneable{
     }
 
     public Object[] getSoonestTime() {
-        if(mDate.isAfterNow()){
+        if(mDate!=null&&mDate.isAfterNow()){
             for(int i=mReminders.size()-1;i>=0;i--){
                 Reminder r = mReminders.get(i);
                 DateTime time = mDate.minusMinutes((int)r.getMinutes());
@@ -160,7 +159,7 @@ public class Task implements Serializable,Cloneable{
     }
 
     public void setSnoozeTime(DateTime date) {
-        mSnoozeTime = date;
+        mSnoozeTime = SpanOfTime.floorDate(date,1);
     }
 
     public DateTime getSnoozeTime() {
@@ -168,7 +167,7 @@ public class Task implements Serializable,Cloneable{
     }
 
     public boolean hasRepeat() {
-        return mHasRepeat;
+        return mRepeat!=null;
     }
 
     public void setComplete(boolean complete) {

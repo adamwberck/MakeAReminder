@@ -16,7 +16,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,7 +79,14 @@ public class GroupLab implements Serializable{
                 sGroupLab = new GroupLab(context);
             }
             sGroupLab = new GroupLab(context);
-            sGroupLab.mGroups.add(Group.specialGroup());
+            sGroupLab.mGroups.add(Group.newSpecialGroup());
+
+            //test
+            Group group = new Group();
+            Task task = new Task(context,group);
+            task.setName("Eat a Cookie");
+            group.addTask(task);
+            sGroupLab.mGroups.add(group);
         }
         return sGroupLab;
     }
@@ -105,8 +111,8 @@ public class GroupLab implements Serializable{
         g.setColor(color);
         mGroups.add(mGroups.size()-1,g);
         if(!mGroups.get(mGroups.size()-1).getID().equals(Group.SPECIAL_ID)){
-            mGroups.remove(Group.specialGroup());
-            mGroups.add(Group.specialGroup());
+            mGroups.remove(Group.newSpecialGroup());
+            mGroups.add(Group.newSpecialGroup());
         }
         saveLab();
     }

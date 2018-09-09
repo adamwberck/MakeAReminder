@@ -21,10 +21,10 @@ public class ReminderService extends IntentService{
     //TODO switch so it uses reminders rather than tasks
     //TODO naming tasks nothing needs to be fixed problem everywhere
     private static final String TAG = "ReminderService";
-    private static final String EXTRA_TASK_ID =  "com.adamwberck.android.makeareminder.taskid";
-    private static final String EXTRA_ALARM = "com.adamwberck.android.makeareminder.alarm";
-    private static final String EXTRA_NAME = "com.adamwberck.android.makeareminder.name";
-    private static final String EXTRA_TITLE = "com.adamwberck.android.makeareminder.title";
+    public static final String EXTRA_TASK_ID =  "com.adamwberck.android.makeareminder.taskid";
+    public static final String EXTRA_ALARM = "com.adamwberck.android.makeareminder.alarm";
+    public static final String EXTRA_NAME = "com.adamwberck.android.makeareminder.name";
+    public static final String EXTRA_TITLE = "com.adamwberck.android.makeareminder.title";
 
     public ReminderService() {
         super(TAG);
@@ -72,7 +72,7 @@ public class ReminderService extends IntentService{
                             turnAlarmOn);
                 }
             }
-            else if(task.getRepeat().isMoreOften()) {
+            else if(task.hasRepeat()&&task.getRepeat().isMoreOften()) {
                 LocalTime lt = task.getRepeat().getSoonestTime();
                 if(lt!=null){
                     DateTime dt = lt.toDateTimeToday();

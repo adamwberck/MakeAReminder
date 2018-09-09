@@ -218,10 +218,18 @@ public class GroupFragment extends VisibleFragment{
             @Override
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
-                TimePickerDialog dialog = TimePickerDialog
-                        .newInstance(mGroup.getDefaultTime());
+                TimePickerDialog dialog;
+                try {
+                    dialog = TimePickerDialog
+                            .newInstance(mGroup.getDefaultTime().toDateTimeToday());
+                }
+                catch (NullPointerException e){
+                    dialog = TimePickerDialog
+                            .newInstance(null);
+                }
                 dialog.setTargetFragment(GroupFragment.this, REQUEST_TIME);
                 dialog.show(manager,DIALOG_TIME);
+
             }
         });
 

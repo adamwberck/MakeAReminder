@@ -7,6 +7,7 @@ import com.adamwberck.android.makeareminder.GroupLab;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.joda.time.LocalTime;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class Group implements Serializable{
     private String mName = (mID.toString()).substring(0,6);
     private Repeat mDefaultRepeat;
     private long mDefaultSnooze;
-    private DateTime mDefaultTime;
+    private LocalTime mDefaultTime;
     private List<Reminder> mDefaultReminders = new SortedObjectList<>(10,
             Reminder.getComparator());
 
@@ -108,7 +109,7 @@ public class Group implements Serializable{
         mName = name;
     }
 
-    public DateTime getDefaultTime() {
+    public LocalTime getDefaultTime() {
         return mDefaultTime;
     }
 
@@ -136,7 +137,17 @@ public class Group implements Serializable{
 
     public void setDefaultTime(DateTime defaultTime) {
         if(defaultTime!=null) {
-            mDefaultTime = SpanOfTime.floorDate(defaultTime,1);
+            mDefaultTime = SpanOfTime.floorDate(defaultTime,1)
+                    .toLocalTime();
+            addReminder(new Reminder(SpanOfTime.ofMinutes(0), true));
+        }
+        mDefaultTime = null;
+    }
+
+    public void setDefaultTime(LocalTime defaultTime) {
+        if(defaultTime!=null) {
+            mDefaultTime = SpanOfTime.floorDate(defaultTime.toDateTimeToday(),1)
+                    .toLocalTime();
             addReminder(new Reminder(SpanOfTime.ofMinutes(0), true));
         }
         mDefaultTime = defaultTime;
@@ -158,7 +169,7 @@ public class Group implements Serializable{
         return Color.parseColor(getColor());
     }
 
-    public static Group specialGroup() {
+    public static Group newSpecialGroup() {
         return new Group(SPECIAL_ID);
     }
 

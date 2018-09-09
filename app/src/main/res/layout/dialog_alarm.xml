@@ -149,7 +149,7 @@ android:layout_height="wrap_content">
             android:layout_height="wrap_content" />
         <Button
             android:id="@+id/alarm_right_button"
-            android:text="@string/complete"
+            android:text="@string/mark_complete"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />

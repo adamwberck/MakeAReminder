@@ -2,6 +2,7 @@ package com.adamwberck.android.makeareminder.Fragment;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -151,6 +152,38 @@ public class TaskListFragment extends VisibleFragment{
         ItemTouchHelper.SimpleCallback itemTouchCallback =
                 new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT) {
                     @Override
+                    public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+                        if (viewHolder != null){
+                            final View foregroundView = ((TaskHolder) viewHolder).mForeground;
+
+                            getDefaultUIUtil().onSelected(foregroundView);
+                        }
+                    }
+                    @Override
+                    public void onChildDraw(Canvas c, RecyclerView recyclerView,
+                                            RecyclerView.ViewHolder viewHolder, float dX, float dY,
+                                            int actionState, boolean isCurrentlyActive) {
+                        final View foregroundView = ((TaskHolder) viewHolder).mForeground;
+
+                        drawBackground(viewHolder, dX, actionState);
+
+                        getDefaultUIUtil().onDraw(c, recyclerView, foregroundView, dX, dY,
+                                actionState, isCurrentlyActive);
+                    }
+
+                    @Override
+                    public void onChildDrawOver(Canvas c, RecyclerView recyclerView,
+                                                RecyclerView.ViewHolder viewHolder, float dX, float dY,
+                                                int actionState, boolean isCurrentlyActive) {
+                        final View foregroundView = ((TaskHolder) viewHolder).mForeground;
+
+                        drawBackground(viewHolder, dX, actionState);
+
+                        getDefaultUIUtil().onDrawOver(c, recyclerView, foregroundView, dX, dY,
+                                actionState, isCurrentlyActive);
+                    }
+
+                    @Override
                     public boolean onMove(RecyclerView recyclerView
                             ,RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                         return false;
@@ -160,8 +193,28 @@ public class TaskListFragment extends VisibleFragment{
                     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                         int position = viewHolder.getAdapterPosition();
                         Task task = mAdapter.mTasks.get(position);
-                        mDeleteCallBack.onTaskDeleted(task);
-                        mGroup.removeTask(task);
+                        mAdapter.notifyItemChanged(position);
+                        task.setComplete(true);
+                    }
+
+                    @Override
+                    public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder){
+                        final View backgroundView = ((TaskHolder) viewHolder).mBackground;
+                        final View foregroundView = ((TaskHolder) viewHolder).mForeground;
+
+                        // TODO: should animate out instead. how?
+                        backgroundView.setRight(0);
+
+                        getDefaultUIUtil().clearView(foregroundView);
+                    }
+
+                    private void drawBackground(RecyclerView.ViewHolder viewHolder, float dX, int actionState) {
+                        final View backgroundView = ((TaskHolder) viewHolder).mBackground;
+
+                        if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                            //noinspection NumericCastThatLosesPrecision
+                            backgroundView.setRight((int) Math.max(dX, 0));
+                        }
                     }
                 };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
@@ -218,9 +271,13 @@ public class TaskListFragment extends VisibleFragment{
         private TextView mDateTextView;
 
         private Task mTask;
+        public View mForeground;
+        public View mBackground;
 
         public TaskHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
             super(inflater.inflate(viewType, parent, false));
+            mForeground=itemView.findViewById(R.id.foreground);
+            mBackground=itemView.findViewById(R.id.background);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -272,9 +329,16 @@ public class TaskListFragment extends VisibleFragment{
                 for(TextView t: taskText){
                     t.setTextColor(getResources().getColor(R.color.black));
                 }
-                String dateText = mTask.getDate()==null ?
-                        getString(R.string.no_date) :
-                        mTask.getDate().toString("d MMM YYYY hh:mm a", Locale.getDefault());
+                String dateText;
+                if(mTask.getSnoozeTime()!=null&&mTask.isOverdue()){
+                    dateText=getString(R.string.snoozed_till,
+                            mTask.getSnoozeTime().toString("d MMM YYYY hh:mm a"));
+                }
+                else {
+                    dateText = mTask.getDate() == null ?
+                            getString(R.string.no_date) :
+                            mTask.getDate().toString("d MMM YYYY hh:mm a", Locale.getDefault());
+                }
                 mDateTextView.setText(dateText);
                 if(task.isComplete()){
                     for(TextView t: taskText){

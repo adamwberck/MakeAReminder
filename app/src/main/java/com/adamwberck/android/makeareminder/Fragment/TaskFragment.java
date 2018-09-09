@@ -29,6 +29,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.adamwberck.android.makeareminder.Activity.AlarmActivity;
 import com.adamwberck.android.makeareminder.Dialog.ChooseSnoozeDialog;
 import com.adamwberck.android.makeareminder.Dialog.CreateReminderDialog;
 import com.adamwberck.android.makeareminder.Dialog.DatePickerDialog;
@@ -40,12 +41,15 @@ import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
+import com.adamwberck.android.makeareminder.Service.ReminderService;
 
 import org.joda.time.DateTime;
 
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class TaskFragment extends VisibleFragment{
     private static final String TAG = "TaskFragment";
@@ -83,7 +87,7 @@ public class TaskFragment extends VisibleFragment{
     private ListView mReminderListView;
     private ReminderAdapter mReminderAdapter;
     private Button mRepeatButton;
-    private Button mSnoozeButton;
+    private Button mQuickSnoozeButton;
     private ImageButton mColorButton;
     private ActionBar mActionBar;
     private Menu mMenu;
@@ -94,6 +98,7 @@ public class TaskFragment extends VisibleFragment{
     private boolean mAlertHasValue = false;
     private View mAlertLayout;
     private ImageButton mCloseAlert;
+    private Button mSnoozeInfoButton;
 
 
     @Override
@@ -128,6 +133,7 @@ public class TaskFragment extends VisibleFragment{
                     getActivity().onBackPressed();
                 }
                 else {
+                    mTask.startAlarm(getContext());
                     getActivity().finish();
                 }
                 return true;
@@ -142,6 +148,26 @@ public class TaskFragment extends VisibleFragment{
 
         mDueLayout = v.findViewById(R.id.due_layout);
         mAlertLayout = v.findViewById(R.id.alert_layout);
+
+        mSnoozeInfoButton = v.findViewById(R.id.snooze_info_text);
+        mSnoozeInfoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Todo  change snooze
+            }
+        });
+        mSnoozeInfoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int id = mTask.getID();
+                String name = mTask.getName();
+                String title = mTask.getName();
+                Intent i = AlarmActivity.newIntent(getContext(),id,true,name,title);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivity(i);
+            }
+        });
 
 
         mCloseDue = v.findViewById(R.id.close_due);
@@ -175,8 +201,11 @@ public class TaskFragment extends VisibleFragment{
         //TODO color button should be group change button
 
 
-        mSnoozeButton = v.findViewById(R.id.quick_snooze_text);
-        mSnoozeButton.setOnClickListener(new View.OnClickListener() {
+
+
+
+        mQuickSnoozeButton = v.findViewById(R.id.quick_snooze_text);
+        mQuickSnoozeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int id = mTask.getID();
@@ -473,12 +502,20 @@ public class TaskFragment extends VisibleFragment{
                 ""):getString(R.string.set_repeat);
         mRepeatButton.setText(underLine(repeatText));
 
+        int snoozeVis = mTask.getSnoozeTime()!=null&&mTask.isOverdue() ? VISIBLE:GONE;
+        mSnoozeInfoButton.setVisibility(snoozeVis);
+        if(snoozeVis==VISIBLE){
+            mSnoozeInfoButton.setText(underLine(getString(R.string.snoozed_till,
+                    mTask.getSnoozeTime().toString("h:mm a MMM dd yyyy"))));
+        }
+
+
         long snooze = mTask.getQuickSnoozeTime();
 
         String snoozeText = snooze>0?(SpanOfTime.ofMillis(snooze)).getTimeString(getContext(),
                 getString(R.string.snooze_for),"") :
                 getString(R.string.set_quick_snooze);
-        mSnoozeButton.setText(underLine(snoozeText));
+        mQuickSnoozeButton.setText(underLine(snoozeText));
 
 
         mDueHasValue = mTask.getDate() != null || mTask.getRepeat() != null;
@@ -486,10 +523,10 @@ public class TaskFragment extends VisibleFragment{
 
         int view;
 
-        view = mDueHasValue ? View.VISIBLE:View.GONE;
+        view = mDueHasValue ? VISIBLE: GONE;
         mCloseDue.setVisibility(view);
 
-        view = mAlertHasValue ? View.VISIBLE:View.GONE;
+        view = mAlertHasValue ? VISIBLE: GONE;
         mCloseAlert.setVisibility(view);
 
         getActivity().invalidateOptionsMenu();
