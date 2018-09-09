@@ -353,7 +353,7 @@ public class TaskListFragment extends VisibleFragment{
                     for(TextView t: taskText){
                         t.setTextColor(getResources().getColor(R.color.darkGray));
                         String s = t.getText().toString();
-                        t.setText(strikethrough(s));
+                        t.setText(strikeThrough(s));
                     }
                     mBackground.setBackgroundColor(getContext().getResources()
                             .getColor(R.color.lightGray));

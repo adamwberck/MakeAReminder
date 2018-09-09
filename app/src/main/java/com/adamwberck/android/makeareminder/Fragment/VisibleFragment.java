@@ -118,7 +118,7 @@ public class VisibleFragment extends Fragment {
         return content;
     }
 
-    public static SpannableString strikethrough(String time) {
+    public static SpannableString strikeThrough(String time) {
         SpannableString content = new SpannableString(time);
         content.setSpan(new StrikethroughSpan(), 0, content.length(), 0);
         return content;

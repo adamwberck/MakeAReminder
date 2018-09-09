@@ -269,4 +269,8 @@ public class Task implements Serializable,Cloneable{
     public void toggleComplete() {
         mComplete=!mComplete;
     }
+
+    public void setGroup(Group newGroup) {
+        mGroup=newGroup;
+    }
 }

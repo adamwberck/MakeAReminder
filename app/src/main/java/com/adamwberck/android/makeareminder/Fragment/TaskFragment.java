@@ -19,12 +19,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Activity.AlarmActivity;
@@ -34,6 +37,7 @@ import com.adamwberck.android.makeareminder.Dialog.DatePickerDialog;
 import com.adamwberck.android.makeareminder.Dialog.SetRepeatDialog;
 import com.adamwberck.android.makeareminder.Dialog.TimePickerDialog;
 import com.adamwberck.android.makeareminder.Elements.Task;
+import com.adamwberck.android.makeareminder.Elements.Group;
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
@@ -42,9 +46,9 @@ import com.adamwberck.android.makeareminder.R;
 
 import org.joda.time.DateTime;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static android.app.Activity.RESULT_OK;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
@@ -96,6 +100,8 @@ public class TaskFragment extends VisibleFragment{
     private View mAlertLayout;
     private ImageButton mCloseAlert;
     private Button mSnoozeInfoButton;
+    private Spinner mGroupSpinner;
+    private List<Group> mGroups;
 
 
     @Override
@@ -143,8 +149,38 @@ public class TaskFragment extends VisibleFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle SIState) {
         View v = inflater.inflate(R.layout.fragment_task, container,false);
 
+        mGroups = GroupLab.get(getContext()).getGroups();
+
         mDueLayout = v.findViewById(R.id.due_layout);
         mAlertLayout = v.findViewById(R.id.alert_layout);
+
+        mGroupSpinner = v.findViewById(R.id.group_spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),R.layout.spinner_item_black);
+        adapter.addAll(getGroupNames());
+        mGroupSpinner.setAdapter(adapter);
+        mGroupSpinner.setSelection(mGroups.indexOf(mTask.getGroup()));
+        mGroupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Group lastGroup = mTask.getGroup();
+                Group newGroup = mGroups.get(position);
+                if(lastGroup.getID().equals(newGroup.getID())){
+                    return;
+                }
+                //GroupLab.get(getContext()).getGroup(lastGroup.getID()).removeTask(mTask);
+                //GroupLab.get(getContext()).getGroup(newGroup.getID()).addTask(mTask);
+                lastGroup.removeTask(mTask);
+                newGroup.addTask(mTask);
+                mTask.setGroup(newGroup);
+                int colorInt = newGroup.getColorInt();
+                alterActionBar(colorInt,getContext(),getActivity());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         mSnoozeInfoButton = v.findViewById(R.id.snooze_info_text);
         mSnoozeInfoButton.setOnClickListener(new View.OnClickListener() {
@@ -305,6 +341,16 @@ public class TaskFragment extends VisibleFragment{
         return v;
     }
 
+    private List<String> getGroupNames() {
+        List<String> strings = new ArrayList<>(mGroups.size());
+        for(Group g : mGroups){
+            if(!g.isSpecial()) {
+                strings.add(g.getName());
+            }
+        }
+        return strings;
+    }
+
     private void updateDate() {
         if(mTask.getDate()!=null) {
             String time = mTask.getDate().toString("h:mm a");
@@ -329,12 +375,6 @@ public class TaskFragment extends VisibleFragment{
         if(context instanceof Callbacks) {
             mCallbacks = (Callbacks) context;
         }
-    }
-
-    private void setTskChanged(int TskChanged){
-        Intent data = new Intent();
-        data.putExtra(EXTRA_Tsk_CHANGED, TskChanged);
-        getActivity().setResult(RESULT_OK, data);
     }
 
     private void updateTask() {
