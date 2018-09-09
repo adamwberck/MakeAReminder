@@ -100,6 +100,7 @@
     <string name="info">Info</string>
     <string name="set_snooze_duration">Set Snooze Duration</string>
     <string name="complete">Complete</string>
+    <string name="restore">Restore</string>
     <string-array name="group_colors">
         <item>#ffff0000</item>
         <item>#ff0000ff</item>

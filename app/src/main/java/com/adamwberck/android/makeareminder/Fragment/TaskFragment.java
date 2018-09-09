@@ -10,9 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.text.Editable;
-import android.text.SpannableString;
 import android.text.TextWatcher;
-import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -41,7 +39,6 @@ import com.adamwberck.android.makeareminder.Elements.Repeat;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
-import com.adamwberck.android.makeareminder.Service.ReminderService;
 
 import org.joda.time.DateTime;
 
@@ -311,10 +308,10 @@ public class TaskFragment extends VisibleFragment{
     private void updateDate() {
         if(mTask.getDate()!=null) {
             String time = mTask.getDate().toString("h:mm a");
-            mTimeButton.setText(underLine(time));
+            mTimeButton.setText(underline(time));
 
             time = mTask.getDate().toString("MMM d, yyyy");
-            mDateButton.setText(underLine(time));
+            mDateButton.setText(underline(time));
         }
         else {
             mTimeButton.setText(R.string.set_time);
@@ -322,11 +319,7 @@ public class TaskFragment extends VisibleFragment{
         }
     }
 
-    private static SpannableString underLine(String time) {
-        SpannableString content = new SpannableString(time);
-        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-        return content;
-    }
+
 
 
 
@@ -500,12 +493,12 @@ public class TaskFragment extends VisibleFragment{
         Repeat repeat = mTask.getRepeat();
         String repeatText = repeat!=null?repeat.getRepeatTime().getTimeString(getContext(),getString(R.string.every),
                 ""):getString(R.string.set_repeat);
-        mRepeatButton.setText(underLine(repeatText));
+        mRepeatButton.setText(underline(repeatText));
 
         int snoozeVis = mTask.getSnoozeTime()!=null&&mTask.isOverdue() ? VISIBLE:GONE;
         mSnoozeInfoButton.setVisibility(snoozeVis);
         if(snoozeVis==VISIBLE){
-            mSnoozeInfoButton.setText(underLine(getString(R.string.snoozed_till,
+            mSnoozeInfoButton.setText(underline(getString(R.string.snoozed_till,
                     mTask.getSnoozeTime().toString("h:mm a MMM dd yyyy"))));
         }
 
@@ -515,7 +508,7 @@ public class TaskFragment extends VisibleFragment{
         String snoozeText = snooze>0?(SpanOfTime.ofMillis(snooze)).getTimeString(getContext(),
                 getString(R.string.snooze_for),"") :
                 getString(R.string.set_quick_snooze);
-        mQuickSnoozeButton.setText(underLine(snoozeText));
+        mQuickSnoozeButton.setText(underline(snoozeText));
 
 
         mDueHasValue = mTask.getDate() != null || mTask.getRepeat() != null;

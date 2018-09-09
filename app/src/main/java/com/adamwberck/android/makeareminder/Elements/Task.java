@@ -265,4 +265,8 @@ public class Task implements Serializable,Cloneable{
     public long getQuickSnoozeTime() {
         return mQuickSnoozeTime;
     }
+
+    public void toggleComplete() {
+        mComplete=!mComplete;
+    }
 }

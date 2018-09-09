@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -194,7 +195,7 @@ public class TaskListFragment extends VisibleFragment{
                         int position = viewHolder.getAdapterPosition();
                         Task task = mAdapter.mTasks.get(position);
                         mAdapter.notifyItemChanged(position);
-                        task.setComplete(true);
+                        task.toggleComplete();
                     }
 
                     @Override
@@ -267,6 +268,8 @@ public class TaskListFragment extends VisibleFragment{
 
     private class TaskHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        private ImageView mSwipeIcon;
+        private TextView mSwipeText;
         private TextView mTitleTextView;
         private TextView mDateTextView;
 
@@ -278,6 +281,8 @@ public class TaskListFragment extends VisibleFragment{
             super(inflater.inflate(viewType, parent, false));
             mForeground=itemView.findViewById(R.id.foreground);
             mBackground=itemView.findViewById(R.id.background);
+            mSwipeText = mBackground.findViewById(R.id.background_swipe_text);
+            mSwipeIcon = mBackground.findViewById(R.id.background_swipe_icon);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -340,10 +345,20 @@ public class TaskListFragment extends VisibleFragment{
                             mTask.getDate().toString("d MMM YYYY hh:mm a", Locale.getDefault());
                 }
                 mDateTextView.setText(dateText);
+                mBackground.setBackgroundColor(getContext().getResources()
+                        .getColor(R.color.lightGreen));
+                mSwipeText.setText(R.string.complete);
+                mSwipeIcon.setImageResource(R.drawable.ic_check);
                 if(task.isComplete()){
                     for(TextView t: taskText){
-                        t.setTextColor(getResources().getColor(R.color.green));
+                        t.setTextColor(getResources().getColor(R.color.darkGray));
+                        String s = t.getText().toString();
+                        t.setText(strikethrough(s));
                     }
+                    mBackground.setBackgroundColor(getContext().getResources()
+                            .getColor(R.color.lightGray));
+                    mSwipeText.setText(R.string.restore);
+                    mSwipeIcon.setImageResource(R.drawable.ic_undo);
                 }
                 else if(task.isOverdue()){
                     for(TextView t: taskText){

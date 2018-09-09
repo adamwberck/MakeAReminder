@@ -86,7 +86,7 @@ public class GroupLab implements Serializable{
             Task task = new Task(context,group);
             task.setName("Eat a Cookie");
             group.addTask(task);
-            sGroupLab.mGroups.add(group);
+            sGroupLab.mGroups.add(sGroupLab.mGroups.size()-1,group);
         }
         return sGroupLab;
     }

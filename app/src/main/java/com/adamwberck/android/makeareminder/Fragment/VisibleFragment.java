@@ -10,6 +10,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.SpannableString;
+import android.text.style.StrikethroughSpan;
+import android.text.style.UnderlineSpan;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -108,6 +111,19 @@ public class VisibleFragment extends Fragment {
                     activity.getCurrentFocus().getWindowToken(), 0);
         }
     }
+
+    public static SpannableString underline(String time) {
+        SpannableString content = new SpannableString(time);
+        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+        return content;
+    }
+
+    public static SpannableString strikethrough(String time) {
+        SpannableString content = new SpannableString(time);
+        content.setSpan(new StrikethroughSpan(), 0, content.length(), 0);
+        return content;
+    }
+
 
     public static boolean isDark(int argb) {
         double rgb[] = new double[3];

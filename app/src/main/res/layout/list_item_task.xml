@@ -11,16 +11,18 @@
         android:orientation="horizontal"
         android:id="@+id/background"
         android:layout_width="0dp"
-        android:layout_height="80dp"
+        android:layout_height="70dp"
         android:background="@color/lightGreen"
         tools:layout_width="match_parent">
         <ImageView
+            android:id="@+id/background_swipe_icon"
             android:src="@drawable/ic_check"
             android:layout_centerVertical="true"
             android:layout_width="30dp"
             android:layout_marginStart="20dp"
             android:layout_height="30dp" />
         <TextView
+            android:id="@+id/background_swipe_text"
             android:text="@string/complete"
             android:layout_centerVertical="true"
             android:textAllCaps="true"
@@ -41,7 +43,7 @@
         android:layout_height="30dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:text="Take out the Trash"
         android:textColor="@android:color/black"
         android:textSize="22sp"
