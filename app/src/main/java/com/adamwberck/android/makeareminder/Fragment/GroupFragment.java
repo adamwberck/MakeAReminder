@@ -418,16 +418,15 @@ public class GroupFragment extends VisibleFragment{
         if(resultCode != Activity.RESULT_OK){
             return;
         }
-        if(requestCode == REQUEST_REMINDER || requestCode == REQUEST_EDIT){
-            SpanOfTime span = (SpanOfTime) data
-                    .getSerializableExtra(CreateReminderDialog.EXTRA_NEW_REMINDER);
-            boolean isAlarm = data.getExtras().getBoolean(CreateReminderDialog.EXTRA_IS_ALARM);
-            if(requestCode==REQUEST_EDIT){
-                Reminder reminder = (Reminder) data
-                        .getSerializableExtra(CreateReminderDialog.EXTRA_DELETE_REMINDER);
-                mGroup.removeReminder(reminder);
-            }
-            mGroup.addReminder(span,isAlarm);
+        if(requestCode == REQUEST_REMINDER){
+            Reminder oldR
+                    = (Reminder) data.getExtras()
+                    .getSerializable(CreateReminderDialog.EXTRA_OLD_REMINDER);
+            Reminder newR
+                    = (Reminder) data.getExtras()
+                    .getSerializable(CreateReminderDialog.EXTRA_NEW_REMINDER);
+            mGroup.removeReminder(oldR);
+            mGroup.addReminder(newR);
         }
         if(requestCode == REQUEST_DATE || requestCode == REQUEST_TIME){
             DateTime date;

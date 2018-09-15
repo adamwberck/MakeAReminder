@@ -31,6 +31,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Activity.AlarmActivity;
+import com.adamwberck.android.makeareminder.Dialog.AlterAlertDialog;
 import com.adamwberck.android.makeareminder.Dialog.ChooseSnoozeDialog;
 import com.adamwberck.android.makeareminder.Dialog.CreateReminderDialog;
 import com.adamwberck.android.makeareminder.Dialog.DatePickerDialog;
@@ -55,6 +56,7 @@ import static android.view.View.VISIBLE;
 public class TaskFragment extends VisibleFragment{
     private static final String TAG = "TaskFragment";
 
+
     private Task mTask;
     private Callbacks mCallbacks;
     private EditText mNameField;
@@ -67,6 +69,7 @@ public class TaskFragment extends VisibleFragment{
     private static final int REQUEST_EDIT = 4;
     private static final int REQUEST_SNOOZE = 5;
     private static final int REQUEST_REPEAT = 6;
+    private static final int REQUEST_BASE_REMINDER = 7;
 
     private static final String ARG_TASK_ID = "Task_id";
 
@@ -102,6 +105,7 @@ public class TaskFragment extends VisibleFragment{
     private Button mSnoozeInfoButton;
     private Spinner mGroupSpinner;
     private List<Group> mGroups;
+    private Button mAlterAlertText;
 
 
     @Override
@@ -214,7 +218,7 @@ public class TaskFragment extends VisibleFragment{
             }
         });
 
-        mCloseAlert = v.findViewById(R.id.close_alerts);
+        mCloseAlert = v.findViewById(R.id.clear_alerts);
         mCloseAlert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -336,6 +340,18 @@ public class TaskFragment extends VisibleFragment{
 
 
         mReminderListView.addFooterView(footer);
+
+
+        mAlterAlertText = v.findViewById(R.id.alter_alert_text);
+        mAlterAlertText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager manager = getFragmentManager();
+                AlterAlertDialog dialog = AlterAlertDialog.newInstance(mTask.getBaseReminder());
+                dialog.setTargetFragment(TaskFragment.this, REQUEST_BASE_REMINDER);
+                dialog.show(manager,DIALOG_REMINDER);
+            }
+        });
 
         updateUI();
         return v;
@@ -483,16 +499,15 @@ public class TaskFragment extends VisibleFragment{
         if(resultCode != Activity.RESULT_OK){
             return;
         }
-        if(requestCode == REQUEST_REMINDER || requestCode == REQUEST_EDIT){
-            SpanOfTime span = (SpanOfTime) data
-                    .getSerializableExtra(CreateReminderDialog.EXTRA_NEW_REMINDER);
-            boolean isAlarm = data.getExtras().getBoolean(CreateReminderDialog.EXTRA_IS_ALARM);
-            if(requestCode==REQUEST_EDIT){
-                Reminder reminder = (Reminder) data
-                        .getSerializableExtra(CreateReminderDialog.EXTRA_DELETE_REMINDER);
-                mTask.removeReminder(reminder);
-            }
-            mTask.addReminder(span,isAlarm);
+        if(requestCode == REQUEST_REMINDER){
+            Reminder oldR
+                    = (Reminder) data.getExtras()
+                    .getSerializable(CreateReminderDialog.EXTRA_OLD_REMINDER);
+            Reminder newR
+                    = (Reminder) data.getExtras()
+                    .getSerializable(CreateReminderDialog.EXTRA_NEW_REMINDER);
+            mTask.removeReminder(oldR);
+            mTask.addReminder(newR);
         }
         if(requestCode == REQUEST_DATE || requestCode == REQUEST_TIME){
             DateTime date;
@@ -513,6 +528,12 @@ public class TaskFragment extends VisibleFragment{
         if(requestCode == REQUEST_SNOOZE){
             long snooze = data.getExtras().getLong(ChooseSnoozeDialog.EXTRA_INTERVAL);
             mTask.setQuickSnoozeTime(snooze);
+        }
+
+        if(requestCode == REQUEST_BASE_REMINDER){
+            Reminder reminder = (Reminder)
+                    data.getExtras().getSerializable(AlterAlertDialog.EXTRA_BASE_REMINDER);
+            mTask.setBaseReminder(reminder);
         }
         updateUI();
     }

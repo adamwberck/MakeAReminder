@@ -30,7 +30,7 @@ public class Group implements Serializable{
     private List<Task> mTasks = new ArrayList<>();
 
     public Group() {
-        mDefaultReminders.add(new Reminder(null,SpanOfTime.ofMinutes(0)));
+        mDefaultReminders.add(new Reminder(this,SpanOfTime.ofMinutes(0)));
     }
 
     private Group(UUID uuid) {
@@ -125,8 +125,8 @@ public class Group implements Serializable{
         mDefaultReminders.remove(reminder);
     }
 
-    public void addReminder(SpanOfTime span, boolean isAlarm) {
-        Reminder r = new Reminder(span, isAlarm);
+    public void addReminder(SpanOfTime span) {
+        Reminder r = new Reminder(this, span);
         addReminder(r);
     }
 
@@ -139,7 +139,7 @@ public class Group implements Serializable{
         if(defaultTime!=null) {
             mDefaultTime = SpanOfTime.floorDate(defaultTime,1)
                     .toLocalTime();
-            addReminder(new Reminder(SpanOfTime.ofMinutes(0), true));
+            addReminder(new Reminder(this,SpanOfTime.ofMinutes(0)));
         }
         mDefaultTime = null;
     }
@@ -148,7 +148,7 @@ public class Group implements Serializable{
         if(defaultTime!=null) {
             mDefaultTime = SpanOfTime.floorDate(defaultTime.toDateTimeToday(),1)
                     .toLocalTime();
-            addReminder(new Reminder(SpanOfTime.ofMinutes(0), true));
+            addReminder(new Reminder(this,SpanOfTime.ofMinutes(0)));
         }
         mDefaultTime = defaultTime;
     }

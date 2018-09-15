@@ -32,6 +32,7 @@ public class Task implements Serializable,Cloneable{
     private List<Reminder> mReminders
             = new SortedObjectList<>(10,Reminder.getComparator());
     private Group mGroup;
+    private Reminder mBaseReminder;
 
     public void addReminder(Reminder r){
         mReminders.add(r);
@@ -45,10 +46,6 @@ public class Task implements Serializable,Cloneable{
 
     public void setRepeat(Repeat repeat) {
         mRepeat = repeat;
-    }
-
-    public void addReminder(SpanOfTime span){
-        addReminder(new Reminder(this,span));
     }
 
     public void removeReminder(Reminder r){
@@ -105,7 +102,7 @@ public class Task implements Serializable,Cloneable{
         mRepeat = mGroup.getDefaultRepeat();
         mQuickSnoozeTime = mGroup.getDefaultSnooze();
         mReminders.addAll(mGroup.getDefaultReminders());
-
+        mBaseReminder = new Reminder(this,SpanOfTime.ofMinutes(0));
     }
 
     @Override
@@ -133,8 +130,8 @@ public class Task implements Serializable,Cloneable{
         return  mReminders;
     }
 
-    public void addReminder(SpanOfTime span, boolean isAlarm) {
-        Reminder r = new Reminder(this, span, isAlarm);
+    public void addReminder(SpanOfTime span) {
+        Reminder r = new Reminder(this, span);
         addReminder(r);
     }
 
@@ -272,5 +269,13 @@ public class Task implements Serializable,Cloneable{
 
     public void setGroup(Group newGroup) {
         mGroup=newGroup;
+    }
+
+    public Reminder getBaseReminder() {
+        return mBaseReminder;
+    }
+
+    public void setBaseReminder(Reminder baseReminder) {
+        mBaseReminder = baseReminder;
     }
 }

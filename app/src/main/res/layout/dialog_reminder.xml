@@ -1,45 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
         android:orientation="horizontal">
-    <EditText
-        android:id="@+id/reminder_time_text"
+    <Spinner
+        android:id="@+id/reminder_time_spinner"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:inputType="number"
-        android:gravity="end"/>
+        android:gravity="end"
+        tools:ignore="HardcodedText" />
     <Spinner
-        android:id="@+id/type_time_spinner"
+        android:id="@+id/type_spinner"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        tools:ignore="HardcodedText">
     </Spinner>
     </LinearLayout>
     <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="4"/>
-        <TextView
-            android:textColor="@color/black"
-            android:id="@+id/reminder_warning_type_text"
-            android:textSize="18sp"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="3"/>
-        <Switch
-            android:id="@+id/reminder_warning_type_switch"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"/>
+        android:layout_height="wrap_content">
+    <Button
+        android:id="@+id/customize_alert_button"
+        android:textSize="22sp"
+        android:gravity="start"
+        android:text="@string/customize_alert"
+        style="@style/Base.Widget.AppCompat.ButtonBar"
+        android:layout_weight="9"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+        <ImageButton
+            android:background="#00000000"
+            android:id="@+id/close_custom_alert"
+            android:src="@drawable/ic_circle_close"
+            android:layout_width="wrap_content"
+            android:padding="6dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/customize_alert_section"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="15dp">
+            <TextView
+                android:text="@string/alert_type"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:gravity="start"/>
+            <Spinner
+                android:id="@+id/alert_type_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="6">
+            </Spinner>
+            <ImageView
+                android:src="@drawable/ic_alarm"
+                android:id="@+id/alert_type_icon"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="15dp">
+            <TextView
+                android:text="@string/sound"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:gravity="start"/>
+            <Spinner
+                android:id="@+id/alert_sound_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="6">
+            </Spinner>
+            <ImageButton
+                android:src="@drawable/ic_sound"
+                android:background="#00000000"
+                android:id="@+id/sound_test_button"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="15dp">
+            <TextView
+                android:text="@string/volume"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+                android:layout_weight="3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+            <SeekBar
+                android:id="@+id/volume_slider"
+                android:layout_gravity="center"
+                android:layout_weight="6"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+            <ImageButton
+                android:id="@+id/vibrate_button"
+                android:background="#00000000"
+                android:src="@drawable/ic_vibrate"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

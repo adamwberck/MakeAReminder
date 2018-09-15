@@ -101,6 +101,25 @@
     <string name="set_snooze_duration">Set Snooze Duration</string>
     <string name="complete">Complete</string>
     <string name="restore">Restore</string>
+    <string name="alter_alert"><u>Alter Alert</u></string>
+    <string name="alert_type">Alert Type</string>
+    <string name="sound">Sound</string>
+    <string name="volume">Volume</string>
+    <string name="ok">OK</string>
+    <string name="customize_alert"><u>Customize Alert</u></string>
+    <string name="customize_alerts"><u>Customize Alerts</u></string>
+    <string-array name="alert_type_array">
+        <item>Alarm</item>
+        <item>Notification</item>
+    </string-array>
+    <string-array name="alert_sounds">
+        <item>Sound 1</item>
+        <item>Sound 2</item>
+        <item>Sound 3</item>
+        <item>Sound 4</item>
+        <item>Sound 5</item>
+    </string-array>
+
     <string-array name="group_colors">
         <item>#ffff0000</item>
         <item>#ff0000ff</item>
@@ -150,7 +169,7 @@
         <item>Fri</item>
         <item>Sat</item>
     </string-array>
-    <string-array name="time_type">
+    <string-array name="time_type_reminder">
         <item>Minutes</item>
         <item>Hours</item>
         <item>Days</item>

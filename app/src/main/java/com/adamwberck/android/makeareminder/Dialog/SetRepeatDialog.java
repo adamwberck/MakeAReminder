@@ -80,10 +80,10 @@ public class SetRepeatDialog extends DismissDialog {
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        mTimeValueMap.put(SpanOfTime.Type.DAY,intArray(60));
-        mTimeValueMap.put(SpanOfTime.Type.WEEK,intArray(52));
-        mTimeValueMap.put(SpanOfTime.Type.MONTH,intArray(36));
-        mTimeValueMap.put(SpanOfTime.Type.YEAR,intArray(5));
+        mTimeValueMap.put(SpanOfTime.Type.DAY, createIntArray(1,60));
+        mTimeValueMap.put(SpanOfTime.Type.WEEK, createIntArray(1,52));
+        mTimeValueMap.put(SpanOfTime.Type.MONTH, createIntArray(1,36));
+        mTimeValueMap.put(SpanOfTime.Type.YEAR, createIntArray(1,5));
 
         mRepeat = (Repeat) getArguments().getSerializable(ARG_REPEAT);
         if(mRepeat==null){
@@ -199,13 +199,7 @@ public class SetRepeatDialog extends DismissDialog {
         return builder.create();
     }
 
-    private static List<Integer> intArray(int size) {
-        List<Integer> list = new ArrayList<>(size);
-        for(int i=1;i<=size;i++){
-            list.add(i);
-        }
-        return list;
-    }
+
 
     private SpanOfTime getSpanOfTime() {
         SpanOfTime span;

@@ -122,7 +122,7 @@
         android:layout_height="wrap_content"/>
         <ImageButton
             android:background="#00000000"
-            android:id="@+id/close_alerts"
+            android:id="@+id/clear_alerts"
             android:src="@drawable/ic_circle_close"
             android:layout_width="wrap_content"
             android:padding="6dp"
@@ -148,6 +148,14 @@
             android:textSize="22sp"
             android:id="@+id/quick_snooze_text"
             android:text="@string/set_quick_snooze"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            style="?android:attr/buttonBarStyle"
+            android:id="@+id/alter_alert_text"
+            android:gravity="start"
+            android:textSize="22sp"
+            android:text="@string/customize_alerts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <TextView

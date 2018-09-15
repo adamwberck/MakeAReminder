@@ -8,6 +8,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DismissDialog extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -16,4 +19,12 @@ public class DismissDialog extends DialogFragment {
         return super.onCreateView(inflater,container,savedInstanceState);
     }
 
+
+    public static List<Integer> createIntArray(int start,int size) {
+        List<Integer> list = new ArrayList<>(size);
+        for(int i=start;i<=size;i++){
+            list.add(i);
+        }
+        return list;
+    }
 }
