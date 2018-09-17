@@ -5,32 +5,36 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.drm.DrmStore;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Switch;
 
 import com.adamwberck.android.makeareminder.Elements.Reminder;
+import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
+import com.adamwberck.android.makeareminder.Elements.Task;
 import com.adamwberck.android.makeareminder.R;
 
 public class AlterAlertDialog extends DismissDialog {
     private static final String ARG_REMINDER = "reminder";
-    public static final String EXTRA_BASE_REMINDER = "com.adamwberck.android.makeareminder.newreminder";
-    private Reminder mReminder;
+    public static final String EXTRA_BASE_REMINDER
+            = "com.adamwberck.android.makeareminder.newreminder";
     private Spinner mAlertTypeSpinner;
     private ImageView mAlertTypeIcon;
     private Spinner mSoundAlertSpinner;
-    private ImageButton mVibrateButton;
     private boolean mIsAlarm;
     private boolean mDoesVibrate;
+    private ImageView mVibrateIcon;
 
 
-    public static AlterAlertDialog newInstance(Reminder reminder) {
+    public static AlterAlertDialog newInstance(@NonNull Reminder reminder) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_REMINDER, reminder);
 
@@ -43,7 +47,10 @@ public class AlterAlertDialog extends DismissDialog {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        mReminder = ((Reminder) getArguments().getSerializable(ARG_REMINDER));
+        final Reminder oldReminder = ((Reminder) getArguments().getSerializable(ARG_REMINDER));
+
+
+
 
         View view = inflater.inflate(R.layout.dialog_alter_alert,null);
         mAlertTypeIcon = view.findViewById(R.id.alert_type_icon);
@@ -63,7 +70,6 @@ public class AlterAlertDialog extends DismissDialog {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                sendResult(Activity.RESULT_OK,mReminder);
             }
         });
         mSoundAlertSpinner = view.findViewById(R.id.alert_sound_spinner);
@@ -71,14 +77,24 @@ public class AlterAlertDialog extends DismissDialog {
                 ,R.array.alert_sounds,R.layout.spinner_item_black);
         mSoundAlertSpinner.setAdapter(soundAlert);
 
-        mVibrateButton = view.findViewById(R.id.vibrate_button);
-        mVibrateButton.setOnClickListener(new View.OnClickListener() {
+        mVibrateIcon = view.findViewById(R.id.vibrate_icon);
+        Switch vibrateSwitch = view.findViewById(R.id.vibrate_switch);
+        vibrateSwitch.setChecked(mDoesVibrate);
+        vibrateSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                mDoesVibrate=!mDoesVibrate;
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mDoesVibrate = isChecked;
                 updateVibrateIcon();
             }
         });
+
+        //init based on current settings
+        if(oldReminder!=null){
+            mIsAlarm = oldReminder.isAlarm();
+            mDoesVibrate = oldReminder.doesVibrate();
+            mAlertTypeSpinner.setSelection(mIsAlarm?0:1);
+            //TODO add sound and volume
+        }
 
 
         updateUI();
@@ -86,7 +102,8 @@ public class AlterAlertDialog extends DismissDialog {
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                sendResult(Activity.RESULT_OK,mReminder);
+                Reminder newReminder = createReminder(oldReminder.getTask());
+                sendResult(Activity.RESULT_OK,newReminder);
             }}).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -96,6 +113,11 @@ public class AlterAlertDialog extends DismissDialog {
         return builder.create();
     }
 
+    private Reminder createReminder(Task task) {
+        SpanOfTime span = SpanOfTime.ofMillis(0);
+        return new Reminder(task,span,mIsAlarm,mDoesVibrate);
+    }
+
     private void updateUI() {
         updateAlertTypeIcon();
         updateVibrateIcon();
@@ -103,12 +125,12 @@ public class AlterAlertDialog extends DismissDialog {
     }
 
     private void updateVibrateIcon() {
-        int icon = mReminder.doesVibrate() ? R.drawable.ic_vibrate:R.drawable.ic_not_vibrate;
-        mVibrateButton.setImageResource(icon);
+        int icon = mDoesVibrate ? R.drawable.ic_vibrate:R.drawable.ic_not_vibrate;
+        mVibrateIcon.setImageResource(icon);
     }
 
     private void updateAlertTypeIcon() {
-        int icon = mReminder.isAlarm() ? R.drawable.ic_alarm : R.drawable.ic_notification;
+        int icon = mIsAlarm ? R.drawable.ic_alarm:R.drawable.ic_notification;
         mAlertTypeIcon.setImageResource(icon);
     }
 

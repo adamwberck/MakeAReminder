@@ -67,10 +67,19 @@ public class Task implements Serializable,Cloneable{
 
     public void setDate(DateTime date) {
         if(date!=null) {
+            if(mDate==null && mReminders.size()==0){
+                mReminders.addAll(mGroup.getDefaultReminders());
+            }
             this.mDate = SpanOfTime.floorDate(date,1);
-            addReminder(new Reminder(this, SpanOfTime.ofMinutes(0)));
+
         }
-        mDate = date;
+        else{
+            if(mReminders.equals(mGroup.getDefaultReminders())) {
+                mReminders.clear();
+            }
+            mDate=null;
+        }
+
         GroupLab.saveLab();
     }
 
@@ -95,13 +104,16 @@ public class Task implements Serializable,Cloneable{
     }
 
     public Task(Context appContext,Group group) {
+
         mID = GroupLab.get(appContext).nextValue();
         mGroup = group;
         LocalTime localTime = mGroup.getDefaultTime();
         mDate = localTime!=null ? localTime.toDateTimeToday() : null;
         mRepeat = mGroup.getDefaultRepeat();
         mQuickSnoozeTime = mGroup.getDefaultSnooze();
-        mReminders.addAll(mGroup.getDefaultReminders());
+        if(mDate!=null) {
+            mReminders.addAll(mGroup.getDefaultReminders());
+        }
         mBaseReminder = new Reminder(this,SpanOfTime.ofMinutes(0));
     }
 
@@ -130,10 +142,6 @@ public class Task implements Serializable,Cloneable{
         return  mReminders;
     }
 
-    public void addReminder(SpanOfTime span) {
-        Reminder r = new Reminder(this, span);
-        addReminder(r);
-    }
 
     public Object[] getSoonestTime() {
         if(mDate!=null&&mDate.isAfterNow()){

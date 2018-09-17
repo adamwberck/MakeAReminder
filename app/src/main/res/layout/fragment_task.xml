@@ -8,16 +8,32 @@
     android:orientation="vertical"
     android:layout_marginStart="16dp"
     android:layout_marginBottom="16dp">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <TextView
         android:id="@+id/name_label"
         android:textSize="20sp"
         android:textAllCaps="true"
-        android:layout_width="match_parent"
+        android:layout_weight="3"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/task_name_label"
         android:labelFor="@+id/task_name"
         />
+    <TextView
+        android:textSize="18sp"
+        android:textAllCaps="true"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/group"
+        android:labelFor="@+id/group_spinner"
+        />
+    </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -98,7 +114,7 @@
             android:gravity="start"
             android:id="@+id/set_repeat_text"
             android:textSize="22sp"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/repeat" />
         </LinearLayout>
@@ -139,7 +155,7 @@
             android:textSize="22sp"
             android:id="@+id/snooze_info_text"
             android:text="Snooze Info"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:ignore="HardcodedText" />
         <Button
@@ -148,16 +164,33 @@
             android:textSize="22sp"
             android:id="@+id/quick_snooze_text"
             android:text="@string/set_quick_snooze"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <Button
             style="?android:attr/buttonBarStyle"
             android:id="@+id/alter_alert_text"
             android:gravity="start"
             android:textSize="22sp"
             android:text="@string/customize_alerts"
-            android:layout_width="match_parent"
+            android:paddingEnd="20dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+            <ImageView
+                android:id="@+id/base_alert_type"
+                android:src="@drawable/ic_alarm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"/>
+            <ImageView
+                android:id="@+id/base_vibrates"
+                android:src="@drawable/ic_vibrate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
         <TextView
             android:textSize="18sp"
             android:text="@string/reminders"

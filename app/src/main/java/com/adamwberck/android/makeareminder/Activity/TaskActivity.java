@@ -55,7 +55,6 @@ public class TaskActivity extends SingleFragmentActivity {
                 .setNegativeButton(R.string.discard_changes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //Todo discard
                         task.getGroup().removeTask(task);
                         if(mOldTask!=null){
                             task.getGroup().addTask(mOldTask);

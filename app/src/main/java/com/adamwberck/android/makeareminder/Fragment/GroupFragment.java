@@ -256,7 +256,8 @@ public class GroupFragment extends VisibleFragment{
             public void onClick(View v) {
                 //Add reminder button
                 FragmentManager manager = getFragmentManager();
-                CreateReminderDialog dialog = CreateReminderDialog.newInstance();
+                CreateReminderDialog dialog = CreateReminderDialog.newInstance(
+                        new Reminder(mGroup,SpanOfTime.ofMinutes(0)));
                 dialog.setTargetFragment(GroupFragment.this, REQUEST_REMINDER);
                 dialog.show(manager,DIALOG_REMINDER);
             }
@@ -428,15 +429,9 @@ public class GroupFragment extends VisibleFragment{
             mGroup.removeReminder(oldR);
             mGroup.addReminder(newR);
         }
-        if(requestCode == REQUEST_DATE || requestCode == REQUEST_TIME){
-            DateTime date;
-            if(requestCode == REQUEST_TIME) {
-                date = (DateTime) data.getSerializableExtra(TimePickerDialog.EXTRA_TIME);
-            }
-            else {
-                date = (DateTime) data.getSerializableExtra(DatePickerDialog.EXTRA_DATE);
-            }
-            mGroup.setDefaultTime(date);
+        if(requestCode == REQUEST_TIME){
+            DateTime time = (DateTime) data.getSerializableExtra(TimePickerDialog.EXTRA_TIME);
+            mGroup.setDefaultTime(time);
             updateDate();
         }
         if(requestCode == REQUEST_REPEAT){
@@ -466,7 +461,8 @@ public class GroupFragment extends VisibleFragment{
         if (mReminderAdapter== null) {
             mReminderAdapter = new ReminderAdapter(getContext(),reminders);
             mReminderListView.setAdapter(mReminderAdapter);
-        } else {
+        }
+        else {
             mReminderListView.setAdapter(mReminderAdapter);
             mReminderAdapter.notifyDataSetChanged();
         }

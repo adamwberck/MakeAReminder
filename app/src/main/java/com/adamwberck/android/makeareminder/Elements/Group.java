@@ -140,6 +140,7 @@ public class Group implements Serializable{
             mDefaultTime = SpanOfTime.floorDate(defaultTime,1)
                     .toLocalTime();
             addReminder(new Reminder(this,SpanOfTime.ofMinutes(0)));
+            return;
         }
         mDefaultTime = null;
     }
@@ -149,8 +150,9 @@ public class Group implements Serializable{
             mDefaultTime = SpanOfTime.floorDate(defaultTime.toDateTimeToday(),1)
                     .toLocalTime();
             addReminder(new Reminder(this,SpanOfTime.ofMinutes(0)));
+            return;
         }
-        mDefaultTime = defaultTime;
+        mDefaultTime = null;
     }
 
     public void setDefaultRepeat(Repeat defaultRepeat) {

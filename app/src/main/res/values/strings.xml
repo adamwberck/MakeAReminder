@@ -108,6 +108,8 @@
     <string name="ok">OK</string>
     <string name="customize_alert"><u>Customize Alert</u></string>
     <string name="customize_alerts"><u>Customize Alerts</u></string>
+    <string name="customize_alerts_set"><u>Customize Alerts: %s</u>></string>
+    <string name="group">Group</string>
     <string-array name="alert_type_array">
         <item>Alarm</item>
         <item>Notification</item>

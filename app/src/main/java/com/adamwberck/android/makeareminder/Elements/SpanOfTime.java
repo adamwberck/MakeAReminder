@@ -43,8 +43,17 @@ public class SpanOfTime implements Serializable{
             case HOUR: return getHours();
             case DAY: return getDays();
             case WEEK: return getWeeks();
+            case MONTH: return getMonths();
+            case YEAR: return getYears();
             default : return 0;
         }
+    }
+
+    private long getMonths() {
+        return TimeUnit.MINUTES.toDays(getMinutes())*30;
+    }
+    private long getYears() {
+        return TimeUnit.MINUTES.toDays(getMinutes())*365;
     }
 
     public String getTimeString(Context context,String startText, String endText) {
@@ -109,6 +118,10 @@ public class SpanOfTime implements Serializable{
 
     public static SpanOfTime ofMillis(long m) {
         return SpanOfTime.ofMinutes(TimeUnit.MILLISECONDS.toMinutes(m));
+    }
+
+    public long getValue() {
+        return getTime(mTimeType);
     }
 
 

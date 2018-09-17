@@ -66,7 +66,6 @@ public class TaskFragment extends VisibleFragment{
     private static final int REQUEST_TIME = 1;
     private static final int REQUEST_COLOR = 2;
     private static final int REQUEST_REMINDER = 3;
-    private static final int REQUEST_EDIT = 4;
     private static final int REQUEST_SNOOZE = 5;
     private static final int REQUEST_REPEAT = 6;
     private static final int REQUEST_BASE_REMINDER = 7;
@@ -106,6 +105,8 @@ public class TaskFragment extends VisibleFragment{
     private Spinner mGroupSpinner;
     private List<Group> mGroups;
     private Button mAlterAlertText;
+    private ImageView mBaseAlertTypeIcon;
+    private ImageView mBaseAlertVibrateIcon;
 
 
     @Override
@@ -332,7 +333,7 @@ public class TaskFragment extends VisibleFragment{
             public void onClick(View v) {
                 //Add reminder button
                 FragmentManager manager = getFragmentManager();
-                CreateReminderDialog dialog = CreateReminderDialog.newInstance();
+                CreateReminderDialog dialog = CreateReminderDialog.newInstance(mTask);
                 dialog.setTargetFragment(TaskFragment.this, REQUEST_REMINDER);
                 dialog.show(manager,DIALOG_REMINDER);
             }
@@ -352,6 +353,8 @@ public class TaskFragment extends VisibleFragment{
                 dialog.show(manager,DIALOG_REMINDER);
             }
         });
+        mBaseAlertTypeIcon = v.findViewById(R.id.base_alert_type);
+        mBaseAlertVibrateIcon = v.findViewById(R.id.base_vibrates);
 
         updateUI();
         return v;
@@ -380,10 +383,6 @@ public class TaskFragment extends VisibleFragment{
             mDateButton.setText(R.string.set_date);
         }
     }
-
-
-
-
 
     @Override
     public void onAttach(Context context){
@@ -454,7 +453,7 @@ public class TaskFragment extends VisibleFragment{
                 public void onClick(View v) {
                     FragmentManager manager = getFragmentManager();
                     CreateReminderDialog dialog = CreateReminderDialog.newInstance(reminder);
-                    dialog.setTargetFragment(TaskFragment.this, REQUEST_EDIT);
+                    dialog.setTargetFragment(TaskFragment.this, REQUEST_REMINDER);
                     dialog.show(manager,DIALOG_REMINDER);
                 }
             });
@@ -506,7 +505,9 @@ public class TaskFragment extends VisibleFragment{
             Reminder newR
                     = (Reminder) data.getExtras()
                     .getSerializable(CreateReminderDialog.EXTRA_NEW_REMINDER);
-            mTask.removeReminder(oldR);
+            if(oldR!=null) {
+                mTask.removeReminder(oldR);
+            }
             mTask.addReminder(newR);
         }
         if(requestCode == REQUEST_DATE || requestCode == REQUEST_TIME){
@@ -583,6 +584,23 @@ public class TaskFragment extends VisibleFragment{
         view = mAlertHasValue ? VISIBLE: GONE;
         mCloseAlert.setVisibility(view);
 
+        //Customize Alerts Icons
+        Reminder baseReminder = mTask.getBaseReminder();
+
+        if(baseReminder.matchesDefault()&&reminders.size()==0){
+            mBaseAlertVibrateIcon.setVisibility(GONE);
+            mBaseAlertTypeIcon.setVisibility(GONE);
+        }
+        else {
+            mBaseAlertVibrateIcon.setVisibility(VISIBLE);
+            mBaseAlertTypeIcon.setVisibility(VISIBLE);
+            int baseTypeIcon = baseReminder.isAlarm()
+                    ? R.drawable.ic_alarm:R.drawable.ic_notification;
+            mBaseAlertTypeIcon.setImageResource(baseTypeIcon);
+            int baseVibrateIcon = baseReminder.doesVibrate()
+                    ? R.drawable.ic_vibrate:R.drawable.ic_not_vibrate;
+            mBaseAlertVibrateIcon.setImageResource(baseVibrateIcon);
+        }
         getActivity().invalidateOptionsMenu();
     }
 }

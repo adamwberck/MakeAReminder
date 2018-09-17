@@ -14,15 +14,18 @@ public class Reminder implements Serializable {
     private static Comparator<Reminder> sComparator = new ReminderComparator();
     private Task mTask;
     private Group mGroup;
+    private int mValue;
     private SpanOfTime mTimeBefore;
     private boolean mMatchesDefault;
-    private boolean mIsAlarm ;
-    private boolean mDoesVibrate;
+    private boolean mIsAlarm = false;
+    private boolean mDoesVibrate = true;
 
     public Reminder(Task task,SpanOfTime duration, boolean isAlarm, boolean doesVibrate) {
         mTask = task;
         mTimeBefore = duration;
+        mValue = (int) duration.getValue();
         mIsAlarm = isAlarm;
+        mDoesVibrate = doesVibrate;
     }
 
     public Reminder(Task task, SpanOfTime duration) {
@@ -97,6 +100,14 @@ public class Reminder implements Serializable {
 
     public Task getTask() {
         return mTask;
+    }
+
+    public boolean matchesDefault() {
+        return mMatchesDefault;
+    }
+
+    public int getValue() {
+        return mValue;
     }
 
     private static class ReminderComparator implements Comparator<Reminder>,Serializable {

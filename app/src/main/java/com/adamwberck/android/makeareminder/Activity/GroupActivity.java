@@ -17,7 +17,6 @@ public class GroupActivity extends SingleFragmentActivity {
 
 
     private static final String EXTRA_GROUP = "com.adamwberck.android.makeareminder.group";
-    //private static final String EXTRA_ALARM = "com.adamwberck.android.makeareminder.alarm";
 
     public static Intent newIntent(Context packageContext, UUID uuid) {
         Intent intent = new Intent(packageContext,GroupActivity.class);
