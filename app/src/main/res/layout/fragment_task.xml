@@ -90,24 +90,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <Button
-                style="?android:attr/buttonBarStyle"
-                android:gravity="start"
-                android:id="@+id/time_text"
-                android:textSize="22sp"
-                android:layout_width="0dp"
+            <LinearLayout
                 android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="@string/set_time"/>
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+                <Button
+                    style="?android:attr/buttonBarStyle"
+                    android:gravity="start"
+                    android:id="@+id/time_text"
+                    android:textSize="22sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/set_time"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
             <Button
                 style="?android:attr/buttonBarStyle"
                 android:gravity="start"
                 android:id="@+id/date_text"
-                android:layout_weight="1"
                 android:textSize="22sp"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/set_date"/>
+            </LinearLayout>
         </LinearLayout>
         <Button
             style="?android:attr/buttonBarStyle"

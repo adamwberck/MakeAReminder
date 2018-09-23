@@ -553,8 +553,13 @@ public class TaskFragment extends VisibleFragment{
 
 
         Repeat repeat = mTask.getRepeat();
-        String repeatText = repeat!=null?repeat.getRepeatTime().getTimeString(getContext(),getString(R.string.every),
-                ""):getString(R.string.set_repeat);
+        String repeatText;
+        if(repeat==null){
+            repeatText = getString(R.string.set_repeat);
+        }
+        else{
+            repeatText = repeat.displayString(getResources());
+        }
         mRepeatButton.setText(underline(repeatText));
 
         int snoozeVis = mTask.getSnoozeTime()!=null&&mTask.isOverdue() ? VISIBLE:GONE;

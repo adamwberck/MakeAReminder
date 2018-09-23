@@ -57,11 +57,9 @@ public class SetRepeatDialog extends DismissDialog {
     private ListView mMoreOftenList;
     private TimeListAdapter mTimeListAdapter;
     private TextView mMoreOftenText;
-    private boolean mMoreOftenPressed = false;
+    private boolean mMoreOftenOpen = false;
     private ArrayAdapter mTimeValueArray;
     private Map<SpanOfTime.Type,List<Integer>> mTimeValueMap = new ArrayMap<>(4);
-
-    //TODO more often should be open
 
     //TODO add hourly repeats
     //TODO add exclusion days for hourly repeats
@@ -103,6 +101,7 @@ public class SetRepeatDialog extends DismissDialog {
                 String s  = parent.getItemAtPosition(position).toString();
                 try {
                     mDuration = Long.parseLong(s);
+                    mRepeat.setRawPeriod(mDuration);
                 }catch(NumberFormatException ignored){ }
             }
 
@@ -118,9 +117,10 @@ public class SetRepeatDialog extends DismissDialog {
         mMoreOftenText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                mMoreOftenPressed=!mMoreOftenPressed;
-                updateUI();
+                if(mRepeat.getTimes().size()==0) {
+                    mMoreOftenOpen = !mMoreOftenOpen;
+                    updateUI();
+                }
             }
         });
         mMoreOftenList = view.findViewById(R.id.more_often_repeat_list);
@@ -145,9 +145,9 @@ public class SetRepeatDialog extends DismissDialog {
 
         final GridView gridView = view.findViewById(R.id.day_buttons);
         final DayAdapter weekAdapter = new DayAdapter(getContext(),Arrays.asList(getResources()
-                .getStringArray(R.array.days_of_the_week)),true);
+                .getStringArray(R.array.days_of_the_week_short)),true);
         List<String> list = daysOfMonthList();
-        list.add(getString(R.string.every_day));
+        list.add(getString(R.string.last_day));
         final DayAdapter monthAdapter = new DayAdapter(getContext(),list, false);
 
         updateGridView(gridView, weekAdapter, monthAdapter);
@@ -163,11 +163,11 @@ public class SetRepeatDialog extends DismissDialog {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(!parent.getItemAtPosition(position).toString().equals("")) {
                     mTimeTypeInt = position;
-                    mRepeat.setRepeatTime(getSpanOfTime());
                     updateGridView(gridView, weekAdapter, monthAdapter);
                     mTimeValueArray.clear();
                     mTimeValueArray.addAll(mTimeValueMap.get(getSpanOfTime().getTimeType()));
                     timeSpinner.setSelection(0);
+                    mRepeat.setRepeatTime(getSpanOfTime(),mDuration);
                     updateUI();
                 }
             }
@@ -433,8 +433,11 @@ public class SetRepeatDialog extends DismissDialog {
         }
         int vis;
         SpanOfTime.Type type = mRepeat.getTimeType();
-        vis = type== SpanOfTime.Type.DAY && (mRepeat.isMoreOften() || mMoreOftenPressed)
-                ? VISIBLE : GONE;
+        mMoreOftenOpen= times.size() > 0 && type == SpanOfTime.Type.DAY || mMoreOftenOpen;
+
+        vis = mMoreOftenOpen? VISIBLE:GONE;
+        //vis = type== SpanOfTime.Type.DAY && (mRepeat.isMoreOften() || mMoreOftenOpen)
+        //        ? VISIBLE : GONE;
         mMoreOftenList.setVisibility(vis);
         vis = type == SpanOfTime.Type.DAY ? VISIBLE:GONE;
         mMoreOftenText.setVisibility(vis);

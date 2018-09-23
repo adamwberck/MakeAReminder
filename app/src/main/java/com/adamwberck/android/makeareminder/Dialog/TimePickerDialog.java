@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TimePicker;
 
+import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.R;
 
 import org.joda.time.DateTime;
@@ -35,7 +36,7 @@ public class TimePickerDialog extends DismissDialog {
             args.putSerializable(ARG_TIME, date);
         }
         else {
-            args.putSerializable(ARG_TIME, new DateTime());
+            args.putSerializable(ARG_TIME, SpanOfTime.roundTime(new DateTime(),15));
         }
 
         TimePickerDialog fragment = new TimePickerDialog();

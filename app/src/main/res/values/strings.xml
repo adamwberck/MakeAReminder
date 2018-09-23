@@ -110,6 +110,12 @@
     <string name="customize_alerts"><u>Customize Alerts</u></string>
     <string name="customize_alerts_set"><u>Customize Alerts: %s</u>></string>
     <string name="group">Group</string>
+    <string name="at">at</string>
+    <string name="on">on</string>
+    <string name="reg_separator">,\u0020</string>
+    <string name="final_separator">\u0020&amp;\u0020</string>
+    <string name="on_the">on the</string>
+    <string name="the_last_day">the last day</string>
     <string-array name="alert_type_array">
         <item>Alarm</item>
         <item>Notification</item>
@@ -162,7 +168,7 @@
         <item>8h</item>
         <item>30d</item>
     </string-array>
-    <string-array name="days_of_the_week">
+    <string-array name="days_of_the_week_short">
         <item>Sun</item>
         <item>Mon</item>
         <item>Tue</item>
@@ -170,6 +176,15 @@
         <item>Thur</item>
         <item>Fri</item>
         <item>Sat</item>
+    </string-array>
+    <string-array name="days_of_the_week">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
     </string-array>
     <string-array name="time_type_reminder">
         <item>Minutes</item>
@@ -194,19 +209,27 @@
     </string-array>
 
     <plurals name="minute">
-        <item quantity="one">%d minute</item>
+        <item quantity="one"> minute</item>
         <item quantity="other">%d minutes</item>
     </plurals>
     <plurals name="hour">
-        <item quantity="one">%d hour</item>
+        <item quantity="one"> hour</item>
         <item quantity="other">%d hours</item>
     </plurals>
     <plurals name="day">
-        <item quantity="one">%d day</item>
+        <item quantity="one"> day</item>
         <item quantity="other">%d days</item>
     </plurals>
     <plurals name="weeks">
-        <item quantity="one">%d week</item>
+        <item quantity="one"> week</item>
         <item quantity="other">%d weeks</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one"> month</item>
+        <item quantity="other">%d months</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one"> year</item>
+        <item quantity="other">%d year</item>
     </plurals>
 </resources>
