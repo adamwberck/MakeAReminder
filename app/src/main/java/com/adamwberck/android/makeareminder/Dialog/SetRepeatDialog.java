@@ -95,6 +95,7 @@ public class SetRepeatDialog extends DismissDialog {
         mTimeValueArray = new ArrayAdapter(getContext(),R.layout.spinner_item_right);
         final Spinner timeSpinner = view.findViewById(R.id.repeat_time_spinner);
         timeSpinner.setAdapter(mTimeValueArray);
+        timeSpinner.setSelection((int)mRepeat.getRawPeriod()-1);
         timeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -158,15 +159,27 @@ public class SetRepeatDialog extends DismissDialog {
                 R.array.time_type_repeat,R.layout.spinner_item);
         Spinner typeSpinner = view.findViewById(R.id.repeat_time_type_spinner);
         typeSpinner.setAdapter(adapter);
+        typeSpinner.setSelection(setSpinnerNumber(mRepeat.getTimeType()));
+
+        //init time spinner
+        mTimeValueArray.clear();
+        mTimeValueArray.addAll(mTimeValueMap.get(mRepeat.getTimeType()));
+        timeSpinner.setSelection((int)mRepeat.getRawPeriod()-1);
         typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(!parent.getItemAtPosition(position).toString().equals("")) {
                     mTimeTypeInt = position;
                     updateGridView(gridView, weekAdapter, monthAdapter);
+
+                    //savePos
+                    int oldValuePos = timeSpinner.getSelectedItemPosition();
                     mTimeValueArray.clear();
                     mTimeValueArray.addAll(mTimeValueMap.get(getSpanOfTime().getTimeType()));
-                    timeSpinner.setSelection(0);
+                    timeSpinner.setSelection(Math.min(oldValuePos,mTimeValueArray.getCount()));
+
+
+
                     mRepeat.setRepeatTime(getSpanOfTime(),mDuration);
                     updateUI();
                 }
@@ -192,9 +205,6 @@ public class SetRepeatDialog extends DismissDialog {
                         sendResult(Activity.RESULT_CANCELED);
                     }
                 });
-
-
-        typeSpinner.setSelection(setSpinnerNumber(mRepeat.getTimeType()));
         updateUI();
         return builder.create();
     }

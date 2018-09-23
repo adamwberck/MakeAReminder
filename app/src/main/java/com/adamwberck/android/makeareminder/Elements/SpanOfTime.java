@@ -75,21 +75,21 @@ public class SpanOfTime implements Serializable{
 
         int weeks = (map.get(Type.WEEK)).intValue();
         String strWeeks = context.getResources()
-                .getQuantityString(R.plurals.weeks,weeks,weeks);
+                .getQuantityString(R.plurals.weeks_show_1,weeks,weeks);
         timeResources.add(new TimeResource(strWeeks,weeks));
 
         int days = (map.get(Type.DAY)).intValue();
-        String strDays  = (context.getResources().getQuantityString(R.plurals.day,days,days));
+        String strDays  = (context.getResources().getQuantityString(R.plurals.day_show_1,days,days));
         timeResources.add(new TimeResource(strDays,days));
 
         int hours =(map.get(Type.HOUR)).intValue();
         String strHours = (context.getResources()
-                .getQuantityString(R.plurals.hour,hours,hours));
+                .getQuantityString(R.plurals.hour_show_1,hours,hours));
         timeResources.add(new TimeResource(strHours,hours));
 
         int minutes = map.get(Type.MINUTE).intValue();
         String strMinutes = context.getResources()
-                .getQuantityString(R.plurals.minute,minutes,minutes);
+                .getQuantityString(R.plurals.minute_show_1,minutes,minutes);
         timeResources.add(new TimeResource(strMinutes,minutes));
 
         int zeros=0;

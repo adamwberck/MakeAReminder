@@ -10,6 +10,7 @@ import org.joda.time.Duration;
 import org.joda.time.LocalTime;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -114,7 +115,8 @@ public class Task implements Serializable,Cloneable{
         if(mDate!=null) {
             mReminders.addAll(mGroup.getDefaultReminders());
         }
-        mBaseReminder = new Reminder(this,SpanOfTime.ofMinutes(0));
+        mBaseReminder = new Reminder(this,SpanOfTime.ofMinutes(0),0
+                ,false,true);
     }
 
     @Override

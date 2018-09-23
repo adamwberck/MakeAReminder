@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 
+import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.R;
 
 import org.joda.time.DateTime;
@@ -34,7 +35,8 @@ public class DatePickerDialog extends DismissDialog {
             args.putSerializable(ARG_DATE, date);
         }
         else {
-            args.putSerializable(ARG_DATE, new DateTime());
+
+            args.putSerializable(ARG_DATE, SpanOfTime.roundTime(new DateTime(),15));
         }
 
         DatePickerDialog fragment = new DatePickerDialog();
@@ -90,7 +92,6 @@ public class DatePickerDialog extends DismissDialog {
         if (getTargetFragment() == null) {
             return;
         }
-
         Intent intent = new Intent();
         intent.putExtra(EXTRA_DATE, date);
 

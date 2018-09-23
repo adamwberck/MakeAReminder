@@ -12,6 +12,7 @@
     <string name="new_task">New Task</string>
     <string name="add_reminder">Add Reminder</string>
     <string name="when_due">When due.</string>
+    <string name="before_due">Before due.</string>
 
 
     <string name="group_due">Due Today: %1$d"</string>
@@ -207,6 +208,33 @@
         <item>Months</item>
         <item>Years</item>
     </string-array>
+
+
+    <plurals name="minute_show_1">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="hour_show_1">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <plurals name="day_show_1">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <plurals name="weeks_show_1">
+        <item quantity="one">%d week</item>
+        <item quantity="other">%d weeks</item>
+    </plurals>
+    <plurals name="months_show_1">
+        <item quantity="one">%d month</item>
+        <item quantity="other">%d months</item>
+    </plurals>
+    <plurals name="years_show_1">
+        <item quantity="one">%d year</item>
+        <item quantity="other">%d year</item>
+    </plurals>
+
 
     <plurals name="minute">
         <item quantity="one"> minute</item>

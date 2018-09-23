@@ -6,27 +6,35 @@
     android:paddingStart="10dp"
     android:paddingEnd="10dp"
     android:orientation="vertical">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="25dp"
         android:orientation="horizontal">
-    <Spinner
-        android:id="@+id/reminder_time_spinner"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:inputType="number"
-        android:gravity="end"
-        tools:ignore="HardcodedText" />
-    <Spinner
-        android:id="@+id/type_spinner"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        tools:ignore="HardcodedText">
-    </Spinner>
+        <Spinner
+            android:id="@+id/reminder_time_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="number"
+            android:gravity="end"
+            tools:ignore="HardcodedText" />
+        <Spinner
+            android:id="@+id/type_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:ignore="HardcodedText">
+        </Spinner>
     </LinearLayout>
+    <TextView
+        android:text="@string/before_due"
+        android:textAllCaps="true"
+        android:layout_gravity="end"
+        android:textSize="20sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -53,89 +61,5 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="15dp">
-            <TextView
-                android:text="@string/alert_type"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:gravity="start"/>
-            <Spinner
-                android:id="@+id/alert_type_spinner"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="6">
-            </Spinner>
-            <ImageView
-                android:src="@drawable/ic_alarm"
-                android:id="@+id/alert_type_icon"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="15dp">
-            <TextView
-                android:text="@string/sound"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:gravity="start"/>
-            <Spinner
-                android:id="@+id/alert_sound_spinner"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="6">
-            </Spinner>
-            <ImageButton
-                android:src="@drawable/ic_play_sound"
-                android:background="#00000000"
-                android:id="@+id/sound_test_button"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="15dp">
-            <TextView
-                android:text="@string/volume"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                android:layout_weight="2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-            <SeekBar
-                android:id="@+id/volume_slider"
-                android:layout_gravity="center"
-                android:layout_weight="4"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-            <ImageView
-                android:id="@+id/vibrate_icon"
-                android:background="#00000000"
-                android:src="@drawable/ic_vibrate"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-            <Switch
-                android:id="@+id/vibrate_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-            />
-        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

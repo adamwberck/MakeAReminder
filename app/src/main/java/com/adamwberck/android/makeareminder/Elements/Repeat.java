@@ -228,7 +228,7 @@ public class Repeat implements Serializable{
         mRepeatTime = repeatTime;
         mDates = new ArrayList<>(366);
         DateTime now = new DateTime();
-        toggleWeek(now.getDayOfWeek());
+        toggleWeek((now.getDayOfWeek()==7)? 0 : now.getDayOfWeek());
         toggleDayOfMonth(now.getDayOfMonth());
     }
 

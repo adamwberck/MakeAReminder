@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.ArrayMap;
@@ -18,8 +17,10 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
@@ -53,8 +54,9 @@ public class CreateReminderDialog extends DismissDialog {
     private boolean mIsAlarm;
     private Button mCustomizeAlertButton;
     private boolean mMatchesDefault = true;
-    private View mCustomizeSection;
+    private LinearLayout mCustomizeSection;
     private ImageButton mCloseCustomizeSectionButton;
+    private Switch mVibrateSwitch;
 
 
     public static CreateReminderDialog newInstance(@NonNull Reminder reminder) {
@@ -89,9 +91,9 @@ public class CreateReminderDialog extends DismissDialog {
         View view = inflater.inflate(R.layout.dialog_reminder,null);
 
         mTimeValueArray = new ArrayAdapter(getContext(),R.layout.spinner_item_big_right);
-        final Spinner timeSpinner = view.findViewById(R.id.reminder_time_spinner);
-        timeSpinner.setAdapter(mTimeValueArray);
-        timeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        final Spinner timeValueSpinner = view.findViewById(R.id.reminder_time_spinner);
+        timeValueSpinner.setAdapter(mTimeValueArray);
+        timeValueSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String s  = parent.getItemAtPosition(position).toString();
@@ -116,10 +118,14 @@ public class CreateReminderDialog extends DismissDialog {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(!parent.getItemAtPosition(position).toString().equals("")) {
                     mTimeTypePos = position;
-                    mTimeValueArray.clear();
                     SpanOfTime.Type spanType = typeFromPos();
+
+                    int oldValuePos = timeValueSpinner.getSelectedItemPosition();
+
+                    mTimeValueArray.clear();
                     mTimeValueArray.addAll(mTimeValueMap.get(spanType));
-                    timeSpinner.setSelection(0);
+                    timeValueSpinner.setSelection(oldValuePos);
+
                     updateTimeArray();
                     updateUI();
                 }
@@ -151,13 +157,15 @@ public class CreateReminderDialog extends DismissDialog {
 
 
         mCustomizeSection = view.findViewById(R.id.customize_alert_section);
+        inflater.inflate(R.layout.dialog_alter_alert,mCustomizeSection);
+        changeTextSize(mCustomizeSection,20);
 
 
         final Reminder oldReminder = ((Reminder) getArguments().getSerializable(ARG_REMINDER));
         
-        mAlertTypeIcon = view.findViewById(R.id.alert_type_icon);
+        mAlertTypeIcon = mCustomizeSection.findViewById(R.id.alert_type_icon);
 
-        mAlertTypeSpinner = view.findViewById(R.id.alert_type_spinner);
+        mAlertTypeSpinner = mCustomizeSection.findViewById(R.id.alert_type_spinner);
         ArrayAdapter<CharSequence> alertTypeAdapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.alert_type_array,R.layout.spinner_item_black);
         mAlertTypeSpinner.setAdapter(alertTypeAdapter);
@@ -174,41 +182,57 @@ public class CreateReminderDialog extends DismissDialog {
 
             }
         });
-        mSoundAlertSpinner = view.findViewById(R.id.alert_sound_spinner);
+        mSoundAlertSpinner = mCustomizeSection.findViewById(R.id.alert_sound_spinner);
         ArrayAdapter<CharSequence> soundAlert = ArrayAdapter.createFromResource(getContext()
                 ,R.array.alert_sounds,R.layout.spinner_item_black);
         mSoundAlertSpinner.setAdapter(soundAlert);
 
-        mVibrateIcon = view.findViewById(R.id.vibrate_icon);
-        Switch vibrateSwitch = view.findViewById(R.id.vibrate_switch);
-        vibrateSwitch.setChecked(mDoesVibrate);
-        vibrateSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mVibrateIcon = mCustomizeSection.findViewById(R.id.vibrate_icon);
+        mVibrateSwitch = mCustomizeSection.findViewById(R.id.vibrate_switch);
+        mVibrateSwitch.setChecked(mDoesVibrate);
+        mVibrateSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mDoesVibrate = isChecked;
                 updateVibrateIcon();
             }
         });
+        //End Customize Alert
 
+        //Read old settings
         final Task oldTask;
-        if(oldReminder !=null) {
-            SpanOfTime.Type type = oldReminder.getTimeBefore().getTimeType();
-            int time = (int) oldReminder.getTimeBefore().getTime(type);timeSpinner.setSelection(time);
-            int spinnerNumber = getSpinnerNumberFromType(type);
-            typeSpinner.setSelection(spinnerNumber);
-            timeSpinner.setSelection(oldReminder.getValue());
-            mMatchesDefault=false;
+        if(oldReminder != null) {
+            //IMPORT OLD REMINDER IF EDIT
+            mMatchesDefault=oldReminder.matchesDefault();
             mIsAlarm=oldReminder.isAlarm();
             mDoesVibrate=oldReminder.doesVibrate();
             oldTask = oldReminder.getTask();
+
+            //Set Type to correct spinner number
+            SpanOfTime.Type type = oldReminder.getTimeBefore().getTimeType();
+            int typeSpinnerNumber = getSpinnerNumberFromType(type);
+            typeSpinner.setSelection(typeSpinnerNumber);
+            mTimeValueArray.clear();
+            mTimeValueArray.addAll(mTimeValueMap.get(type));
+
+            //Set Time Value to correct spinner number
+            timeValueSpinner.setSelection(oldReminder.getInputTime());
         }
         else{
-            typeSpinner.setSelection(0);
-            timeSpinner.setSelection(0);
+            //IMPORT BASE REMINDER
             oldTask = (Task) getArguments().getSerializable(ARG_TASK);
+            assert oldTask != null;
+            Reminder baseReminder = oldTask.getBaseReminder();
+
+            mMatchesDefault=true;
+            mIsAlarm=baseReminder.isAlarm();
+            mDoesVibrate=baseReminder.doesVibrate();
         }
 
-        builder.setTitle(R.string.alter_alert).setView(view)
+        String title = oldReminder==null ? getString(R.string.create_reminder) :
+                getString(R.string.edit_reminder);
+
+        builder.setTitle(title).setView(view)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -283,10 +307,10 @@ public class CreateReminderDialog extends DismissDialog {
             span = SpanOfTime.ofWeeks(mTimeValuePos);
         }
         if(mMatchesDefault) {
-            return new Reminder(task, span);
+            return new Reminder(task, span,mTimeValuePos);
         }
         else {
-            return new Reminder(task,span,mIsAlarm,mDoesVibrate);
+            return new Reminder(task,span,mTimeValuePos,mIsAlarm,mDoesVibrate);
         }
     }
 
@@ -315,10 +339,12 @@ public class CreateReminderDialog extends DismissDialog {
     private void updateVibrateIcon() {
         int icon = mDoesVibrate ? R.drawable.ic_vibrate:R.drawable.ic_not_vibrate;
         mVibrateIcon.setImageResource(icon);
+        mVibrateSwitch.setChecked(mDoesVibrate);
     }
 
     private void updateAlertTypeIcon() {
         int icon = mIsAlarm ? R.drawable.ic_alarm : R.drawable.ic_notification;
         mAlertTypeIcon.setImageResource(icon);
+        mAlertTypeSpinner.setSelection(mIsAlarm?0:1);
     }
 }

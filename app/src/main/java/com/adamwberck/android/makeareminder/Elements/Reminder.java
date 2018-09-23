@@ -12,6 +12,7 @@ import java.util.Comparator;
 
 public class Reminder implements Serializable {
     private static Comparator<Reminder> sComparator = new ReminderComparator();
+    private int mInputTime;
     private Task mTask;
     private Group mGroup;
     private int mValue;
@@ -20,19 +21,20 @@ public class Reminder implements Serializable {
     private boolean mIsAlarm = false;
     private boolean mDoesVibrate = true;
 
-    public Reminder(Task task,SpanOfTime duration, boolean isAlarm, boolean doesVibrate) {
+    public Reminder(Task task,SpanOfTime duration,int inputTime, boolean isAlarm, boolean doesVibrate) {
         mTask = task;
         mTimeBefore = duration;
-        mValue = (int) duration.getValue();
-        mIsAlarm = isAlarm;
+        mInputTime = inputTime;
         mDoesVibrate = doesVibrate;
+        mIsAlarm = isAlarm;
+        mMatchesDefault = false;
     }
 
-    public Reminder(Task task, SpanOfTime duration) {
+    public Reminder(Task task, SpanOfTime duration, int inputTime) {
+        mInputTime = inputTime;
         mTask = task;
         mTimeBefore = duration;
         mMatchesDefault = true;
-
     }
 
     public Reminder(Group group, SpanOfTime duration) {
@@ -76,6 +78,9 @@ public class Reminder implements Serializable {
     }
 
     public boolean isAlarm() {
+        if(mMatchesDefault){
+            return mTask.getBaseReminder().mIsAlarm;
+        }
         return mIsAlarm;
     }
 
@@ -86,6 +91,9 @@ public class Reminder implements Serializable {
 
 
     public boolean doesVibrate() {
+        if(mMatchesDefault){
+            return mTask.getBaseReminder().doesVibrate();
+        }
         return mDoesVibrate;
     }
 
@@ -108,6 +116,10 @@ public class Reminder implements Serializable {
 
     public int getValue() {
         return mValue;
+    }
+
+    public int getInputTime() {
+        return mInputTime;
     }
 
     private static class ReminderComparator implements Comparator<Reminder>,Serializable {

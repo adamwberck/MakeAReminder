@@ -32,6 +32,7 @@ public class AlterAlertDialog extends DismissDialog {
     private boolean mIsAlarm;
     private boolean mDoesVibrate;
     private ImageView mVibrateIcon;
+    private Switch mVibrateSwitch;
 
 
     public static AlterAlertDialog newInstance(@NonNull Reminder reminder) {
@@ -78,9 +79,9 @@ public class AlterAlertDialog extends DismissDialog {
         mSoundAlertSpinner.setAdapter(soundAlert);
 
         mVibrateIcon = view.findViewById(R.id.vibrate_icon);
-        Switch vibrateSwitch = view.findViewById(R.id.vibrate_switch);
-        vibrateSwitch.setChecked(mDoesVibrate);
-        vibrateSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mVibrateSwitch = view.findViewById(R.id.vibrate_switch);
+        mVibrateSwitch.setChecked(mDoesVibrate);
+        mVibrateSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mDoesVibrate = isChecked;
@@ -115,7 +116,7 @@ public class AlterAlertDialog extends DismissDialog {
 
     private Reminder createReminder(Task task) {
         SpanOfTime span = SpanOfTime.ofMillis(0);
-        return new Reminder(task,span,mIsAlarm,mDoesVibrate);
+        return new Reminder(task,span,0,mIsAlarm,mDoesVibrate);
     }
 
     private void updateUI() {
@@ -127,11 +128,13 @@ public class AlterAlertDialog extends DismissDialog {
     private void updateVibrateIcon() {
         int icon = mDoesVibrate ? R.drawable.ic_vibrate:R.drawable.ic_not_vibrate;
         mVibrateIcon.setImageResource(icon);
+        mVibrateSwitch.setChecked(mDoesVibrate);
     }
 
     private void updateAlertTypeIcon() {
-        int icon = mIsAlarm ? R.drawable.ic_alarm:R.drawable.ic_notification;
+        int icon = mIsAlarm ? R.drawable.ic_alarm : R.drawable.ic_notification;
         mAlertTypeIcon.setImageResource(icon);
+        mAlertTypeSpinner.setSelection(mIsAlarm?0:1);
     }
 
     private void updateSound() {
