@@ -14,13 +14,17 @@ import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.Elements.Task;
+import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
+import com.adamwberck.android.makeareminder.Sound;
+import com.adamwberck.android.makeareminder.SoundPlayer;
 
 public class AlterAlertDialog extends DismissDialog {
     private static final String ARG_REMINDER = "reminder";
@@ -29,10 +33,12 @@ public class AlterAlertDialog extends DismissDialog {
     private Spinner mAlertTypeSpinner;
     private ImageView mAlertTypeIcon;
     private Spinner mSoundAlertSpinner;
+    private float mVolume;
     private boolean mIsAlarm;
     private boolean mDoesVibrate;
     private ImageView mVibrateIcon;
     private Switch mVibrateSwitch;
+    private Sound mSound;
 
 
     public static AlterAlertDialog newInstance(@NonNull Reminder reminder) {
@@ -89,12 +95,41 @@ public class AlterAlertDialog extends DismissDialog {
             }
         });
 
+        SeekBar seekBar = view.findViewById(R.id.volume_slider);
+        ImageButton soundTest = view.findViewById(R.id.sound_test_button);
+        soundTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SoundPlayer soundPlayer = GroupLab.get(getContext()).getSoundPlayer();
+                soundPlayer.play(mSound,1f);
+            }
+        });
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mVolume = (progress*1.0f)/100.0f;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         //init based on current settings
         if(oldReminder!=null){
             mIsAlarm = oldReminder.isAlarm();
             mDoesVibrate = oldReminder.doesVibrate();
             mAlertTypeSpinner.setSelection(mIsAlarm?0:1);
-            //TODO add sound and volume
+            mSound = oldReminder.getSound();
+            mVolume = oldReminder.getVolume();
+            updateSeekbar(seekBar);
         }
 
 
@@ -116,7 +151,11 @@ public class AlterAlertDialog extends DismissDialog {
 
     private Reminder createReminder(Task task) {
         SpanOfTime span = SpanOfTime.ofMillis(0);
-        return new Reminder(task,span,0,mIsAlarm,mDoesVibrate);
+        return new Reminder(task,span,0,mIsAlarm,mDoesVibrate,mSound,mVolume);
+    }
+
+    private void updateSeekbar(SeekBar seekBar) {
+        seekBar.setProgress(Math.round(mVolume*100.0f));
     }
 
     private void updateUI() {

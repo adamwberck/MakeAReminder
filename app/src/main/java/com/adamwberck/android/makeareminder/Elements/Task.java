@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.Service.ReminderService;
+import com.adamwberck.android.makeareminder.Sound;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -105,8 +106,8 @@ public class Task implements Serializable,Cloneable{
     }
 
     public Task(Context appContext,Group group) {
-
-        mID = GroupLab.get(appContext).nextValue();
+        GroupLab groupLab = GroupLab.get(appContext);
+        mID = groupLab.nextValue();
         mGroup = group;
         LocalTime localTime = mGroup.getDefaultTime();
         mDate = localTime!=null ? localTime.toDateTimeToday() : null;
@@ -115,8 +116,9 @@ public class Task implements Serializable,Cloneable{
         if(mDate!=null) {
             mReminders.addAll(mGroup.getDefaultReminders());
         }
+        Sound sound = groupLab.getSoundPlayer().getSounds().get(0);
         mBaseReminder = new Reminder(this,SpanOfTime.ofMinutes(0),0
-                ,false,true);
+                ,false,true,sound,.5f);
     }
 
     @Override

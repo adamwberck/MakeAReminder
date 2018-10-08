@@ -28,6 +28,7 @@ public class GroupLab implements Serializable{
     private final static String TAG = "GroupLab";
     private static final Random RANDOM = new Random();
 
+
     private static List<String> sGroupColors;
     private static List<Integer> sColorUsed = new ArrayList<>(12);
 
@@ -39,6 +40,7 @@ public class GroupLab implements Serializable{
     private static GroupLab sGroupLab;
     private List<Group> mGroups;
     private transient Context mContext;
+    private SoundPlayer mSoundPlayer;
     private static final String FILE_NAME = "group.info";
     private AtomicInteger mAtomicInteger = new AtomicInteger(Integer.MIN_VALUE);
 
@@ -80,6 +82,7 @@ public class GroupLab implements Serializable{
             }
             sGroupLab = new GroupLab(context);
             sGroupLab.mGroups.add(Group.newSpecialGroup());
+            sGroupLab.mSoundPlayer = new SoundPlayer(context);
 
             //test
             Group group = new Group();
@@ -87,6 +90,7 @@ public class GroupLab implements Serializable{
             task.setName("Eat a Cookie");
             group.addTask(task);
             sGroupLab.mGroups.add(sGroupLab.mGroups.size()-1,group);
+
         }
         return sGroupLab;
     }
@@ -192,4 +196,7 @@ public class GroupLab implements Serializable{
         return tasks;
     }
 
+    public SoundPlayer getSoundPlayer() {
+        return mSoundPlayer;
+    }
 }

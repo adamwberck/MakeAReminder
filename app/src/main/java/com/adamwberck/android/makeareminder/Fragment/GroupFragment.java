@@ -257,7 +257,7 @@ public class GroupFragment extends VisibleFragment{
                 //Add reminder button
                 FragmentManager manager = getFragmentManager();
                 CreateReminderDialog dialog = CreateReminderDialog.newInstance(
-                        new Reminder(mGroup,SpanOfTime.ofMinutes(0)));
+                        new Reminder(mGroup,SpanOfTime.ofMinutes(0),0));
                 dialog.setTargetFragment(GroupFragment.this, REQUEST_REMINDER);
                 dialog.show(manager,DIALOG_REMINDER);
             }

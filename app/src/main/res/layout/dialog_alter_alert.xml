@@ -51,7 +51,7 @@
         android:layout_weight="6">
     </Spinner>
     <ImageButton
-        android:src="@drawable/ic_sound"
+        android:src="@drawable/ic_play_sound"
         android:background="#00000000"
         android:id="@+id/sound_test_button"
         android:layout_weight="1"

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 
 import com.adamwberck.android.makeareminder.R;
+import com.adamwberck.android.makeareminder.Sound;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -16,18 +17,23 @@ public class Reminder implements Serializable {
     private Task mTask;
     private Group mGroup;
     private int mValue;
+    private Sound mSound;
+    private float mVolume;
     private SpanOfTime mTimeBefore;
     private boolean mMatchesDefault;
     private boolean mIsAlarm = false;
     private boolean mDoesVibrate = true;
 
-    public Reminder(Task task,SpanOfTime duration,int inputTime, boolean isAlarm, boolean doesVibrate) {
+    public Reminder(Task task,SpanOfTime duration,int inputTime, boolean isAlarm,
+                    boolean doesVibrate, Sound sound, float volume) {
         mTask = task;
         mTimeBefore = duration;
         mInputTime = inputTime;
         mDoesVibrate = doesVibrate;
         mIsAlarm = isAlarm;
         mMatchesDefault = false;
+        mSound = sound;
+        mVolume = volume;
     }
 
     public Reminder(Task task, SpanOfTime duration, int inputTime) {
@@ -37,10 +43,13 @@ public class Reminder implements Serializable {
         mMatchesDefault = true;
     }
 
-    public Reminder(Group group, SpanOfTime duration) {
+    public Reminder(Group group, SpanOfTime duration, int inputTime) {
+        mInputTime = inputTime;
         mGroup = group;
         mTimeBefore = duration;
+        mMatchesDefault = true;
     }
+
 
 
     @Override
@@ -99,13 +108,6 @@ public class Reminder implements Serializable {
 
 
 
-    public void update(Reminder reminder){
-        if(mMatchesDefault){
-            mDoesVibrate=reminder.doesVibrate();
-            mIsAlarm=reminder.isAlarm();
-        }
-    }
-
     public Task getTask() {
         return mTask;
     }
@@ -120,6 +122,17 @@ public class Reminder implements Serializable {
 
     public int getInputTime() {
         return mInputTime;
+    }
+
+    public Sound getSound() {
+        if(!mMatchesDefault) {
+            return mSound;
+        }
+        return mTask.getBaseReminder().getSound();
+    }
+
+    public float getVolume() {
+        return mVolume;
     }
 
     private static class ReminderComparator implements Comparator<Reminder>,Serializable {

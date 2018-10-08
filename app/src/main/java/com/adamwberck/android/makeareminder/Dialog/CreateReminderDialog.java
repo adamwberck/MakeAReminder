@@ -18,6 +18,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -25,7 +26,10 @@ import android.widget.TextView;
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.Elements.Task;
+import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
+import com.adamwberck.android.makeareminder.Sound;
+import com.adamwberck.android.makeareminder.SoundPlayer;
 
 import java.util.List;
 import java.util.Map;
@@ -57,6 +61,8 @@ public class CreateReminderDialog extends DismissDialog {
     private LinearLayout mCustomizeSection;
     private ImageButton mCloseCustomizeSectionButton;
     private Switch mVibrateSwitch;
+    private Sound mSound;
+    private float mVolume;
 
 
     public static CreateReminderDialog newInstance(@NonNull Reminder reminder) {
@@ -199,6 +205,34 @@ public class CreateReminderDialog extends DismissDialog {
         });
         //End Customize Alert
 
+        SeekBar seekBar = view.findViewById(R.id.volume_slider);
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mVolume = (progress*1.0f)/100.0f;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        ImageButton soundTest = view.findViewById(R.id.sound_test_button);
+        soundTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SoundPlayer soundPlayer = GroupLab.get(getContext()).getSoundPlayer();
+                soundPlayer.play(mSound,mVolume);
+            }
+        });
+
         //Read old settings
         final Task oldTask;
         if(oldReminder != null) {
@@ -215,6 +249,10 @@ public class CreateReminderDialog extends DismissDialog {
             mTimeValueArray.clear();
             mTimeValueArray.addAll(mTimeValueMap.get(type));
 
+            mSound = oldReminder.getSound();
+            mVolume = oldReminder.getVolume();
+            updateSeekbar(seekBar);
+
             //Set Time Value to correct spinner number
             timeValueSpinner.setSelection(oldReminder.getInputTime());
         }
@@ -227,7 +265,13 @@ public class CreateReminderDialog extends DismissDialog {
             mMatchesDefault=true;
             mIsAlarm=baseReminder.isAlarm();
             mDoesVibrate=baseReminder.doesVibrate();
+
+            mSound = oldTask.getBaseReminder().getSound();
+            mVolume = oldTask.getBaseReminder().getVolume();
+            updateSeekbar(seekBar);
         }
+        updateSeekbar(seekBar);
+
 
         String title = oldReminder==null ? getString(R.string.create_reminder) :
                 getString(R.string.edit_reminder);
@@ -246,6 +290,10 @@ public class CreateReminderDialog extends DismissDialog {
         });
         updateUI();
         return builder.create();
+    }
+
+    private void updateSeekbar(SeekBar seekBar) {
+        seekBar.setProgress(Math.round(mVolume*100.0f));
     }
 
     private void updateCustomizeUI() {
@@ -310,7 +358,7 @@ public class CreateReminderDialog extends DismissDialog {
             return new Reminder(task, span,mTimeValuePos);
         }
         else {
-            return new Reminder(task,span,mTimeValuePos,mIsAlarm,mDoesVibrate);
+            return new Reminder(task,span,mTimeValuePos,mIsAlarm,mDoesVibrate,mSound,mVolume);
         }
     }
 

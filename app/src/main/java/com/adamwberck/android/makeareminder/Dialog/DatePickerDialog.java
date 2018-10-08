@@ -35,10 +35,8 @@ public class DatePickerDialog extends DismissDialog {
             args.putSerializable(ARG_DATE, date);
         }
         else {
-
             args.putSerializable(ARG_DATE, SpanOfTime.roundTime(new DateTime(),15));
         }
-
         DatePickerDialog fragment = new DatePickerDialog();
         fragment.setArguments(args);
         return fragment;
@@ -54,8 +52,7 @@ public class DatePickerDialog extends DismissDialog {
         //TODO make it set to current date if button date is in the past
 
 
-        View v = LayoutInflater.from(getActivity())
-                .inflate(R.layout.dialog_date,null);
+        View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_date,null);
 
         mDatePicker = v.findViewById(R.id.dialog_date_picker);
         mDatePicker.init(year, month-1,day,null);
