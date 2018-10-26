@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SoundPlayer {
+    /*
     private static final String TAG = "SoundPlayer";
 
     private static final int MAX_SOUNDS = 1;
@@ -68,4 +69,5 @@ public class SoundPlayer {
         int soundId = mSoundPool.load(afd,1);
         sound.setSoundId(soundId);
     }
+    */
 }

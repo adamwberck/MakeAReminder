@@ -5,12 +5,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.Ringtone;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -21,14 +22,12 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
 import com.adamwberck.android.makeareminder.Elements.Task;
 import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.R;
-import com.adamwberck.android.makeareminder.Sound;
 import com.adamwberck.android.makeareminder.SoundPlayer;
 
 import java.util.List;
@@ -61,8 +60,9 @@ public class CreateReminderDialog extends DismissDialog {
     private LinearLayout mCustomizeSection;
     private ImageButton mCloseCustomizeSectionButton;
     private Switch mVibrateSwitch;
-    private Sound mSound;
+    private Ringtone mRingtone;
     private float mVolume;
+    private Uri mRingtoneUri;
 
 
     public static CreateReminderDialog newInstance(@NonNull Reminder reminder) {
@@ -188,10 +188,6 @@ public class CreateReminderDialog extends DismissDialog {
 
             }
         });
-        mSoundAlertSpinner = mCustomizeSection.findViewById(R.id.alert_sound_spinner);
-        ArrayAdapter<CharSequence> soundAlert = ArrayAdapter.createFromResource(getContext()
-                ,R.array.alert_sounds,R.layout.spinner_item_black);
-        mSoundAlertSpinner.setAdapter(soundAlert);
 
         mVibrateIcon = mCustomizeSection.findViewById(R.id.vibrate_icon);
         mVibrateSwitch = mCustomizeSection.findViewById(R.id.vibrate_switch);
@@ -228,8 +224,6 @@ public class CreateReminderDialog extends DismissDialog {
         soundTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SoundPlayer soundPlayer = GroupLab.get(getContext()).getSoundPlayer();
-                soundPlayer.play(mSound,mVolume);
             }
         });
 
@@ -249,7 +243,7 @@ public class CreateReminderDialog extends DismissDialog {
             mTimeValueArray.clear();
             mTimeValueArray.addAll(mTimeValueMap.get(type));
 
-            mSound = oldReminder.getSound();
+            mRingtone = oldReminder.getRingtone(getContext());
             mVolume = oldReminder.getVolume();
             updateSeekbar(seekBar);
 
@@ -266,7 +260,7 @@ public class CreateReminderDialog extends DismissDialog {
             mIsAlarm=baseReminder.isAlarm();
             mDoesVibrate=baseReminder.doesVibrate();
 
-            mSound = oldTask.getBaseReminder().getSound();
+            mRingtone = oldTask.getBaseReminder().getRingtone(getContext());
             mVolume = oldTask.getBaseReminder().getVolume();
             updateSeekbar(seekBar);
         }
@@ -358,7 +352,7 @@ public class CreateReminderDialog extends DismissDialog {
             return new Reminder(task, span,mTimeValuePos);
         }
         else {
-            return new Reminder(task,span,mTimeValuePos,mIsAlarm,mDoesVibrate,mSound,mVolume);
+            return new Reminder(task,span,mTimeValuePos,mIsAlarm,mDoesVibrate,mRingtoneUri,mVolume);
         }
     }
 

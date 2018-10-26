@@ -44,12 +44,15 @@
         android:layout_height="wrap_content"
         android:layout_weight="3"
         android:gravity="start"/>
-    <Spinner
-        android:id="@+id/alert_sound_spinner"
+    <Button
+        style="?android:attr/buttonBarStyle"
+        android:textSize="20sp"
+        android:text="@string/set_sound"
+        android:id="@+id/alert_sound_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="6">
-    </Spinner>
+    </Button>
     <ImageButton
         android:src="@drawable/ic_play_sound"
         android:background="#00000000"

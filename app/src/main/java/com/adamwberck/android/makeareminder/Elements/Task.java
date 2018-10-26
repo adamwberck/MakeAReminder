@@ -1,19 +1,19 @@
 package com.adamwberck.android.makeareminder.Elements;
 
 import android.content.Context;
+import android.media.AudioManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 
 import com.adamwberck.android.makeareminder.GroupLab;
 import com.adamwberck.android.makeareminder.Service.ReminderService;
-import com.adamwberck.android.makeareminder.Sound;
 
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
 import org.joda.time.LocalTime;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 public class Task implements Serializable,Cloneable{
@@ -116,9 +116,11 @@ public class Task implements Serializable,Cloneable{
         if(mDate!=null) {
             mReminders.addAll(mGroup.getDefaultReminders());
         }
-        Sound sound = groupLab.getSoundPlayer().getSounds().get(0);
+        //Sound sound = groupLab.getSoundPlayer().getSounds().get(0);
+        Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(appContext,
+                RingtoneManager.TYPE_RINGTONE);
         mBaseReminder = new Reminder(this,SpanOfTime.ofMinutes(0),0
-                ,false,true,sound,.5f);
+                ,false,true,defaultRingtoneUri,.5f);
     }
 
     @Override

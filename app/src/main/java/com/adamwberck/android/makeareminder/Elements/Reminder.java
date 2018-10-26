@@ -2,9 +2,11 @@ package com.adamwberck.android.makeareminder.Elements;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 
 import com.adamwberck.android.makeareminder.R;
-import com.adamwberck.android.makeareminder.Sound;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -17,7 +19,7 @@ public class Reminder implements Serializable {
     private Task mTask;
     private Group mGroup;
     private int mValue;
-    private Sound mSound;
+    transient private Uri mRingtoneUri;
     private float mVolume;
     private SpanOfTime mTimeBefore;
     private boolean mMatchesDefault;
@@ -25,14 +27,15 @@ public class Reminder implements Serializable {
     private boolean mDoesVibrate = true;
 
     public Reminder(Task task,SpanOfTime duration,int inputTime, boolean isAlarm,
-                    boolean doesVibrate, Sound sound, float volume) {
+                    boolean doesVibrate, Uri ringtoneUri, float volume) {
         mTask = task;
         mTimeBefore = duration;
         mInputTime = inputTime;
         mDoesVibrate = doesVibrate;
         mIsAlarm = isAlarm;
         mMatchesDefault = false;
-        mSound = sound;
+        mRingtoneUri = ringtoneUri;
+        RingtoneManager manager;
         mVolume = volume;
     }
 
@@ -124,16 +127,18 @@ public class Reminder implements Serializable {
         return mInputTime;
     }
 
-    public Sound getSound() {
+
+    public Ringtone getRingtone(Context context) {
         if(!mMatchesDefault) {
-            return mSound;
+            return RingtoneManager.getRingtone(context,mRingtoneUri);
         }
-        return mTask.getBaseReminder().getSound();
+        return mTask.getBaseReminder().getRingtone(context);
     }
 
     public float getVolume() {
         return mVolume;
     }
+
 
     private static class ReminderComparator implements Comparator<Reminder>,Serializable {
         @Override

@@ -82,7 +82,7 @@ public class GroupLab implements Serializable{
             }
             sGroupLab = new GroupLab(context);
             sGroupLab.mGroups.add(Group.newSpecialGroup());
-            sGroupLab.mSoundPlayer = new SoundPlayer(context);
+            //sGroupLab.mSoundPlayer = new SoundPlayer();
 
             //test
             Group group = new Group();

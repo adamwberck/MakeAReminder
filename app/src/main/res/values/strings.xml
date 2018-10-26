@@ -117,6 +117,7 @@
     <string name="final_separator">\u0020&amp;\u0020</string>
     <string name="on_the">on the</string>
     <string name="the_last_day">the last day</string>
+    <string name="set_sound"><u>Set Sound</u></string>
     <string-array name="alert_type_array">
         <item>Alarm</item>
         <item>Notification</item>
