@@ -7,8 +7,16 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 
 import com.adamwberck.android.makeareminder.R;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.Comparator;
 
 
@@ -19,23 +27,22 @@ public class Reminder implements Serializable {
     private Task mTask;
     private Group mGroup;
     private int mValue;
-    transient private Uri mRingtoneUri;
+    private String mRingtoneUri;
     private float mVolume;
     private SpanOfTime mTimeBefore;
     private boolean mMatchesDefault;
     private boolean mIsAlarm = false;
     private boolean mDoesVibrate = true;
 
-    public Reminder(Task task,SpanOfTime duration,int inputTime, boolean isAlarm,
+    public Reminder(Task task, SpanOfTime duration, int inputTime, boolean isAlarm,
                     boolean doesVibrate, Uri ringtoneUri, float volume) {
         mTask = task;
         mTimeBefore = duration;
         mInputTime = inputTime;
         mDoesVibrate = doesVibrate;
         mIsAlarm = isAlarm;
+        mRingtoneUri = ringtoneUri.toString();
         mMatchesDefault = false;
-        mRingtoneUri = ringtoneUri;
-        RingtoneManager manager;
         mVolume = volume;
     }
 
@@ -54,13 +61,11 @@ public class Reminder implements Serializable {
     }
 
 
-
     @Override
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         try {
-            return getMinutes()==((Reminder)o).getMinutes();
-        }
-        catch (ClassCastException c){
+            return getMinutes() == ((Reminder) o).getMinutes();
+        } catch (ClassCastException c) {
             return false;
         }
     }
@@ -72,10 +77,10 @@ public class Reminder implements Serializable {
 
     @SuppressLint("NewApi")
     public String getInfo(Context context) {
-        if(mTimeBefore.getMinutes() == 0){
+        if (mTimeBefore.getMinutes() == 0) {
             return context.getString(R.string.when_due);
-        }else {
-            return getTimeBefore().getTimeString(context,"","before due.");
+        } else {
+            return getTimeBefore().getTimeString(context, "", "before due.");
         }
 
     }
@@ -90,7 +95,7 @@ public class Reminder implements Serializable {
     }
 
     public boolean isAlarm() {
-        if(mMatchesDefault){
+        if (mMatchesDefault) {
             return mTask.getBaseReminder().mIsAlarm;
         }
         return mIsAlarm;
@@ -103,12 +108,11 @@ public class Reminder implements Serializable {
 
 
     public boolean doesVibrate() {
-        if(mMatchesDefault){
+        if (mMatchesDefault) {
             return mTask.getBaseReminder().doesVibrate();
         }
         return mDoesVibrate;
     }
-
 
 
     public Task getTask() {
@@ -129,8 +133,8 @@ public class Reminder implements Serializable {
 
 
     public Ringtone getRingtone(Context context) {
-        if(!mMatchesDefault) {
-            return RingtoneManager.getRingtone(context,mRingtoneUri);
+        if (!mMatchesDefault) {
+            return RingtoneManager.getRingtone(context, Uri.parse(mRingtoneUri));
         }
         return mTask.getBaseReminder().getRingtone(context);
     }
@@ -140,12 +144,12 @@ public class Reminder implements Serializable {
     }
 
 
-    private static class ReminderComparator implements Comparator<Reminder>,Serializable {
+    private static class ReminderComparator implements Comparator<Reminder>, Serializable {
         @Override
         public int compare(Reminder r1, Reminder r2) {
-            if(r1.getTimeBefore()!=r2.getTimeBefore()){
+            if (r1.getTimeBefore() != r2.getTimeBefore()) {
                 return (r1.getMinutes() < r2.getMinutes()) ? 1 : -1;
-            }else{
+            } else {
                 return 0;
             }
         }

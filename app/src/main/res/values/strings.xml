@@ -118,6 +118,8 @@
     <string name="on_the">on the</string>
     <string name="the_last_day">the last day</string>
     <string name="set_sound"><u>Set Sound</u></string>
+    <string name="vibration">Vibration</string>
+    <string name="alarm_notification">Alarm | Notification</string>
     <string-array name="alert_type_array">
         <item>Alarm</item>
         <item>Notification</item>

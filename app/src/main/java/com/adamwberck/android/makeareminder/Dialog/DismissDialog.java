@@ -1,10 +1,8 @@
 package com.adamwberck.android.makeareminder.Dialog;
 
-import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -29,16 +27,18 @@ public class DismissDialog extends DialogFragment {
         return list;
     }
 
-    public static void changeTextSize(final View view,int size) {
+    public static void reduceTextSize(final View view, int size) {
         if(view instanceof TextView){
             TextView textView = (TextView) view;
-            textView.setTextSize(size);
+            if(textView.getTextSize()>size) {
+                textView.setTextSize(size);
+            }
         }
 
         if (view instanceof ViewGroup) {
             for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
                 View innerView = ((ViewGroup) view).getChildAt(i);
-                changeTextSize(innerView,size);
+                reduceTextSize(innerView,size);
             }
         }
     }

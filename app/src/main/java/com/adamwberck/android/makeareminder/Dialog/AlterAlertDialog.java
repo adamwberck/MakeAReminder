@@ -3,27 +3,25 @@ package com.adamwberck.android.makeareminder.Dialog;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
-import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.SpanOfTime;
@@ -38,7 +36,7 @@ public class AlterAlertDialog extends DismissDialog {
             = "com.adamwberck.android.makeareminder.newreminder";
     private static final int REQUEST_RINGTONE = 0;
     private static final String TAG = "AlterAlert";
-    private Spinner mAlertTypeSpinner;
+    private Switch mAlarmSwitch;
     private ImageView mAlertTypeIcon;
     private Button mSoundAlertButton;
     private float mVolume;
@@ -70,25 +68,17 @@ public class AlterAlertDialog extends DismissDialog {
 
         View view = inflater.inflate(R.layout.dialog_alter_alert,null);
         mAlertTypeIcon = view.findViewById(R.id.alert_type_icon);
-
-
-        mAlertTypeSpinner = view.findViewById(R.id.alert_type_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.alert_type_array,R.layout.spinner_item_black);
-        mAlertTypeSpinner.setAdapter(adapter);
-        mAlertTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mAlarmSwitch = view.findViewById(R.id.alarm_switch);
+        mAlarmSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mIsAlarm = position==0;
-                updateRingtone();
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mIsAlarm = !isChecked;
                 updateAlertTypeIcon();
             }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
         });
-        mSoundAlertButton = view.findViewById(R.id.alert_sound_button);
+
+
+        mSoundAlertButton = view.findViewById(R.id.ringtone_selector_button);
         mSoundAlertButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,6 +101,15 @@ public class AlterAlertDialog extends DismissDialog {
         });
 
         SeekBar seekBar = view.findViewById(R.id.volume_slider);
+        TextView volumeText = view.findViewById(R.id.volume_text);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            seekBar.setVisibility(View.VISIBLE);
+        }
+        else {
+            volumeText.setText(R.string.vibration);
+            seekBar.setVisibility(View.INVISIBLE);
+            mVolume = 1.0f;
+        }
         ImageButton soundTest = view.findViewById(R.id.sound_test_button);
         
 
@@ -120,19 +119,13 @@ public class AlterAlertDialog extends DismissDialog {
         soundTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //SoundPlayer soundPlayer = GroupLab.get(getContext()).getSoundPlayer();
-                //soundPlayer.play(mSound,1f);
                 if(mRingtone.isPlaying()){
                     mRingtone.stop();
                 }
                 else {
-                    AudioManager manager = (AudioManager)
-                            getContext().getSystemService(Context.AUDIO_SERVICE);
-                    int vol = manager.getStreamVolume(AudioManager.STREAM_ALARM);
-                    int max = manager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
-                    Log.i(TAG,"Vol: " +vol+"/"+max );
-
-                    //manager.setStreamVolume(AudioManager.STREAM_ALARM,);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        mRingtone.setVolume(mVolume);
+                    }
                     mRingtone.play();
                 }
             }
@@ -159,7 +152,7 @@ public class AlterAlertDialog extends DismissDialog {
         if(oldReminder!=null){
             mIsAlarm = oldReminder.isAlarm();
             mDoesVibrate = oldReminder.doesVibrate();
-            mAlertTypeSpinner.setSelection(mIsAlarm?0:1);
+            mAlarmSwitch.setChecked(!mIsAlarm);
             mRingtone = oldReminder.getRingtone(getContext());
             mVolume = oldReminder.getVolume();
             updateSeekbar(seekBar);
@@ -206,7 +199,7 @@ public class AlterAlertDialog extends DismissDialog {
     private void updateAlertTypeIcon() {
         int icon = mIsAlarm ? R.drawable.ic_alarm : R.drawable.ic_notification;
         mAlertTypeIcon.setImageResource(icon);
-        mAlertTypeSpinner.setSelection(mIsAlarm?0:1);
+        mAlarmSwitch.setChecked(!mIsAlarm);
     }
 
     private void updateRingtone() {
@@ -245,7 +238,6 @@ public class AlterAlertDialog extends DismissDialog {
             mRingtoneUri = (Uri) data.getExtras().get(EXTRA_RINGTONE_PICKED_URI);
             mRingtone = RingtoneManager.getRingtone(getActivity(), mRingtoneUri);
             mRingtone.setStreamType(AudioManager.STREAM_ALARM);
-
 
             Log.i(TAG,"onActivity: Uri = " + mRingtoneUri.toString());
             Log.i(TAG,"onActivity: Ringtone = " + mRingtone.getTitle(getContext()));

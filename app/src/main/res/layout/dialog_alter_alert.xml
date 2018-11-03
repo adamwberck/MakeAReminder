@@ -5,29 +5,69 @@
     android:orientation="vertical"
     android:padding="10dp">
     <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:paddingBottom="15dp">
         <TextView
-            android:text="@string/alert_type"
+            android:id="@+id/reminder_time_spinner"
+            android:text="@string/sound"
             android:textColor="@color/black"
             android:textSize="22sp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:gravity="start"/>
-        <Spinner
-            android:id="@+id/alert_type_spinner"
+        <Button
+            style="?android:attr/buttonBarStyle"
+            android:textSize="20sp"
+            android:text="@string/set_sound"
+            android:id="@+id/ringtone_selector_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="6">
-        </Spinner>
+        </Button>
+        <ImageButton
+            android:src="@drawable/ic_play_sound"
+            android:background="#00000000"
+            android:id="@+id/sound_test_button"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="15dp">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_weight="6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
+        <TextView
+            android:text="@string/alert_type"
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"/>
+        <TextView
+            android:textSize="18dp"
+            android:textColor="@color/black"
+            android:text="@string/alarm_notification"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        </LinearLayout>
         <ImageView
             android:src="@drawable/ic_alarm"
             android:id="@+id/alert_type_icon"
             android:layout_weight="1"
             android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <Switch
+            android:id="@+id/alarm_switch"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
     <LinearLayout
@@ -35,38 +75,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="15dp">
-    <TextView
-        android:id="@+id/reminder_time_spinner"
-        android:text="@string/sound"
-        android:textColor="@color/black"
-        android:textSize="22sp"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="3"
-        android:gravity="start"/>
-    <Button
-        style="?android:attr/buttonBarStyle"
-        android:textSize="20sp"
-        android:text="@string/set_sound"
-        android:id="@+id/alert_sound_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="6">
-    </Button>
-    <ImageButton
-        android:src="@drawable/ic_play_sound"
-        android:background="#00000000"
-        android:id="@+id/sound_test_button"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content" />
-    </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="15dp">
         <TextView
+            android:id="@+id/volume_text"
             android:text="@string/volume"
             android:textColor="@color/black"
             android:textSize="22sp"
