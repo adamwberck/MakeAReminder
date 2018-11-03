@@ -30,23 +30,11 @@ import com.adamwberck.android.makeareminder.R;
 
 import static android.media.RingtoneManager.EXTRA_RINGTONE_PICKED_URI;
 
-public class AlterAlertDialog extends DismissDialog {
+public class AlterAlertDialog extends ReminderParentDialog {
     private static final String ARG_REMINDER = "reminder";
     public static final String EXTRA_BASE_REMINDER
             = "com.adamwberck.android.makeareminder.newreminder";
-    private static final int REQUEST_RINGTONE = 0;
     private static final String TAG = "AlterAlert";
-    private Switch mAlarmSwitch;
-    private ImageView mAlertTypeIcon;
-    private Button mSoundAlertButton;
-    private float mVolume;
-    private boolean mIsAlarm;
-    private boolean mDoesVibrate;
-    private ImageView mVibrateIcon;
-    private Switch mVibrateSwitch;
-    private Ringtone mRingtone;
-    private Uri mRingtoneUri;
-
 
     public static AlterAlertDialog newInstance(@NonNull Reminder reminder) {
         Bundle args = new Bundle();
@@ -63,101 +51,9 @@ public class AlterAlertDialog extends DismissDialog {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final Reminder oldReminder = ((Reminder) getArguments().getSerializable(ARG_REMINDER));
 
-
-
-
         View view = inflater.inflate(R.layout.dialog_alter_alert,null);
-        mAlertTypeIcon = view.findViewById(R.id.alert_type_icon);
-        mAlarmSwitch = view.findViewById(R.id.alarm_switch);
-        mAlarmSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mIsAlarm = !isChecked;
-                updateAlertTypeIcon();
-            }
-        });
 
-
-        mSoundAlertButton = view.findViewById(R.id.ringtone_selector_button);
-        mSoundAlertButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent ringtoneIntent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-                ringtoneIntent
-                        .putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE,RingtoneManager.TYPE_ALARM);
-                startActivityForResult(ringtoneIntent,REQUEST_RINGTONE);
-            }
-        });
-
-        mVibrateIcon = view.findViewById(R.id.vibrate_icon);
-        mVibrateSwitch = view.findViewById(R.id.vibrate_switch);
-        mVibrateSwitch.setChecked(mDoesVibrate);
-        mVibrateSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mDoesVibrate = isChecked;
-                updateVibrateIcon();
-            }
-        });
-
-        SeekBar seekBar = view.findViewById(R.id.volume_slider);
-        TextView volumeText = view.findViewById(R.id.volume_text);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            seekBar.setVisibility(View.VISIBLE);
-        }
-        else {
-            volumeText.setText(R.string.vibration);
-            seekBar.setVisibility(View.INVISIBLE);
-            mVolume = 1.0f;
-        }
-        ImageButton soundTest = view.findViewById(R.id.sound_test_button);
-        
-
-        mRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getActivity().getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
-        mRingtone = RingtoneManager.getRingtone(getActivity(), mRingtoneUri);
-        mRingtone.setStreamType(AudioManager.STREAM_ALARM);
-        soundTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mRingtone.isPlaying()){
-                    mRingtone.stop();
-                }
-                else {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        mRingtone.setVolume(mVolume);
-                    }
-                    mRingtone.play();
-                }
-            }
-        });
-
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mVolume = (progress*1.0f)/100.0f;
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-        //init based on current settings
-        if(oldReminder!=null){
-            mIsAlarm = oldReminder.isAlarm();
-            mDoesVibrate = oldReminder.doesVibrate();
-            mAlarmSwitch.setChecked(!mIsAlarm);
-            mRingtone = oldReminder.getRingtone(getContext());
-            mVolume = oldReminder.getVolume();
-            updateSeekbar(seekBar);
-        }
-
+        setupRingtoneEdit(view,oldReminder,null);
 
         updateUI();
         builder.setTitle(R.string.alter_alert).setView(view)
@@ -175,35 +71,13 @@ public class AlterAlertDialog extends DismissDialog {
         return builder.create();
     }
 
+    private void updateUI() {
+        updateParentUI();
+    }
+
     private Reminder createReminder(Task task) {
         SpanOfTime span = SpanOfTime.ofMillis(0);
         return new Reminder(task,span,0,mIsAlarm,mDoesVibrate,mRingtoneUri,mVolume);
-    }
-
-    private void updateSeekbar(SeekBar seekBar) {
-        seekBar.setProgress(Math.round(mVolume*100.0f));
-    }
-
-    private void updateUI() {
-        updateAlertTypeIcon();
-        updateVibrateIcon();
-        updateRingtone();
-    }
-
-    private void updateVibrateIcon() {
-        int icon = mDoesVibrate ? R.drawable.ic_vibrate:R.drawable.ic_not_vibrate;
-        mVibrateIcon.setImageResource(icon);
-        mVibrateSwitch.setChecked(mDoesVibrate);
-    }
-
-    private void updateAlertTypeIcon() {
-        int icon = mIsAlarm ? R.drawable.ic_alarm : R.drawable.ic_notification;
-        mAlertTypeIcon.setImageResource(icon);
-        mAlarmSwitch.setChecked(!mIsAlarm);
-    }
-
-    private void updateRingtone() {
-        mSoundAlertButton.setText(mRingtone.getTitle(getContext()));
     }
 
     private void cancel() {
@@ -229,19 +103,4 @@ public class AlterAlertDialog extends DismissDialog {
         getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
     }
 
-    @Override
-    public void onActivityResult(int requestCode,int resultCode,Intent data){
-        if(resultCode != Activity.RESULT_OK){
-            return;
-        }
-        if(REQUEST_RINGTONE==requestCode){
-            mRingtoneUri = (Uri) data.getExtras().get(EXTRA_RINGTONE_PICKED_URI);
-            mRingtone = RingtoneManager.getRingtone(getActivity(), mRingtoneUri);
-            mRingtone.setStreamType(AudioManager.STREAM_ALARM);
-
-            Log.i(TAG,"onActivity: Uri = " + mRingtoneUri.toString());
-            Log.i(TAG,"onActivity: Ringtone = " + mRingtone.getTitle(getContext()));
-        }
-        updateUI();
-    }
 }
