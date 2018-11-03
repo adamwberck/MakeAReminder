@@ -1,6 +1,7 @@
 package com.adamwberck.android.makeareminder.Dialog;
 
 import android.app.Activity;
+import android.app.NotificationChannel;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -18,7 +19,6 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.adamwberck.android.makeareminder.Dialog.DismissDialog;
 import com.adamwberck.android.makeareminder.Elements.Reminder;
 import com.adamwberck.android.makeareminder.Elements.Task;
 import com.adamwberck.android.makeareminder.R;
@@ -26,13 +26,15 @@ import com.adamwberck.android.makeareminder.R;
 import static android.media.RingtoneManager.EXTRA_RINGTONE_PICKED_URI;
 
 public class ReminderParentDialog extends DismissDialog {
-    private static final int REQUEST_RINGTONE = 0;
+    private static final int REQUEST_ALARM = 0;
+    private static final int REQUEST_NOTIFICATION = 1;
 
     private static final String TAG = "ParentReminder";
 
+
     private Switch mAlarmSwitch;
     private ImageView mAlertTypeIcon;
-    private Button mSoundAlertButton;
+    private Button mRingtoneSelectorButton;
     private ImageView mVibrateIcon;
     private Switch mVibrateSwitch;
     private SeekBar mSeekbar;
@@ -40,7 +42,8 @@ public class ReminderParentDialog extends DismissDialog {
     protected float mVolume;
     protected boolean mIsAlarm;
     protected boolean mDoesVibrate;
-    protected Ringtone mRingtone;
+    protected Ringtone mAlarmRingtone;
+    protected Ringtone mNotificationRingtone;
     protected Uri mRingtoneUri;
 
     public void setupRingtoneEdit(View view, Reminder oldReminder,Task oldTask){
@@ -55,15 +58,23 @@ public class ReminderParentDialog extends DismissDialog {
         });
 
 
-        mSoundAlertButton = view.findViewById(R.id.ringtone_selector_button);
-        mSoundAlertButton.setOnClickListener(new View.OnClickListener() {
+        mRingtoneSelectorButton = view.findViewById(R.id.ringtone_selector_button);
+        mRingtoneSelectorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ringtoneStop();
-                Intent ringtoneIntent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-                ringtoneIntent
-                        .putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE,RingtoneManager.TYPE_ALARM);
-                startActivityForResult(ringtoneIntent,REQUEST_RINGTONE);
+                if(mIsAlarm) {
+                    Intent ringtoneIntent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+                    ringtoneIntent
+                            .putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM);
+                    startActivityForResult(ringtoneIntent, REQUEST_ALARM);
+                }
+                else{
+                    Intent ringtoneIntent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+                    ringtoneIntent
+                            .putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM);
+                    startActivityForResult(ringtoneIntent, REQUEST_ALARM);
+                }
             }
         });
 
@@ -90,12 +101,19 @@ public class ReminderParentDialog extends DismissDialog {
         }
         final ImageButton soundTest = view.findViewById(R.id.sound_test_button);
 
+        if(mIsAlarm) {
+            mRingtoneUri = RingtoneManager
+                    .getActualDefaultRingtoneUri(getActivity()
+                            .getApplicationContext(), RingtoneManager.TYPE_ALARM);
+            mAlarmRingtone.setStreamType(AudioManager.STREAM_ALARM);
+            mAlarmRingtone = RingtoneManager.getRingtone(getActivity(), mRingtoneUri);
+        }
+        else{
+            mRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(
+                    getActivity().getApplicationContext(),RingtoneManager.TYPE_NOTIFICATION);
+            mNotificationRingtone.setStreamType(AudioManager.STREAM_NOTIFICATION);
+        }
 
-        mRingtoneUri = RingtoneManager
-                .getActualDefaultRingtoneUri(getActivity()
-                        .getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
-        mRingtone = RingtoneManager.getRingtone(getActivity(), mRingtoneUri);
-        mRingtone.setStreamType(AudioManager.STREAM_ALARM);
 
 
         final Drawable play = getResources().getDrawable(R.drawable.ic_play_sound);
@@ -103,15 +121,16 @@ public class ReminderParentDialog extends DismissDialog {
         soundTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mRingtone.isPlaying()){
-                    mRingtone.stop();
+                Ringtone ringtone = mIsAlarm ? mAlarmRingtone : mNotificationRingtone;
+                if(ringtone.isPlaying()){
+                    ringtone.stop();
                     soundTest.setImageDrawable(play);
                 }
                 else {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        mRingtone.setVolume(mVolume);
+                        ringtone.setVolume(mVolume);
                     }
-                    mRingtone.play();
+                    ringtone.play();
                     soundTest.setImageDrawable(pause);
                 }
             }
@@ -139,8 +158,14 @@ public class ReminderParentDialog extends DismissDialog {
             mIsAlarm = oldReminder.isAlarm();
             mDoesVibrate = oldReminder.doesVibrate();
             mAlarmSwitch.setChecked(!mIsAlarm);
-            mRingtone = oldReminder.getRingtone(getContext());
             mVolume = oldReminder.getVolume();
+
+            if(mIsAlarm) {
+                mAlarmRingtone = oldReminder.getRingtone(getContext());
+            }
+            else {
+                mNotificationRingtone = oldReminder.getRingtone(getContext());
+            }
             updateSeekbar();
         }
         else {
@@ -175,7 +200,8 @@ public class ReminderParentDialog extends DismissDialog {
     }
 
     protected void updateRingtone() {
-        mSoundAlertButton.setText(mRingtone.getTitle(getContext()));
+        Ringtone ringtone = mIsAlarm?mAlarmRingtone:mNotificationRingtone;
+        mRingtoneSelectorButton.setText(ringtone.getTitle(getContext()));
     }
 
     @Override
@@ -183,20 +209,29 @@ public class ReminderParentDialog extends DismissDialog {
         if(resultCode != Activity.RESULT_OK){
             return;
         }
-        if(REQUEST_RINGTONE==requestCode){
+        if(REQUEST_ALARM==requestCode){
             mRingtoneUri = (Uri) data.getExtras().get(EXTRA_RINGTONE_PICKED_URI);
-            mRingtone = RingtoneManager.getRingtone(getActivity(), mRingtoneUri);
-            mRingtone.setStreamType(AudioManager.STREAM_ALARM);
+            mAlarmRingtone = RingtoneManager.getRingtone(getActivity(), mRingtoneUri);
+            mAlarmRingtone.setStreamType(AudioManager.STREAM_ALARM);
 
             Log.i(TAG,"onActivity: Uri = " + mRingtoneUri.toString());
-            Log.i(TAG,"onActivity: Ringtone = " + mRingtone.getTitle(getContext()));
+            Log.i(TAG,"onActivity: Alarm = " + mAlarmRingtone.getTitle(getContext()));
+        }
+        if(REQUEST_NOTIFICATION==requestCode){
+            mRingtoneUri = (Uri) data.getExtras().get(EXTRA_RINGTONE_PICKED_URI);
+            mNotificationRingtone = RingtoneManager.getRingtone(getActivity(), mRingtoneUri);
+            mNotificationRingtone.setStreamType(AudioManager.STREAM_ALARM);
+
+            Log.i(TAG,"onActivity: Uri = " + mRingtoneUri.toString());
+            Log.i(TAG,"onActivity: Notif = " + mNotificationRingtone.getTitle(getContext()));
         }
         updateParentUI();
     }
 
 
     protected void ringtoneStop() {
-        mRingtone.stop();
+        mAlarmRingtone.stop();
+        mNotificationRingtone.stop();
     }
 
 }

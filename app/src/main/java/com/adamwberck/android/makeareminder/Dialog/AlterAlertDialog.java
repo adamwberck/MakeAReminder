@@ -83,17 +83,13 @@ public class AlterAlertDialog extends ReminderParentDialog {
     private void cancel() {
         AlterAlertDialog.this.getDialog().cancel();
         sendResult(Activity.RESULT_CANCELED,null);
-        stopRingtone();
+        ringtoneStop();
     }
 
-    private void stopRingtone() {
-        if(mRingtone.isPlaying()){
-            mRingtone.stop();
-        }
-    }
+
 
     private void sendResult(int resultCode, Reminder reminder) {
-        stopRingtone();
+        ringtoneStop();
         if (getTargetFragment() == null) {
             return;
         }
